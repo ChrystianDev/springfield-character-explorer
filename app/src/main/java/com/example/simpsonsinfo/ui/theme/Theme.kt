@@ -12,15 +12,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
+    primary = BlueDev50,
+    onPrimary = WhiteDev,
+    background = DarkBackground,
+    onBackground = GrayDev90,
+    onSurfaceVariant = WhiteDev,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    onSecondary = WhiteDev,
+    tertiary = Pink80,
+    onTertiary = GrayDev30,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = BlueDev50,
+    onPrimary = WhiteDev,
+    background = WhiteDev,
+    onBackground = GrayDev50,
+    onSurfaceVariant = GrayDev30,
+    secondary = PurpleGrey80,
+    onSecondary =GrayDev50,
+    tertiary = Pink80,
+    onTertiary = GrayDev70,
+
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -53,6 +66,7 @@ fun SimpsonsInfoTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = shapes,
         content = content
     )
 }
