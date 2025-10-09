@@ -21,6 +21,10 @@ class SimpsonsViewModel @Inject constructor(
     private val simpsonsUsecase: SimpsonsUsecase
 ) : ViewModel() {
 
+    init {
+        onGetSimpsons()
+    }
+
     private val _uiState = MutableStateFlow(SimpsonsUiState())
     var isLoading = MutableStateFlow(false)
 
