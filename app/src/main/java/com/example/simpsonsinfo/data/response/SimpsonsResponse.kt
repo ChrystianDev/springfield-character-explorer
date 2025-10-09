@@ -1,5 +1,6 @@
 package com.example.simpsonsinfo.data.response
 
+import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -23,4 +24,30 @@ import com.google.gson.annotations.SerializedName
  *  }
  */
 //data class SimpsonsResponse(@SerializedName ("characters") val personajes: String)
-data class SimpsonsResponse(@SerializedName ("count") val count: String)
+data class SimpsonsResponse(
+    @SerializedName ("count")
+//    val count: Int,
+    val contador: Int,
+    @SerializedName ("next")
+//    val next: String?,
+    val siguiente: String?,
+    @SerializedName ("prev")
+//    val prev: String?,
+    val anterior: String?,
+    @SerializedName ("pages")
+//    val pages: Int?,
+    val paginas: Int?,
+    )
+
+fun SimpsonsResponse.toDomain() : SimpsonsEntity {
+    return SimpsonsEntity(
+//        count = count,
+//        next = next ?: "",
+//        prev = prev ?: "",
+//        pages = pages ?: 0,
+        count = contador,
+        next = siguiente ?: "",
+        prev = anterior ?: "",
+        pages = paginas ?: 0,
+    )
+}

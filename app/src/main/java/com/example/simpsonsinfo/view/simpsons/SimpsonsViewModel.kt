@@ -5,6 +5,7 @@ package com.example.simpsonsinfo.view.simpsons
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
 import com.example.simpsonsinfo.domain.usecase.SimpsonsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +32,11 @@ class SimpsonsViewModel @Inject constructor(
             delay(1000)
             val response = simpsonsUsecase("Home", "Sprinfield's citizen")
             _uiState.update { state ->
-                state.copy(next = response)
+                if (response != null) {
+                    state.copy(entity = response)
+                }else{
+                    state
+                }
             }
             dataLoaded()
         }
@@ -46,4 +51,4 @@ class SimpsonsViewModel @Inject constructor(
     }
 }
 
-data class SimpsonsUiState(val next: String = "")
+data class SimpsonsUiState(val entity: SimpsonsEntity = SimpsonsEntity(0, "", "", 0))

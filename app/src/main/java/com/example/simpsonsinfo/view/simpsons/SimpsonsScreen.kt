@@ -76,7 +76,7 @@ fun SimpsonsScreen(
                     .border(1.dp, Color.Yellow.copy(0.5f))
                     .padding(vertical = 20.dp)
             ) {
-                CustomText("Data: ${uiState.next} ")
+                CustomText("Data: ${uiState.entity} ")
             }
             TextButton(onClick = {
 //                simpsonsViewModel.dataLoaded()
