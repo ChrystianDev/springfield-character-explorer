@@ -73,6 +73,7 @@ dependencies {
     // Media
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.lottie.compose)
 
     // Testing
     testImplementation(libs.junit)
