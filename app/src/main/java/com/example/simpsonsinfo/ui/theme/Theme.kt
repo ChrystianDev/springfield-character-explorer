@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = BlueDev50,
+    primary = YellowDev,
     onPrimary = WhiteDev,
     background = DarkBackground,
     onBackground = GrayDev90,
@@ -24,7 +24,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = BlueDev50,
+    primary = YellowDev,
     onPrimary = WhiteDev,
     background = WhiteDev,
     onBackground = GrayDev50,
@@ -50,7 +50,7 @@ private val LightColorScheme = lightColorScheme(
 fun SimpsonsInfoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
