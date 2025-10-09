@@ -3,6 +3,7 @@
  */
 package com.example.simpsonsinfo.view.simpsons
 
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.view.core.components.CustomText
 
@@ -61,7 +63,12 @@ fun SimpsonsScreen(
                 strokeWidth = 1.dp
                 )
         }else{
-            CustomText("Nombre: ")
+            Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null)
+            AsyncImage(
+//                modifier = Modifier.size(500.dp),
+                model = "https://cdn.thesimpsonsapi.com/500/character/1.webp",
+                contentDescription = "image webp"
+            )
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
