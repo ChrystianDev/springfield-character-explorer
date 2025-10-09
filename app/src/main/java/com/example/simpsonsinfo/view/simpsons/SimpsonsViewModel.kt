@@ -3,6 +3,8 @@
  */
 package com.example.simpsonsinfo.view.simpsons
 
+import android.util.Log
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
@@ -26,14 +28,19 @@ class SimpsonsViewModel @Inject constructor(
     }
 
     private val _uiState = MutableStateFlow(SimpsonsUiState())
+    private val _indexSelected = MutableStateFlow(0)
+    val uiState: StateFlow<SimpsonsUiState> = _uiState
+    val indexSelected: StateFlow<Int> = _indexSelected
     var isLoading = MutableStateFlow(false)
 
-    val uiState: StateFlow<SimpsonsUiState> = _uiState
+
+
+
 
     fun onGetSimpsons() {
         viewModelScope.launch(Dispatchers.IO) {
             isLoadingData()
-            delay(1000)
+            delay(2000)
             val response = simpsonsUsecase("Home", "Sprinfield's citizen")
             _uiState.update { state ->
                 if (response != null) {
@@ -52,6 +59,11 @@ class SimpsonsViewModel @Inject constructor(
 
     fun dataLoaded() {
         isLoading.value = false
+    }
+
+    fun setIndexSelected(index: Int) {
+        Log.i("indexSelected", index.toString())
+        _indexSelected.value = index
     }
 }
 

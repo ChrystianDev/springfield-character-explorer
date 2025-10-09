@@ -3,11 +3,11 @@
  */
 package com.example.simpsonsinfo.view.simpsons
 
-import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +34,7 @@ import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,19 +44,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.simpsonsinfo.R
-import com.example.simpsonsinfo.ui.theme.BlackDev
-import com.example.simpsonsinfo.ui.theme.ImageBackground
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomText
 import com.example.simpsonsinfo.view.core.components.SpaceH10
 import com.example.simpsonsinfo.view.core.components.SpaceV10
 import com.example.simpsonsinfo.view.core.components.SpaceV40
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,13 +67,14 @@ fun SimpsonsScreen(
 ) {
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
+    val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
     val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
-//    val carouselItems = rememberCarouselState { uiState.entity.results.size }
+
     val carouselState = rememberCarouselState(initialItem = 0) { uiState.entity.results.size }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
 
-
+    val scope = rememberCoroutineScope()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,7 +95,9 @@ fun SimpsonsScreen(
                     tint = MaterialTheme.colorScheme.primary
                 )
                 LottieAnimation(
-                    modifier = Modifier.height(50.dp).offset(50.dp, -100.dp),
+                    modifier = Modifier
+                        .height(50.dp)
+                        .offset(50.dp, -100.dp),
                     composition = composition,
                     speed = 1f,
                     reverseOnRepeat = false,
@@ -135,13 +140,21 @@ fun SimpsonsScreen(
                             )
                         ),
                     ) { index ->
+//                        simpsonsViewModel.setIndexSelected(index)
                         AsyncImage(
                             modifier = Modifier
 //                            .clip(shapes.medium)
                                 .clip(shape = shapes.medium)
                                 .background(MaterialTheme.colorScheme.background)
                                 .maskClip(MaterialTheme.shapes.extraLarge)
-                                .padding(vertical = 10.dp, horizontal = 5.dp),
+                                .padding(vertical = 10.dp, horizontal = 5.dp)
+                                .clickable(onClick = {
+//                                    simpsonsViewModel.setIndexSelected(index)
+                                    scope.launch(Dispatchers.Main) {
+                                        carouselState.animateScrollToItem(index)
+//                                        carouselState.scrollToItem(index)
+                                    }
+                                }),
                             model = "https://cdn.thesimpsonsapi.com/200${uiState.entity.results[index].portrait_path}",
                             contentDescription = "image webp"
                         )
@@ -164,8 +177,13 @@ fun SimpsonsScreen(
                             tint = MaterialTheme.colorScheme.onTertiary
                         )
                     }
-                    Text("Name: ${carouselState.currentItem}")
-                    TextButton(onClick = {}) {
+                    Text(
+                        "Name: ${carouselState.currentItem}",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    TextButton(
+                        enabled = false,
+                        onClick = {}) {
                         Text("more", color = MaterialTheme.colorScheme.onTertiary)
                     }
                 }
@@ -189,6 +207,7 @@ fun SimpsonsScreen(
                 SpaceV10()
                 Text(
                     modifier = Modifier.fillMaxWidth(),
+//                    text = uiState.entity.results[carouselState.currentItem].name,
                     text = uiState.entity.results[carouselState.currentItem].name,
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center
