@@ -37,6 +37,8 @@ data class SimpsonsResponse(
     @SerializedName ("pages")
 //    val pages: Int?,
     val paginas: Int?,
+    @SerializedName ("results")
+    val results: List<CharacterResponse>,
     )
 
 fun SimpsonsResponse.toDomain() : SimpsonsEntity {
@@ -49,5 +51,8 @@ fun SimpsonsResponse.toDomain() : SimpsonsEntity {
         next = siguiente ?: "",
         prev = anterior ?: "",
         pages = paginas ?: 0,
+        results = results.map { characterResponse ->
+            characterResponse.toDomain()
+        }
     )
 }

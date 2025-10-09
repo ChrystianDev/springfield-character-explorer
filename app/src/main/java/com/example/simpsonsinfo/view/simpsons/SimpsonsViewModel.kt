@@ -34,7 +34,7 @@ class SimpsonsViewModel @Inject constructor(
             _uiState.update { state ->
                 if (response != null) {
                     state.copy(entity = response)
-                }else{
+                } else {
                     state
                 }
             }
@@ -51,4 +51,12 @@ class SimpsonsViewModel @Inject constructor(
     }
 }
 
-data class SimpsonsUiState(val entity: SimpsonsEntity = SimpsonsEntity(0, "", "", 0))
+data class SimpsonsUiState(
+    val entity: SimpsonsEntity = SimpsonsEntity(
+        0,
+        "",
+        "",
+        0,
+        results = emptyList()
+    )
+)
