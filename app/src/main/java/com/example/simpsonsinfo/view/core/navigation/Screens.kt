@@ -11,3 +11,6 @@ object Register
 
 @Serializable
 object Simpsons
+
+@Serializable
+object Character

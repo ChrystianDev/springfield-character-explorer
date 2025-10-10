@@ -22,7 +22,7 @@ val Typography = Typography(
 //        fontFamily = bitcount,
         fontFamily = open_sans,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+        fontSize = 20.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),

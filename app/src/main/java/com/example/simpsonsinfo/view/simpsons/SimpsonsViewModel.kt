@@ -65,6 +65,10 @@ class SimpsonsViewModel @Inject constructor(
         Log.i("indexSelected", index.toString())
         _indexSelected.value = index
     }
+
+    fun setItemSelectedByIndex(index: Int) {
+        _indexSelected.value = index
+    }
 }
 
 data class SimpsonsUiState(

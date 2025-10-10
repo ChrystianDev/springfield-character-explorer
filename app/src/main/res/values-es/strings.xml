@@ -1,26 +1,11 @@
 <resources>
     <string name="app_name">SimpsonsInfo</string>
 
-<!--    Login: Español -->
-    <string name="login_title">Inicio Sesión</string>
-    <string name="login_select_language">Español/(España)</string>
-    <string name="login_input_username">Usuario, correo electrónico o móvil</string>
-    <string name="login_input_password">Contraseña</string>
-    <string name="login_button_access">Iniciar sesión</string>
-    <string name="login_button_forget_password">¿Has olvidado la contraseña?</string>
-    <string name="login_button_register_new_account">Crear cuenta nueva</string>
+    <!--    Principal: Español -->
+    <string name="main_more">mas</string>
+    <string name="main_get_characters">Recupera personajes</string>
 
-<!--    Register: Español -->
-    <string name="register_title">¿Cuál es tu número de móvil?</string>
-    <string name="register_title_secure_code">Revise la bandeja de su mensajería</string>
-    <string name="register_subtitle">Introduce tu número de móvil de contacto. Nadie lo verá en tu perfil.</string>
-    <string name="register_subtitle_secure_code">Hemos enviado un SMS con uncodigo de seguridad a su telefono móvil</string>
-    <string name="register_input_phone">Número de móvil</string>
-    <string name="register_input_secure_code">Codig de seguridad</string>
-    <string name="register_info_external_notifications">Puede que recibas notificaciones nuestra en Whastapp y SMS por motivos de seguridad y para iniciar sesión</string>
-    <string name="register_button_next">Siguiente</string>
-    <string name="register_button_back">Atrás</string>
-    <string name="register_button_email">Registrarse con tu correo electrónico"></string>
-    <string name="register_toast_create_account">La cuenta se creo correctamente</string>
+    <!--    Personaje: Español -->
+    <string name="character_years">años</string>
 
 </resources>

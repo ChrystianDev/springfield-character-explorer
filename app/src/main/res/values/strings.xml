@@ -1,27 +1,12 @@
 <resources>
     <string name="app_name">SimpsonsInfo</string>
 
-    <!--    Login: English -->
-    <string name="login_title">Login</string>
-    <string name="login_select_language">Spanish/(Spain)</string>
-    <string name="login_input_username">Username, email or phone</string>
-    <string name="login_input_password">Password</string>
-    <string name="login_button_access">Sign in</string>
-    <string name="login_button_forget_password">Forgotten your password?</string>
-    <string name="login_button_register_new_account">Create a new account</string>
+    <!--    Main: English -->
+    <string name="main_more">more</string>
+    <string name="main_get_characters">Get characters</string>
 
-    <!--    Register: English -->
-    <string name="register_title">What is your phone number?</string>
-    <string name="register_title_secure_code">Review your phone</string>
-    <string name="register_subtitle">Introduce your phone number contact. Anybody will see it in your profile.</string>
-    <string name="register_subtitle_secure_code">We had sent a security code, introduce it in the box under.</string>
-    <string name="register_input_phone">Phone number</string>
-    <string name="register_input_secure_code">Secure code</string>
-    <string name="register_info_external_notifications">Could you receive notifications from us on Whastapp and SMS for security and to start session</string>
-    <string name="register_button_next">Next</string>
-    <string name="register_button_back">Back</string>
-    <string name="register_button_email">Sign-up with your email"></string>
-    <string name="register_toast_create_account">The account was created successfully</string>
 
+    <!--    Character: English -->
+    <string name="character_years">years old</string>
 
 </resources>
