@@ -23,13 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.simpsonsinfo.R
 
 @Composable
 fun IOSStyleSegmentedControl(
     options: List<Int>,
     selectedOption: Int,
     onOptionSelected: (Int) -> Unit,
-    onNavigationDetail: () -> Unit
+//    onNavigationDetail: () -> Unit,
 ) {
     val selectedIndex = options.indexOf(selectedOption)
     val segmentWidth = 120.dp
@@ -39,7 +40,7 @@ fun IOSStyleSegmentedControl(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
             .background(MaterialTheme.colorScheme.onTertiary)
-            .height(40.dp)
+            .height(60.dp)
             .width(segmentWidth * options.size)
     ) {
         // Fondo deslizante (thumb)
@@ -62,12 +63,13 @@ fun IOSStyleSegmentedControl(
                         .fillMaxHeight()
                         .clickable {
                             onOptionSelected(option)
-                            onNavigationDetail()
+//                            onNavigationDetail()
                         },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(option),
+//                        painter = painterResource(option),
+                        painter = painterResource(R.drawable.icon_favorite),
                         contentDescription = null,
                         tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary
                     )

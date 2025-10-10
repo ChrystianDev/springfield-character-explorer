@@ -76,17 +76,10 @@ fun SimpsonsScreen(
 ) {
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
-    val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
-    val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
-
+//    val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
+//    val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
     val carouselState = rememberCarouselState(initialItem = 0) { uiState.entity.results.size }
-
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
-
     val scope = rememberCoroutineScope()
-
-    var selected by remember { mutableIntStateOf(R.drawable.icon_home) }
-    val options = listOf(R.drawable.icon_home, R.drawable.icon_location, R.drawable.icon_favorite)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -95,176 +88,137 @@ fun SimpsonsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        if (isLoading) {
+        SpaceV40()
+        Column {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(300.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(0.1f))
+                    .padding(vertical = 5.dp)
             ) {
-
-                Icon(
-                    painterResource(R.drawable.homer_thinking),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                LottieAnimation(
-                    modifier = Modifier
-                        .height(50.dp)
-                        .offset(50.dp, -100.dp),
-                    composition = composition,
-                    speed = 1f,
-                    reverseOnRepeat = false,
-//            iterations = 3,
-                    iterations = LottieConstants.IterateForever,
-//            safeMode = true,
-//            restartOnPlay = false
-                )
-            }
-//            CircularProgressIndicator(
-//                modifier = Modifier.size(100.dp),
-//                color = Color.Yellow,
-//                strokeWidth = 1.dp
-//            )
-        } else {
-            SpaceV40()
-            Column {
-                Box(
-                    contentAlignment = Alignment.Center,
+                HorizontalMultiBrowseCarousel(
+                    state = carouselState,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp)
-                        .background(MaterialTheme.colorScheme.primary.copy(0.1f))
-                        .padding(vertical = 5.dp)
-                ) {
-                    HorizontalMultiBrowseCarousel(
-                        state = carouselState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
+                        .wrapContentHeight(),
 //                        .size(150.dp),
-                        preferredItemWidth = 100.dp,
-                        itemSpacing = 5.dp,
-                        contentPadding = PaddingValues(horizontal = 3.dp),
-                        flingBehavior = CarouselDefaults.singleAdvanceFlingBehavior(
-                            state = carouselState,
-                            snapAnimationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            )
-                        ),
-                    ) { index ->
+                    preferredItemWidth = 100.dp,
+                    itemSpacing = 5.dp,
+                    contentPadding = PaddingValues(horizontal = 3.dp),
+                    flingBehavior = CarouselDefaults.singleAdvanceFlingBehavior(
+                        state = carouselState,
+                        snapAnimationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ),
+                ) { index ->
 //                        simpsonsViewModel.setIndexSelected(index)
-                        AsyncImage(
-                            modifier = Modifier
+                    AsyncImage(
+                        modifier = Modifier
 //                            .clip(shapes.medium)
-                                .clip(shape = shapes.medium)
-                                .background(MaterialTheme.colorScheme.background)
-                                .maskClip(MaterialTheme.shapes.extraLarge)
-                                .padding(vertical = 10.dp, horizontal = 5.dp)
-                                .clickable(onClick = {
+                            .clip(shape = shapes.medium)
+                            .background(MaterialTheme.colorScheme.background)
+                            .maskClip(MaterialTheme.shapes.extraLarge)
+                            .padding(vertical = 10.dp, horizontal = 5.dp)
+                            .clickable(onClick = {
 //                                    simpsonsViewModel.setIndexSelected(index)
-                                    scope.launch(Dispatchers.Main) {
-                                        carouselState.animateScrollToItem(index)
+                                scope.launch(Dispatchers.Main) {
+                                    carouselState.animateScrollToItem(index)
 //                                        carouselState.scrollToItem(index)
-                                    }
-                                }),
-                            model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].portrait_path}",
-                            contentDescription = "image webp"
-                        )
-                    }
-                }
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Button(
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = MaterialTheme.colorScheme.onBackground
-                        ),
-                        onClick = {}
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.icon_volume_disabled),
-                            contentDescription = "enable/disable sound",
-                            tint = MaterialTheme.colorScheme.onTertiary
-                        )
-                    }
-                    // TODO borrar componente
-                    Text(
-                        "Name: ${carouselState.currentItem}",
-                        color = MaterialTheme.colorScheme.primary
+                                }
+                            }),
+                        model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].portrait_path}",
+                        contentDescription = "image webp"
                     )
-                    TextButton(
-                        enabled = false,
-                        onClick = {}) {
-                        Text(stringResource(R.string.main_more), color = MaterialTheme.colorScheme.onTertiary)
-                    }
                 }
             }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(CircleShape)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = CircleShape
-                        )
-//                        .background(BlackDev)
-                        .padding(10.dp)
-                        .clickable(onClick = {
-                            onNavigationDetail()
-                            simpsonsViewModel.setIndexSelected(index = carouselState.currentItem)
-
-                        })
-                    ,
-                    model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[carouselState.currentItem].portrait_path}",
-                    contentDescription = "image webp"
-                )
-                SpaceV10()
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    ),
+                    onClick = {}
+                ) {
+                    Icon(
+                        painterResource(R.drawable.icon_volume_disabled),
+                        contentDescription = "enable/disable sound",
+                        tint = MaterialTheme.colorScheme.onTertiary
+                    )
+                }
+                // TODO borrar componente
                 Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = uiState.entity.results[carouselState.currentItem].name,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center
+                    "Name: ${carouselState.currentItem}",
+                    color = MaterialTheme.colorScheme.primary
                 )
-            }
-            TextButton(
-                enabled = false,
-                onClick = {
-                    simpsonsViewModel.onGetSimpsons()
-                }) {
-                CustomBodyText(stringResource(R.string.main_get_characters), color = MaterialTheme.colorScheme.primary.copy(0.2f))
-                SpaceH10()
-                Icon(
-                    painterResource(R.drawable.icon_download),
-                    contentDescription = "Download characters",
-                    tint = MaterialTheme.colorScheme.primary.copy(0.2f)
-                )
-            }
-
-            Icon(
-                modifier = Modifier.width(130.dp),
-                painter = painterResource(R.drawable.simpsons_logo),
-                contentDescription = "simpsons",
-                tint = MaterialTheme.colorScheme.primary
-            )
-            SpaceV20()
-            IOSStyleSegmentedControl(
-                options,
-                selectedOption = selected,
-                onOptionSelected = {it ->
-                    selected = it
-                },
-                onNavigationDetail = {
-                    //TODO cambiar la navegación de pantallas
-                    onNavigationDetail()
+                TextButton(
+                    enabled = false,
+                    onClick = {}) {
+                    Text(
+                        stringResource(R.string.main_more),
+                        color = MaterialTheme.colorScheme.onTertiary
+                    )
                 }
+            }
+        }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            AsyncImage(
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape
+                    )
+//                        .background(BlackDev)
+                    .padding(10.dp)
+                    .clickable(onClick = {
+                        onNavigationDetail()
+                        simpsonsViewModel.setIndexSelected(index = carouselState.currentItem)
+
+                    }),
+                model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[carouselState.currentItem].portrait_path}",
+                contentDescription = "image webp"
             )
             SpaceV10()
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = uiState.entity.results[carouselState.currentItem].name,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
+            )
         }
+        TextButton(
+            enabled = false,
+            onClick = {
+                simpsonsViewModel.onGetSimpsons()
+            }) {
+            CustomBodyText(
+                stringResource(R.string.main_get_characters),
+                color = MaterialTheme.colorScheme.primary.copy(0.2f)
+            )
+            SpaceH10()
+            Icon(
+                painterResource(R.drawable.icon_download),
+                contentDescription = "Download characters",
+                tint = MaterialTheme.colorScheme.primary.copy(0.2f)
+            )
+        }
+
+        Icon(
+            modifier = Modifier.width(130.dp),
+            painter = painterResource(R.drawable.simpsons_logo),
+            contentDescription = "simpsons",
+            tint = MaterialTheme.colorScheme.primary
+        )
     }
 }
 

@@ -8,13 +8,23 @@ import androidx.navigation.compose.rememberNavController
 import com.example.simpsonsinfo.view.simpsons.FavouritesScreen
 import com.example.simpsonsinfo.view.simpsons.LocationScreen
 import com.example.simpsonsinfo.view.simpsons.CharacterScreen
+import com.example.simpsonsinfo.view.simpsons.MainPager
 import com.example.simpsonsinfo.view.simpsons.SimpsonsScreen
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @Composable
 fun NavigationWrapper(context: Context, simpsonsViewModel: SimpsonsViewModel) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Simpsons) {
+    NavHost(navController = navController, startDestination = Main) {
+
+        composable<Main> {
+            MainPager(
+                simpsonsViewModel = simpsonsViewModel,
+                onNavigationDetail = {
+                    navController.navigate(route = Character)
+                }
+            )
+        }
 
         composable<Simpsons> {
             SimpsonsScreen(
