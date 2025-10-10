@@ -34,7 +34,11 @@ import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,9 +59,12 @@ import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
+import com.example.simpsonsinfo.view.core.components.IOSStyleSegmentedControl
 import com.example.simpsonsinfo.view.core.components.SpaceH10
 import com.example.simpsonsinfo.view.core.components.SpaceV10
+import com.example.simpsonsinfo.view.core.components.SpaceV20
 import com.example.simpsonsinfo.view.core.components.SpaceV40
+import com.example.simpsonsinfo.view.core.components.SpaceVy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -77,6 +84,9 @@ fun SimpsonsScreen(
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
 
     val scope = rememberCoroutineScope()
+
+    var selected by remember { mutableIntStateOf(R.drawable.icon_home) }
+    val options = listOf(R.drawable.icon_home, R.drawable.icon_location, R.drawable.icon_favorite)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -234,13 +244,26 @@ fun SimpsonsScreen(
                     tint = MaterialTheme.colorScheme.primary.copy(0.2f)
                 )
             }
+
             Icon(
                 modifier = Modifier.width(130.dp),
                 painter = painterResource(R.drawable.simpsons_logo),
                 contentDescription = "simpsons",
                 tint = MaterialTheme.colorScheme.primary
             )
-            SpaceV40()
+            SpaceV20()
+            IOSStyleSegmentedControl(
+                options,
+                selectedOption = selected,
+                onOptionSelected = {it ->
+                    selected = it
+                },
+                onNavigationDetail = {
+                    //TODO cambiar la navegación de pantallas
+                    onNavigationDetail()
+                }
+            )
+            SpaceV10()
         }
     }
 }

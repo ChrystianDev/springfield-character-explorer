@@ -4,13 +4,13 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-object Login
-
-@Serializable
-object Register
-
-@Serializable
 object Simpsons
 
 @Serializable
 object Character
+
+@Serializable
+object Locations
+
+@Serializable
+object Favourites
