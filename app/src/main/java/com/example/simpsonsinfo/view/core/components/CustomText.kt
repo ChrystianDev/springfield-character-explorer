@@ -1,5 +1,6 @@
 package com.example.simpsonsinfo.view.core.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -8,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,13 +38,14 @@ fun CustomBodyText(
     text: String,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 15.sp,
+    padding: Dp = 10.dp,
     color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign = TextAlign.Center,
     style: TextStyle = MaterialTheme.typography.bodyMedium,
 ) {
     Text(
         text = text,
-        modifier = modifier,
+        modifier = modifier.padding(padding),
         fontSize = fontSize,
         color = color,
         textAlign = textAlign,

@@ -75,11 +75,6 @@ fun MainPager(
 //                  restartOnPlay = false
                 )
             }
-//            CircularProgressIndicator(
-//                modifier = Modifier.size(100.dp),
-//                color = Color.Yellow,
-//                strokeWidth = 1.dp
-//            )
         } else {
             HorizontalPager(
                 modifier = Modifier.weight(1f),
