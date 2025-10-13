@@ -75,6 +75,10 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.lottie.compose)
 
+    // Local DB
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
