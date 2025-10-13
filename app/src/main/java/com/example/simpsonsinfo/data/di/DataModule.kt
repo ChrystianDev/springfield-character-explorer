@@ -3,6 +3,7 @@
  */
 package com.example.simpsonsinfo.data.di
 
+import com.example.simpsonsinfo.config.Constants.BASE_URL
 import com.example.simpsonsinfo.data.network.SimpsonsClient
 import com.example.simpsonsinfo.data.network.SimpsonsService
 import com.example.simpsonsinfo.data.repository.SimpsonsRepositoryImpl
@@ -32,7 +33,7 @@ object DataModule {
     @Provides
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://thesimpsonsapi.com/api/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -44,7 +45,6 @@ object DataModule {
     }
 
 
-
     // ****** API-REST ******
     @Provides
     fun provideApiService(simpsonsClient: SimpsonsClient): SimpsonsService {
@@ -52,25 +52,15 @@ object DataModule {
     }
 
     /**
-     * [@Provides] indica que esta funcion provee una instancia de [AuthRepository]
-     * y funciona con objectos, no funciona con clases abstractas. Ksp genera el
+     * [@Provides] indica que esta función provee una instancia de [SimpsonsRepository]
+     * y se declara con objectos, no con clases abstractas. Ksp genera el
      * código necesario para proveer la instancia
      */
+
     // ****** REPOSITORIES ******
-//    @Provides
-//    fun provideAuthRepository(): AuthRepository{
-//        return AuthRepositoryImpl()
-//    }
-//
     @Provides
     fun provideSimpsonsRepository(simpsonsService: SimpsonsService): SimpsonsRepository{
         return SimpsonsRepositoryImpl(simpsonsService)
     }
 
-
-    // ****** USECASES ******
-    @Provides
-    fun provideSimpsonsUseCase(simpsonsRepository: SimpsonsRepository): SimpsonsUsecase{
-        return SimpsonsUsecase(simpsonsRepository)
-    }
 }

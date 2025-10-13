@@ -7,5 +7,6 @@
 
     <!--    Personaje: Español -->
     <string name="character_years">años</string>
+    <string name="locations_text">"Lugar: "</string>
 
 </resources>

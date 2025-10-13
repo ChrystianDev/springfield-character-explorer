@@ -3,6 +3,7 @@
  */
 package com.example.simpsonsinfo.data.network
 
+import com.example.simpsonsinfo.data.response.LocationsSimpsonsResponse
 import com.example.simpsonsinfo.data.response.SimpsonsResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,6 +20,12 @@ class SimpsonsService @Inject constructor(
 //            val response = simpsonsClient.doSimpsons()
 //            response.body()?.personajes ?: "No hay personajes"
 //            response.body()?.count ?: "No hay personajes"
+        }
+    }
+
+    suspend fun fetchLocations(): Response<LocationsSimpsonsResponse> {
+        return withContext(Dispatchers.IO) {
+            simpsonsClient.fetchLocations()
         }
     }
 }

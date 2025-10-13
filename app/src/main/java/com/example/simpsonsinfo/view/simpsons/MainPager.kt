@@ -31,6 +31,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.view.core.components.IOSStyleSegmentedControl
+import com.example.simpsonsinfo.view.location.LocationScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,7 +41,6 @@ fun MainPager(
 ) {
     val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
     val pageState = rememberPagerState { 3 }
-//    var selected by remember { mutableIntStateOf(R.drawable.icon_home) }
     val options = listOf(0, 1, 2)
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
     val scope = rememberCoroutineScope()
