@@ -1,7 +1,7 @@
 /**
  * Created by chrystian.lozada.local (10/10/25)
  */
-package com.example.simpsonsinfo.view.simpsons
+package com.example.simpsonsinfo.view.detail
 
 import androidx.compose.runtime.Composable
 
@@ -21,7 +21,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,8 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.ui.theme.shapes
@@ -41,6 +38,7 @@ import com.example.simpsonsinfo.view.core.components.CustomBodyText
 import com.example.simpsonsinfo.view.core.components.CustomItemCharacter
 import com.example.simpsonsinfo.view.core.components.CustomTitleText
 import com.example.simpsonsinfo.view.core.components.SpaceV10
+import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

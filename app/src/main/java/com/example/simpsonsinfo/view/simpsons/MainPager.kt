@@ -31,6 +31,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.view.core.components.IOSStyleSegmentedControl
+import com.example.simpsonsinfo.view.favorite.FavouritesScreen
 import com.example.simpsonsinfo.view.location.LocationScreen
 import kotlinx.coroutines.launch
 
