@@ -36,6 +36,7 @@ import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -63,8 +64,9 @@ fun LocationScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp),
+            .background(MaterialTheme.colorScheme.onTertiary)
+            .padding(top = 40.dp)
+            .padding(horizontal = 20.dp),
     ) {
         items(list.size) {
             Card(
@@ -76,46 +78,41 @@ fun LocationScreen() {
                 AsyncImage(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
-                        .clip(shape = shapes.large)
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(vertical = 10.dp, horizontal = 5.dp),
-
+//                        .height(280.dp)
+//                        .clip(shape = shapes.large)
+                        .background(MaterialTheme.colorScheme.background),
                     model = "$BASE_URL_IMAGE_SHORT/location/1.webp",
-                    contentDescription = "image webp"
-                )
+                    contentDescription = "image webp",
+                    contentScale = ContentScale.FillWidth,
 
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                TextButton(
-                    enabled = false,
-                    onClick = {}) {
-                    Text(
-                        "Location: Springfield",
-                        color = MaterialTheme.colorScheme.onTertiary
                     )
-                }
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = MaterialTheme.colorScheme.onBackground
-                    ),
-                    onClick = {}
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        painterResource(R.drawable.icon_thumb_up_unselected),
-                        contentDescription = "enable/disable sound",
-                        tint = MaterialTheme.colorScheme.onTertiary
-                    )
+                    TextButton(
+                        enabled = false,
+                        onClick = {}) {
+                        Text(
+                            "Location: Springfield",
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Button(
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.onBackground
+                        ),
+                        onClick = {}
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.icon_thumb_up_unselected),
+                            contentDescription = "enable/disable sound",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
-            }
-            SpaceV10()
-            CustomBiographyText("dslfslfjsflsd lfjdflsfjdsl fslfkdjflsf lsfj dflsjf slfd fslfjds fldsf sdlfjslfdsjf ldsfj dslf jlf jsfldskfj fls j")
-            if (list.size != it + 1) {
-                SpaceV20()
+                SpaceV10()
                 HorizontalDivider(
                     modifier = Modifier.padding(
                         horizontal = 20.dp,
@@ -124,8 +121,28 @@ fun LocationScreen() {
                     thickness = 0.5.dp,
                     color = MaterialTheme.colorScheme.primary,
                 )
-                SpaceV20()
+                SpaceV10()
+                CustomBiographyText(
+                    text = "dslfslfjsflsd lfjdflsfjdsl fslfkdjflsf lsfj dflsjf slfd fslfjds fldsf sdlfjslfdsjf ldsfj dslf jlf jsfldskfj fls j",
+                )
+                SpaceV10()
+
             }
+            SpaceV20()
+
+//
+//            if (list.size != it + 1) {
+//                SpaceV20()
+//                HorizontalDivider(
+//                    modifier = Modifier.padding(
+//                        horizontal = 20.dp,
+//                        vertical = 10.dp
+//                    ),
+//                    thickness = 0.5.dp,
+//                    color = MaterialTheme.colorScheme.primary,
+//                )
+//                SpaceV20()
+//            }
         }
     }
 }

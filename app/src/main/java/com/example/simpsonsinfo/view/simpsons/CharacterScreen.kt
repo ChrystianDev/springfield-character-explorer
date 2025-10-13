@@ -51,9 +51,9 @@ fun CharacterScreen(
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
-    val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
-    val scope = rememberCoroutineScope()
+//    val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
+//    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
+//    val scope = rememberCoroutineScope()
 
     val character = uiState.entity.results[indexSelected]
 
