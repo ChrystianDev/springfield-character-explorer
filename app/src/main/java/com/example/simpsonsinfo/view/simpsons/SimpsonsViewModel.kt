@@ -4,7 +4,6 @@
 package com.example.simpsonsinfo.view.simpsons
 
 import android.util.Log
-import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
@@ -66,9 +65,6 @@ class SimpsonsViewModel @Inject constructor(
         _indexSelected.value = index
     }
 
-    fun setItemSelectedByIndex(index: Int) {
-        _indexSelected.value = index
-    }
 }
 
 data class SimpsonsUiState(

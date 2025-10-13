@@ -9,10 +9,16 @@ import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
 import com.example.simpsonsinfo.domain.repository.SimpsonsRepository
 import javax.inject.Inject
 
-class SimpsonsRepositoryImpl @Inject constructor(private val api: SimpsonsService) : SimpsonsRepository {
+class SimpsonsRepositoryImpl @Inject constructor(private val api: SimpsonsService) :
+    SimpsonsRepository {
 
     override suspend fun doSimpsons(name: String, description: String): SimpsonsEntity? {
-        val response = api.doSimpsons(name, description)
-        return response.body()?.toDomain()
+        try {
+            val response = api.doSimpsons(name, description)
+            return response.body()?.toDomain()
+        } catch (e: Exception) {
+            return null
+        }
+
     }
 }

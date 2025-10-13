@@ -5,6 +5,7 @@ package com.example.simpsonsinfo.view.simpsons
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,11 +34,7 @@ import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,24 +43,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
-import com.example.simpsonsinfo.view.core.components.IOSStyleSegmentedControl
 import com.example.simpsonsinfo.view.core.components.SpaceH10
 import com.example.simpsonsinfo.view.core.components.SpaceV10
 import com.example.simpsonsinfo.view.core.components.SpaceV20
 import com.example.simpsonsinfo.view.core.components.SpaceV40
-import com.example.simpsonsinfo.view.core.components.SpaceVy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -76,8 +67,6 @@ fun SimpsonsScreen(
 ) {
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
-//    val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
-//    val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
     val carouselState = rememberCarouselState(initialItem = 0) { uiState.entity.results.size }
     val scope = rememberCoroutineScope()
 
@@ -88,137 +77,149 @@ fun SimpsonsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        SpaceV40()
-        Column {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .background(MaterialTheme.colorScheme.primary.copy(0.1f))
-                    .padding(vertical = 5.dp)
-            ) {
-                HorizontalMultiBrowseCarousel(
-                    state = carouselState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight(),
-//                        .size(150.dp),
-                    preferredItemWidth = 100.dp,
-                    itemSpacing = 5.dp,
-                    contentPadding = PaddingValues(horizontal = 3.dp),
-                    flingBehavior = CarouselDefaults.singleAdvanceFlingBehavior(
-                        state = carouselState,
-                        snapAnimationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    ),
-                ) { index ->
-//                        simpsonsViewModel.setIndexSelected(index)
-                    AsyncImage(
-                        modifier = Modifier
-//                            .clip(shapes.medium)
-                            .clip(shape = shapes.medium)
-                            .background(MaterialTheme.colorScheme.background)
-                            .maskClip(MaterialTheme.shapes.extraLarge)
-                            .padding(vertical = 10.dp, horizontal = 5.dp)
-                            .clickable(onClick = {
-//                                    simpsonsViewModel.setIndexSelected(index)
-                                scope.launch(Dispatchers.Main) {
-                                    carouselState.animateScrollToItem(index)
-//                                        carouselState.scrollToItem(index)
-                                }
-                            }),
-                        model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].portrait_path}",
-                        contentDescription = "image webp"
-                    )
-                }
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = MaterialTheme.colorScheme.onBackground
-                    ),
-                    onClick = {}
-                ) {
-                    Icon(
-                        painterResource(R.drawable.icon_volume_disabled),
-                        contentDescription = "enable/disable sound",
-                        tint = MaterialTheme.colorScheme.onTertiary
-                    )
-                }
-                // TODO borrar componente
+        if (uiState.entity.results.isEmpty()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()) {
+                Image(painterResource(R.drawable.doh_homer_simpson), contentDescription = null)
+                SpaceV20()
                 Text(
-                    "Name: ${carouselState.currentItem}",
+                    text = "opssss ...",
+                    fontSize = 40.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
+                SpaceV10()
+                CustomBodyText("No se obtuvieron resultados, intentelos de nuevo__")
+
                 TextButton(
-                    enabled = false,
-                    onClick = {}) {
-                    Text(
-                        stringResource(R.string.main_more),
-                        color = MaterialTheme.colorScheme.onTertiary
+                    enabled = true,
+                    onClick = {
+                        simpsonsViewModel.onGetSimpsons()
+                    }) {
+                    CustomBodyText(
+                        stringResource(R.string.main_get_characters),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    SpaceH10()
+                    Icon(
+                        painterResource(R.drawable.icon_download),
+                        contentDescription = "Download characters",
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            AsyncImage(
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = CircleShape
+        } else {
+            Column {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                        .background(MaterialTheme.colorScheme.primary.copy(0.1f))
+                        .padding(vertical = 5.dp)
+                ) {
+                    HorizontalMultiBrowseCarousel(
+                        state = carouselState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(),
+                        preferredItemWidth = 100.dp,
+                        itemSpacing = 5.dp,
+                        contentPadding = PaddingValues(horizontal = 3.dp),
+                        flingBehavior = CarouselDefaults.singleAdvanceFlingBehavior(
+                            state = carouselState,
+                            snapAnimationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ),
+                    ) { index ->
+                        AsyncImage(
+                            modifier = Modifier
+                                .clip(shape = shapes.small)
+                                .background(MaterialTheme.colorScheme.background)
+                                .maskClip(MaterialTheme.shapes.extraLarge)
+                                .padding(vertical = 10.dp, horizontal = 5.dp)
+                                .clickable(onClick = {
+                                    scope.launch(Dispatchers.Main) {
+                                        carouselState.animateScrollToItem(index)
+                                    }
+                                }),
+                            model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].portrait_path}",
+                            contentDescription = "image webp"
+                        )
+                    }
+                }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.onBackground
+                        ),
+                        onClick = {}
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.icon_volume_disabled),
+                            contentDescription = "enable/disable sound",
+                            tint = MaterialTheme.colorScheme.onTertiary
+                        )
+                    }
+                    // TODO borrar componente
+                    Text(
+                        "Name: ${carouselState.currentItem}",
+                        color = MaterialTheme.colorScheme.primary
                     )
+                    TextButton(
+                        enabled = false,
+                        onClick = {}) {
+                        Text(
+                            stringResource(R.string.main_more),
+                            color = MaterialTheme.colorScheme.onTertiary
+                        )
+                    }
+                }
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                AsyncImage(
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(CircleShape)
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape
+                        )
 //                        .background(BlackDev)
-                    .padding(10.dp)
-                    .clickable(onClick = {
-                        onNavigationDetail()
-                        simpsonsViewModel.setIndexSelected(index = carouselState.currentItem)
+                        .padding(10.dp)
+                        .clickable(onClick = {
+                            onNavigationDetail()
+                            simpsonsViewModel.setIndexSelected(index = carouselState.currentItem)
 
-                    }),
-                model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[carouselState.currentItem].portrait_path}",
-                contentDescription = "image webp"
-            )
-            SpaceV10()
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = uiState.entity.results[carouselState.currentItem].name,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center
-            )
-        }
-        TextButton(
-            enabled = false,
-            onClick = {
-                simpsonsViewModel.onGetSimpsons()
-            }) {
-            CustomBodyText(
-                stringResource(R.string.main_get_characters),
-                color = MaterialTheme.colorScheme.primary.copy(0.2f)
-            )
-            SpaceH10()
+                        }),
+                    model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[carouselState.currentItem].portrait_path}",
+                    contentDescription = "image webp"
+                )
+                SpaceV10()
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = uiState.entity.results[carouselState.currentItem].name,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+
             Icon(
-                painterResource(R.drawable.icon_download),
-                contentDescription = "Download characters",
-                tint = MaterialTheme.colorScheme.primary.copy(0.2f)
+                modifier = Modifier.width(130.dp),
+                painter = painterResource(R.drawable.simpsons_logo),
+                contentDescription = "simpsons",
+                tint = MaterialTheme.colorScheme.primary
             )
         }
-
-        Icon(
-            modifier = Modifier.width(130.dp),
-            painter = painterResource(R.drawable.simpsons_logo),
-            contentDescription = "simpsons",
-            tint = MaterialTheme.colorScheme.primary
-        )
     }
 }
 
