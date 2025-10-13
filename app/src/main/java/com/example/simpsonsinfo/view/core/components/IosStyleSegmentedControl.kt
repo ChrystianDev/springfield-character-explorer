@@ -30,7 +30,6 @@ fun IOSStyleSegmentedControl(
     options: List<Int>,
     selectedOption: Int,
     onOptionSelected: (Int) -> Unit,
-//    onNavigationDetail: () -> Unit,
 ) {
     val selectedIndex = options.indexOf(selectedOption)
     val segmentWidth = 120.dp
@@ -43,7 +42,6 @@ fun IOSStyleSegmentedControl(
             .height(60.dp)
             .width(segmentWidth * options.size)
     ) {
-        // Fondo deslizante (thumb)
         Box(
             modifier = Modifier
                 .offset(x = thumbOffset)
@@ -53,9 +51,14 @@ fun IOSStyleSegmentedControl(
                 .fillMaxHeight()
         )
 
-        // Texto de opciones
         Row(Modifier.fillMaxSize()) {
             options.forEach { option ->
+               val icon =  when (option) {
+                    0 -> R.drawable.icon_home
+                    1 -> R.drawable.icon_location
+                    2 -> R.drawable.icon_favorite
+                    else -> R.drawable.icon_home
+                }
                 val isSelected = option == selectedOption
                 Box(
                     modifier = Modifier
@@ -63,40 +66,16 @@ fun IOSStyleSegmentedControl(
                         .fillMaxHeight()
                         .clickable {
                             onOptionSelected(option)
-//                            onNavigationDetail()
                         },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-//                        painter = painterResource(option),
-                        painter = painterResource(R.drawable.icon_favorite),
+                        painter = painterResource(icon),
                         contentDescription = null,
                         tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary
                     )
-//                    Text(
-//                        text = option,
-//                        color = if (selected) Color.Black else Color.DarkGray,
-//                        fontSize = 14.sp
-//                    )
                 }
             }
         }
     }
 }
-
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun PreviewIOSStyleSegmentedControl() {
-//    var selected by remember { mutableIntStateOf(R.drawable.icon_volume_disabled) }
-//    val options = listOf(R.drawable.icon_home, R.drawable.icon_favorite, R.drawable.icon_settings)
-//
-//    Surface(color = MaterialTheme.colorScheme.background) {
-//        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//            IOSStyleSegmentedControl(
-//                options = options,
-//                selectedOption = selected,
-//                onOptionSelected = { selected = it }
-//            )
-//        }
-//    }
-//}

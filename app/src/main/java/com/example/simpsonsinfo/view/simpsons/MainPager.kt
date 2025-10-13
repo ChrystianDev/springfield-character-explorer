@@ -18,13 +18,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -35,9 +31,6 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.view.core.components.IOSStyleSegmentedControl
-import com.example.simpsonsinfo.view.core.components.SpaceV10
-import com.example.simpsonsinfo.view.core.components.SpaceV20
-import com.example.simpsonsinfo.view.core.components.SpaceV40
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,9 +40,8 @@ fun MainPager(
 ) {
     val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
     val pageState = rememberPagerState { 3 }
-    var selected by remember { mutableIntStateOf(R.drawable.icon_home) }
-//    val options = listOf(R.drawable.icon_home, R.drawable.icon_location, R.drawable.icon_favorite)
-    val options = listOf(0,1,2)
+//    var selected by remember { mutableIntStateOf(R.drawable.icon_home) }
+    val options = listOf(0, 1, 2)
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
     val scope = rememberCoroutineScope()
     Column(
@@ -77,10 +69,9 @@ fun MainPager(
                     composition = composition,
                     speed = 1f,
                     reverseOnRepeat = false,
-//            iterations = 3,
                     iterations = LottieConstants.IterateForever,
-//            safeMode = true,
-//            restartOnPlay = false
+//                  safeMode = true,
+//                  restartOnPlay = false
                 )
             }
 //            CircularProgressIndicator(
@@ -115,21 +106,8 @@ fun MainPager(
                             pageState.animateScrollToPage(it)
                         }
                     },
-//                    onNavigationDetail = {
-//                        //TODO cambiar la navegación de pantallas
-//                        onNavigationDetail()
-//                    }
                 )
             }
         }
     }
 }
-//
-//@Composable
-//fun PageContent(index: Int) {
-//    when{
-//        index == 0 -> SimpsonsScreen()
-//        index == 1 -> LocationScreen()
-//        index == 2 -> FavouritesScreen()
-//    }
-//}
