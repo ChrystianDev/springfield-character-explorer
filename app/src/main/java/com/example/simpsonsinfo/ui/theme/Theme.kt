@@ -8,7 +8,9 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorScheme = darkColorScheme(
     primary = YellowDarkDev,
@@ -60,6 +62,19 @@ fun SimpsonsInfoTheme(
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }
+
+    /**
+     *  Controla los colores del sistema
+     */
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = !darkTheme
+
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = colorScheme.background,
+            darkIcons = useDarkIcons
+        )
     }
 
     MaterialTheme(
