@@ -1,7 +1,7 @@
 /**
  * Created by chrystian.lozada.local (10/10/25)
  */
-package com.example.simpsonsinfo.view.simpsons
+package com.example.simpsonsinfo.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +24,8 @@ import com.example.simpsonsinfo.view.core.components.CustomHomerLoading
 import com.example.simpsonsinfo.view.core.components.IOSStyleSegmentedControl
 import com.example.simpsonsinfo.view.favorite.FavouritesScreen
 import com.example.simpsonsinfo.view.location.LocationScreen
+import com.example.simpsonsinfo.view.simpsons.SimpsonsScreen
+import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 import kotlinx.coroutines.launch
 
 @Composable

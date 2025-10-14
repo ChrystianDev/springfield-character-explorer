@@ -5,9 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.simpsonsinfo.data.repository.local.DataBaseRoom
 import com.example.simpsonsinfo.view.detail.CharacterScreen
-import com.example.simpsonsinfo.view.simpsons.MainPager
+import com.example.simpsonsinfo.view.MainPager
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @Composable
