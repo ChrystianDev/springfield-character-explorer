@@ -9,7 +9,7 @@ import javax.inject.Inject
 class SimpsonsUsecase @Inject constructor(
     private val repository: SimpsonsRepository
 ) {
-    suspend operator fun invoke(name: String, description: String): SimpsonsEntity? {
-        return repository.doSimpsons(name, description)
+    suspend operator fun invoke(page: String): SimpsonsEntity? {
+        return repository.doSimpsons(page )
     }
 }

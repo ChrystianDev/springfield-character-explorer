@@ -14,9 +14,9 @@ class SimpsonsService @Inject constructor(
     private val simpsonsClient: SimpsonsClient
 ) {
 
-    suspend fun doSimpsons(name: String, description: String): Response<SimpsonsResponse> {
+    suspend fun doSimpsons(page: String): Response<SimpsonsResponse> {
         return withContext(Dispatchers.IO) {
-            simpsonsClient.doSimpsons()
+            simpsonsClient.doSimpsons(page = page)
 //            val response = simpsonsClient.doSimpsons()
 //            response.body()?.personajes ?: "No hay personajes"
 //            response.body()?.count ?: "No hay personajes"

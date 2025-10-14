@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -75,6 +76,13 @@ fun SimpsonsScreen(
     val scope = rememberCoroutineScope()
     var isDarkThemeMode by remember { mutableStateOf(true) }
 
+//    LaunchedEffect(carouselState.currentItem) {
+//        if(carouselState.currentItem == 15){
+//            Log.i("CAROUSEL_STATE", "ITEM ENCONTRADO")
+//            simpsonsViewModel.onGetSimpsons()
+//        }
+//    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -100,7 +108,7 @@ fun SimpsonsScreen(
                 TextButton(
                     enabled = true,
                     onClick = {
-                        simpsonsViewModel.onGetSimpsons()
+//                        simpsonsViewModel.onGetSimpsons()
                     }) {
                     CustomBodyText(
                         stringResource(R.string.main_get_characters),
@@ -116,11 +124,23 @@ fun SimpsonsScreen(
             }
         } else {
             Column {
-                Box(
-                    contentAlignment = Alignment.CenterEnd,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.onBackground
+                        ),
+                        onClick = {}
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.icon_volume_disabled),
+                            contentDescription = "enable/disable sound",
+                            tint = MaterialTheme.colorScheme.onTertiary
+                        )
+                    }
                     CustomIconButton(
                         icon = if (isDarkThemeMode) R.drawable.icon_light_mode else R.drawable.icon_dark_mode,
                         iconDescription = "Set ThemeMode, Dark or Light",
@@ -175,25 +195,35 @@ fun SimpsonsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Button(
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = MaterialTheme.colorScheme.onBackground
-                        ),
-                        onClick = {}
+                    IconButton(
+                        enabled = uiState.entity.prev.isNotEmpty(),
+                        onClick = {
+                            simpsonsViewModel.downPage()
+                            simpsonsViewModel.onGetSimpsons()
+                        }
                     ) {
                         Icon(
-                            painterResource(R.drawable.icon_volume_disabled),
-                            contentDescription = "enable/disable sound",
-                            tint = MaterialTheme.colorScheme.onTertiary
+                            painterResource(R.drawable.icon_arrow_backward),
+                            contentDescription = "forward",
+                            tint = if (uiState.entity.prev.isNotEmpty())
+                                MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
+                                0.2f
+                            )
                         )
                     }
-                    TextButton(
-                        enabled = false,
-                        onClick = {}) {
-                        Text(
-                            stringResource(R.string.main_more),
-                            color = MaterialTheme.colorScheme.onTertiary
+                    IconButton(
+                        enabled = uiState.entity.next.isNotEmpty(),
+                        onClick = {
+                            simpsonsViewModel.upPage()
+                            simpsonsViewModel.onGetSimpsons()
+                        }) {
+                        Icon(
+                            painterResource(R.drawable.icon_arrow_forward),
+                            contentDescription = "forward",
+                            tint = if (uiState.entity.next.isNotEmpty())
+                                MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
+                                0.5f
+                            )
                         )
                     }
                 }

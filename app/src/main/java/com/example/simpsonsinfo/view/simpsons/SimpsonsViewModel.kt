@@ -27,20 +27,18 @@ class SimpsonsViewModel @Inject constructor(
     }
 
     private val _uiState = MutableStateFlow(SimpsonsUiState())
-    private val _indexSelected = MutableStateFlow(0)
     val uiState: StateFlow<SimpsonsUiState> = _uiState
+    private val _indexSelected = MutableStateFlow(0)
     val indexSelected: StateFlow<Int> = _indexSelected
     var isLoading = MutableStateFlow(false)
 
-
-
-
+    private val _page = MutableStateFlow("1")
 
     fun onGetSimpsons() {
         viewModelScope.launch(Dispatchers.IO) {
             isLoadingData()
             delay(2000)
-            val response = simpsonsUsecase("Home", "Sprinfield's citizen")
+            val response = simpsonsUsecase(page = _page.value)
             _uiState.update { state ->
                 if (response != null) {
                     state.copy(entity = response)
@@ -63,6 +61,22 @@ class SimpsonsViewModel @Inject constructor(
     fun setIndexSelected(index: Int) {
         Log.i("indexSelected", index.toString())
         _indexSelected.value = index
+    }
+
+    fun upPage(){
+        var pageNumber = _page.value.toIntOrNull()
+        if (pageNumber != null) {
+            pageNumber++
+            _page.value = pageNumber.toString()
+        }
+    }
+
+    fun downPage(){
+        var pageNumber = _page.value.toIntOrNull()
+        if (pageNumber != null) {
+            pageNumber--
+            _page.value = pageNumber.toString()
+        }
     }
 
 }

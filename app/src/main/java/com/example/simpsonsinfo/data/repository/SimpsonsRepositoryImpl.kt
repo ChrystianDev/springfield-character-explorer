@@ -13,9 +13,9 @@ import javax.inject.Inject
 class SimpsonsRepositoryImpl @Inject constructor(private val api: SimpsonsService) :
     SimpsonsRepository {
 
-    override suspend fun doSimpsons(name: String, description: String): SimpsonsEntity? {
+    override suspend fun doSimpsons(page: String): SimpsonsEntity? {
         try {
-            val response = api.doSimpsons(name, description)
+            val response = api.doSimpsons(page)
             return response.body()?.toDomain()
         } catch (e: Exception) {
             return null
