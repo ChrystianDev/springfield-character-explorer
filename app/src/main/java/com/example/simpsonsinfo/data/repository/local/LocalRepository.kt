@@ -6,7 +6,13 @@ import javax.inject.Inject
 class LocalRepository @Inject constructor(
     private val favouriteCharacterDao: FavouriteCharacterDao
 ) {
-    fun getAllFavourites() = favouriteCharacterDao.getAll()
+    suspend fun getAllFavourites() = favouriteCharacterDao.getAll()
+
+    suspend fun existsItem(fid: Int) = favouriteCharacterDao.existsItem(fid)
+
+    suspend fun existItemV2(fid:Int) : Boolean {
+        return favouriteCharacterDao.existsItem(fid)
+    }
 
     fun insertFavourite(favouriteCharacter: FavouriteCharacterEntity) =
         favouriteCharacterDao.insertAll(favouriteCharacter)

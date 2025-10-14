@@ -3,15 +3,13 @@
  */
 package com.example.simpsonsinfo.view.favorite
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
-import com.example.simpsonsinfo.domain.entity.LocationsSimpsonsEntity
 import com.example.simpsonsinfo.domain.usecase.FavouritesUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -27,18 +25,24 @@ class FavouritesViewModel @Inject constructor(
         onGetFavourites()
     }
 
-    private val _uiState = MutableStateFlow(FavouritesUiState())
-    val uiState: StateFlow<FavouritesUiState> = _uiState
+   lateinit var uiState : Flow<List<FavouriteCharacterEntity>>
+
+
+    private val _isFavourite = MutableStateFlow(false)
+    val isFavourite: StateFlow<Boolean> = _isFavourite
 
     fun onGetFavourites() {
         viewModelScope.launch(Dispatchers.IO) {
             val response = favouritesUsecase()
-            _uiState.update { state ->
-                if (response.isNotEmpty()) {
-                    state.copy(list = response)
-                } else {
-                    state.copy(list = emptyList())
-                }
+            uiState = response
+        }
+    }
+
+    fun existsItem(fid: Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = favouritesUsecase.existsItem(fid)
+            _isFavourite.update {
+                response
             }
         }
     }
@@ -46,6 +50,7 @@ class FavouritesViewModel @Inject constructor(
     fun onSaveFavourite(favouriteCharacter: FavouriteCharacterEntity) {
         viewModelScope.launch(Dispatchers.IO) {
             favouritesUsecase.saveFavourite(favouriteCharacter)
+            existsItem(favouriteCharacter.fid)
             onGetFavourites()
         }
     }
@@ -53,11 +58,8 @@ class FavouritesViewModel @Inject constructor(
     fun onDeleteFavourite(favouriteCharacter: FavouriteCharacterEntity) {
         viewModelScope.launch(Dispatchers.IO) {
             favouritesUsecase.deleteFavourite(favouriteCharacter)
+            existsItem(favouriteCharacter.fid)
             onGetFavourites()
         }
     }
 }
-
-data class FavouritesUiState(
-    val list: List<FavouriteCharacterEntity> = emptyList(),
-)

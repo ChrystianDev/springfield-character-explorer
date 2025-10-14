@@ -5,14 +5,15 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavouriteCharacterDao {
     @Query("SELECT * FROM favourites")
-    fun getAll(): List<FavouriteCharacterEntity>
+    fun getAll(): Flow<List<FavouriteCharacterEntity>>
 
-    @Query("SELECT * FROM favourites WHERE fid IN (:userIds)")
-    fun loadAllByIds(userIds: IntArray): List<FavouriteCharacterEntity>
+    @Query("SELECT EXISTS(SELECT 1 FROM favourites WHERE fid = :fid)")
+    suspend fun existsItem(fid: Int): Boolean
 
     @Insert
     fun insertAll(vararg favouriteCharacters: FavouriteCharacterEntity)

@@ -52,11 +52,15 @@ fun CharacterScreen(
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
-//    val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
-//    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
-//    val scope = rememberCoroutineScope()
+    val isFavourite by favouritesViewModel.isFavourite.collectAsStateWithLifecycle()
 
     val character = uiState.entity.results[indexSelected]
+    favouritesViewModel.existsItem(character.id)
+    val favouriteItem = FavouriteCharacterEntity(
+        fid = character.id,
+        name = character.name,
+        urlImage = character.portrait_path
+    )
 
     Scaffold(
         topBar = {
@@ -109,20 +113,17 @@ fun CharacterScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .fillMaxWidth()
-//                        .padding(horizontal = 5.dp)
                     ) {
                         CustomBodyText(text = character.name)
                         CustomIconButton(
-                            icon = R.drawable.icon_favorite_unselected,
+                            icon = if (isFavourite) R.drawable.icon_favorite_selected else R.drawable.icon_favorite_unselected,
                             iconDescription = "Add to Favourites",
                             onClick = {
-                                favouritesViewModel.onSaveFavourite(
-                                    FavouriteCharacterEntity(
-                                        fid = character.id,
-                                        name = character.name,
-                                        urlImage = character.portrait_path
-                                    )
-                                )
+                                if (isFavourite) {
+                                    favouritesViewModel.onDeleteFavourite(favouriteItem)
+                                } else {
+                                    favouritesViewModel.onSaveFavourite(favouriteItem)
+                                }
                             },
                         )
                     }

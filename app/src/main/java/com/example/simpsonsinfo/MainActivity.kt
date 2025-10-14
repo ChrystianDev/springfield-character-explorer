@@ -5,9 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.room.Room
-import com.example.simpsonsinfo.data.repository.local.DataBaseRoom
-import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
 import com.example.simpsonsinfo.ui.theme.SimpsonsInfoTheme
 import com.example.simpsonsinfo.view.core.navigation.NavigationWrapper
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
@@ -16,7 +13,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val simpsonsViewModel: SimpsonsViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

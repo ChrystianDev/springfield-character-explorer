@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -45,11 +44,9 @@ fun FavouritesScreen(
 
     val gridState = rememberLazyGridState(0)
 
-//    val list = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    val uiState by favouriteViewModel.uiState.collectAsStateWithLifecycle(initialValue = emptyList())
 
-    val uiState by favouriteViewModel.uiState.collectAsStateWithLifecycle()
-
-    if (uiState.list.isEmpty()) {
+    if (uiState.isEmpty()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
@@ -75,8 +72,8 @@ fun FavouritesScreen(
                 .padding(top = 40.dp, bottom = 2.dp),
         ) {
 //            items(list.size) {
-            items(uiState.list.size) { index ->
-                val item = uiState.list[index]
+            items(uiState.size) { index ->
+                val item = uiState[index]
                 Card(
                     modifier = Modifier.padding(5.dp),
                     colors = CardDefaults.cardColors(
@@ -90,7 +87,6 @@ fun FavouritesScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(shapes.large),
-//                            .background(MaterialTheme.colorScheme.onTertiary),
                             model = "$BASE_URL_IMAGE_LARGE${item.urlImage}",
                             contentDescription = "image webp"
                         )
