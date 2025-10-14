@@ -39,23 +39,23 @@ import com.example.simpsonsinfo.view.core.components.CustomBodyText
 import com.example.simpsonsinfo.view.core.components.CustomItemCharacter
 import com.example.simpsonsinfo.view.core.components.CustomTitleText
 import com.example.simpsonsinfo.view.core.components.SpaceV10
-import com.example.simpsonsinfo.view.favorite.FavouritesViewModel
+import com.example.simpsonsinfo.view.favorite.FavouriteViewModel
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterScreen(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
-    favouritesViewModel: FavouritesViewModel = hiltViewModel(),
+    favouriteViewModel: FavouriteViewModel = hiltViewModel(),
     onBackNavigation: () -> Unit,
 ) {
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
-    val isFavourite by favouritesViewModel.isFavourite.collectAsStateWithLifecycle()
+    val isFavourite by favouriteViewModel.isFavourite.collectAsStateWithLifecycle()
 
     val character = uiState.entity.results[indexSelected]
-    favouritesViewModel.existsItem(character.id)
+    favouriteViewModel.existsItem(character.id)
     val favouriteItem = FavouriteCharacterEntity(
         fid = character.id,
         name = character.name,
@@ -120,9 +120,9 @@ fun CharacterScreen(
                             iconDescription = "Add to Favourites",
                             onClick = {
                                 if (isFavourite) {
-                                    favouritesViewModel.onDeleteFavourite(favouriteItem)
+                                    favouriteViewModel.onDeleteFavourite(favouriteItem)
                                 } else {
-                                    favouritesViewModel.onSaveFavourite(favouriteItem)
+                                    favouriteViewModel.onSaveFavourite(favouriteItem)
                                 }
                             },
                         )

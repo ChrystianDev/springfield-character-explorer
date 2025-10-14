@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FavouritesViewModel @Inject constructor(
+class FavouriteViewModel @Inject constructor(
     private val favouritesUsecase: FavouritesUsecase
 ) : ViewModel() {
 
