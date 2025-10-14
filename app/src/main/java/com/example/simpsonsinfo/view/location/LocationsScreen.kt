@@ -2,12 +2,9 @@ package com.example.simpsonsinfo.view.location
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
@@ -31,13 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
 import com.example.simpsonsinfo.view.core.components.CustomBiographyText
+import com.example.simpsonsinfo.view.core.components.CustomHomerLoading
 import com.example.simpsonsinfo.view.core.components.SpaceV10
 import com.example.simpsonsinfo.view.core.components.SpaceV20
 
@@ -48,28 +42,9 @@ fun LocationScreen(
 ) {
     val uiState by locationsViewModel.uiState.collectAsStateWithLifecycle()
     val isLoading by locationsViewModel.isLoading.collectAsStateWithLifecycle()
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
 
     if(isLoading){
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                painterResource(R.drawable.homer_thinking),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-            LottieAnimation(
-                modifier = Modifier
-                    .height(50.dp)
-                    .offset(50.dp, -100.dp),
-                composition = composition,
-                speed = 1f,
-                reverseOnRepeat = false,
-                iterations = LottieConstants.IterateForever,
-            )
-        }
+        CustomHomerLoading()
     }else {
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
