@@ -9,5 +9,7 @@
     <!--    Character: English -->
     <string name="character_years">years old</string>
     <string name="locations_text">"Location: "</string>
+    <string name="favourite_character_added">The character was added to favourites</string>
+    <string name="favourite_character_deleted">The character was deleted from favourites</string>
 
 </resources>

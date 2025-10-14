@@ -8,5 +8,7 @@
     <!--    Personaje: Español -->
     <string name="character_years">años</string>
     <string name="locations_text">"Lugar: "</string>
+    <string name="favourite_character_added">El personaje se añadio a favoritos</string>
+    <string name="favourite_character_deleted">El personaje fue eliminado de favoritos</string>
 
 </resources>

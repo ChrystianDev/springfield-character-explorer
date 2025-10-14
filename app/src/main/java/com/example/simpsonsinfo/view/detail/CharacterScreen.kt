@@ -3,8 +3,6 @@
  */
 package com.example.simpsonsinfo.view.detail
 
-import androidx.compose.runtime.Composable
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,9 +16,14 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,13 +37,15 @@ import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBiographyText
-import com.example.simpsonsinfo.view.core.components.CustomIconButton
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
+import com.example.simpsonsinfo.view.core.components.CustomIconButton
 import com.example.simpsonsinfo.view.core.components.CustomItemCharacter
+import com.example.simpsonsinfo.view.core.components.CustomSnackBar
 import com.example.simpsonsinfo.view.core.components.CustomTitleText
 import com.example.simpsonsinfo.view.core.components.SpaceV10
 import com.example.simpsonsinfo.view.favorite.FavouriteViewModel
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +54,8 @@ fun CharacterScreen(
     favouriteViewModel: FavouriteViewModel = hiltViewModel(),
     onBackNavigation: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
@@ -63,6 +70,18 @@ fun CharacterScreen(
     )
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = {
+                    CustomSnackBar(
+                        message = if (isFavourite) stringResource(R.string.favourite_character_added) else stringResource(
+                            R.string.favourite_character_deleted
+                        )
+                    )
+                }
+            )
+        },
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -121,8 +140,14 @@ fun CharacterScreen(
                             onClick = {
                                 if (isFavourite) {
                                     favouriteViewModel.onDeleteFavourite(favouriteItem)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Deleted")
+                                    }
                                 } else {
                                     favouriteViewModel.onSaveFavourite(favouriteItem)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Added")
+                                    }
                                 }
                             },
                         )
@@ -187,3 +212,5 @@ fun CharacterScreen(
         }
     }
 }
+
+
