@@ -26,7 +26,8 @@ val GrayDev30 = Color(0xFF454545)
 val BlueDev50 = Color(0xFF0B5FD5)
 val RedDev = Color(0xFFE64040)
 val GreenDev = Color(0xFF16A34A)
-val YellowDev = Color(0xFFFFEB3B)
+val YellowDarkDev = Color(0xFFFFEB3B)
+val YellowLightDev = Color(0xFF9D9107)
 
 // Background
 val DarkBackground = Color(0xFF152125)

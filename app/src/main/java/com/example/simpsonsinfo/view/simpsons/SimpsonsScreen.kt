@@ -34,7 +34,10 @@ import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,10 +55,10 @@ import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
+import com.example.simpsonsinfo.view.core.components.CustomIconButton
 import com.example.simpsonsinfo.view.core.components.SpaceH10
 import com.example.simpsonsinfo.view.core.components.SpaceV10
 import com.example.simpsonsinfo.view.core.components.SpaceV20
-import com.example.simpsonsinfo.view.core.components.SpaceV40
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -63,12 +66,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun SimpsonsScreen(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
-    onNavigationDetail: () -> Unit
+    onNavigationDetail: () -> Unit,
+    onSetDarkMode: (Boolean) -> Unit,
 ) {
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
     val carouselState = rememberCarouselState(initialItem = 0) { uiState.entity.results.size }
     val scope = rememberCoroutineScope()
+    var isDarkThemeMode by remember { mutableStateOf(true) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -80,7 +85,8 @@ fun SimpsonsScreen(
         if (uiState.entity.results.isEmpty()) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()) {
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Image(painterResource(R.drawable.doh_homer_simpson), contentDescription = null)
                 SpaceV20()
                 Text(
@@ -110,6 +116,21 @@ fun SimpsonsScreen(
             }
         } else {
             Column {
+                Box(
+                    contentAlignment = Alignment.CenterEnd,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    CustomIconButton(
+                        icon = if (isDarkThemeMode) R.drawable.icon_light_mode else R.drawable.icon_dark_mode,
+                        iconDescription = "Set ThemeMode, Dark or Light",
+                        onClick = {
+                            isDarkThemeMode = !isDarkThemeMode
+                            onSetDarkMode(isDarkThemeMode)
+                        }
+                    )
+                }
+                SpaceV10()
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -167,11 +188,6 @@ fun SimpsonsScreen(
                             tint = MaterialTheme.colorScheme.onTertiary
                         )
                     }
-                    // TODO borrar componente
-                    Text(
-                        "Name: ${carouselState.currentItem}",
-                        color = MaterialTheme.colorScheme.primary
-                    )
                     TextButton(
                         enabled = false,
                         onClick = {}) {

@@ -29,7 +29,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainPager(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
-    onNavigationDetail: () -> Unit
+    onNavigationDetail: () -> Unit,
+    onSetDarkMode: (Boolean) -> Unit
 ) {
     val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
     val pageState = rememberPagerState { 3 }
@@ -52,7 +53,8 @@ fun MainPager(
                 when (page) {
                     0 -> SimpsonsScreen(
                         simpsonsViewModel,
-                        onNavigationDetail
+                        onNavigationDetail,
+                        onSetDarkMode,
                     )
                     1 -> LocationScreen()
                     2 -> FavouritesScreen()

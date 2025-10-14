@@ -5,6 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.simpsonsinfo.ui.theme.SimpsonsInfoTheme
 import com.example.simpsonsinfo.view.core.navigation.NavigationWrapper
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
@@ -17,10 +21,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SimpsonsInfoTheme {
+            var isDarkMode by remember { mutableStateOf(true) }
+            SimpsonsInfoTheme(darkTheme = isDarkMode) {
                 NavigationWrapper(
                     context = applicationContext,
-                    simpsonsViewModel = simpsonsViewModel
+                    simpsonsViewModel = simpsonsViewModel,
+                    onSetDarkMode = { it ->
+                        isDarkMode = it
+                    },
                 )
             }
         }

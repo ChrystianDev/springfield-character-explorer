@@ -11,7 +11,11 @@ import com.example.simpsonsinfo.view.simpsons.MainPager
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @Composable
-fun NavigationWrapper(context: Context, simpsonsViewModel: SimpsonsViewModel) {
+fun NavigationWrapper(
+    context: Context,
+    simpsonsViewModel: SimpsonsViewModel,
+    onSetDarkMode: (Boolean) -> Unit
+) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Main) {
 
@@ -20,6 +24,9 @@ fun NavigationWrapper(context: Context, simpsonsViewModel: SimpsonsViewModel) {
                 simpsonsViewModel = simpsonsViewModel,
                 onNavigationDetail = {
                     navController.navigate(route = Character)
+                },
+                onSetDarkMode = { isDarkMode ->
+                    onSetDarkMode(isDarkMode)
                 }
             )
         }

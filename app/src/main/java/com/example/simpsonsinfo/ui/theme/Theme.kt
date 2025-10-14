@@ -1,6 +1,5 @@
 package com.example.simpsonsinfo.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -12,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = YellowDev,
+    primary = YellowDarkDev,
     onPrimary = WhiteDev,
     background = DarkBackground,
     onBackground = GrayDev90,
@@ -24,15 +23,15 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = YellowDev,
-    onPrimary = WhiteDev,
+    primary = YellowLightDev,
+    onPrimary = BlackDev,
     background = WhiteDev,
-    onBackground = GrayDev50,
+    onBackground = GrayDev30,
     onSurfaceVariant = GrayDev30,
     secondary = PurpleGrey80,
-    onSecondary =GrayDev50,
+    onSecondary =GrayDev30,
     tertiary = Pink80,
-    onTertiary = GrayDev70,
+    onTertiary = GrayDev100,
 
 
     /* Other default colors to override
