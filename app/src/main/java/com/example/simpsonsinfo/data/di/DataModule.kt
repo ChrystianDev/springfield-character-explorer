@@ -3,15 +3,20 @@
  */
 package com.example.simpsonsinfo.data.di
 
+import android.content.Context
+import androidx.room.Room
 import com.example.simpsonsinfo.config.Constants.BASE_URL
 import com.example.simpsonsinfo.data.network.SimpsonsClient
 import com.example.simpsonsinfo.data.network.SimpsonsService
 import com.example.simpsonsinfo.data.repository.SimpsonsRepositoryImpl
+import com.example.simpsonsinfo.data.repository.local.DataBaseRoom
+import com.example.simpsonsinfo.data.repository.local.FavouriteCharacterDao
 import com.example.simpsonsinfo.domain.repository.SimpsonsRepository
 import com.example.simpsonsinfo.domain.usecase.SimpsonsUsecase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -62,5 +67,20 @@ object DataModule {
     fun provideSimpsonsRepository(simpsonsService: SimpsonsService): SimpsonsRepository{
         return SimpsonsRepositoryImpl(simpsonsService)
     }
+
+    @Provides
+    @Singleton
+    fun provideDatabase(
+        @ApplicationContext context: Context
+    ): DataBaseRoom {
+        return Room.databaseBuilder(
+            context,
+            DataBaseRoom::class.java,
+            "FavouriteCharacter.db"
+        ).build()
+    }
+
+    @Provides
+    fun provideFavouriteCharacterDao(db: DataBaseRoom): FavouriteCharacterDao = db.favouriteCharacterDao()
 
 }

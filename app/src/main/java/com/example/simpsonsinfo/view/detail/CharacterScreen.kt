@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
+import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBiographyText
 import com.example.simpsonsinfo.view.core.components.CustomIconButton
@@ -38,12 +39,14 @@ import com.example.simpsonsinfo.view.core.components.CustomBodyText
 import com.example.simpsonsinfo.view.core.components.CustomItemCharacter
 import com.example.simpsonsinfo.view.core.components.CustomTitleText
 import com.example.simpsonsinfo.view.core.components.SpaceV10
+import com.example.simpsonsinfo.view.favorite.FavouritesViewModel
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterScreen(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
+    favouritesViewModel: FavouritesViewModel = hiltViewModel(),
     onBackNavigation: () -> Unit,
 ) {
 
@@ -110,9 +113,17 @@ fun CharacterScreen(
                     ) {
                         CustomBodyText(text = character.name)
                         CustomIconButton(
-                            icon = R.drawable.icon_favorite,
+                            icon = R.drawable.icon_favorite_unselected,
                             iconDescription = "Add to Favourites",
-                            onClick = {},
+                            onClick = {
+                                favouritesViewModel.onSaveFavourite(
+                                    FavouriteCharacterEntity(
+                                        fid = character.id,
+                                        name = character.name,
+                                        urlImage = character.portrait_path
+                                    )
+                                )
+                            },
                         )
                     }
                 }
@@ -140,7 +151,13 @@ fun CharacterScreen(
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        CustomBiographyText(if (character.age != null) "${character.age} ${stringResource(R.string.character_years)}" else "-")
+                        CustomBiographyText(
+                            if (character.age != null) "${character.age} ${
+                                stringResource(
+                                    R.string.character_years
+                                )
+                            }" else "-"
+                        )
 
                         CustomBiographyText(character.gender)
                         CustomBiographyText(character.birthdate ?: "-")
@@ -155,10 +172,10 @@ fun CharacterScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                 )
             ) {
-                LazyColumn (modifier = Modifier.padding(10.dp)){
+                LazyColumn(modifier = Modifier.padding(10.dp)) {
                     items(character.phrases.size) { index ->
                         CustomItemCharacter(
-                            text =  character.phrases[index],
+                            text = character.phrases[index],
                             isLastItem = character.phrases.size == index + 1,
                             onClick = { }
                         )

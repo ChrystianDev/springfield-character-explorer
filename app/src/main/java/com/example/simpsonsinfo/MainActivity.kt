@@ -5,6 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.room.Room
+import com.example.simpsonsinfo.data.repository.local.DataBaseRoom
+import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
 import com.example.simpsonsinfo.ui.theme.SimpsonsInfoTheme
 import com.example.simpsonsinfo.view.core.navigation.NavigationWrapper
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
@@ -19,7 +22,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SimpsonsInfoTheme {
-                NavigationWrapper(context = this, simpsonsViewModel = simpsonsViewModel)
+                NavigationWrapper(
+                    context = applicationContext,
+                    simpsonsViewModel = simpsonsViewModel
+                )
             }
         }
     }

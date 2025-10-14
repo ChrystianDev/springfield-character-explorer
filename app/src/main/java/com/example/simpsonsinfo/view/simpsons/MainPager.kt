@@ -3,6 +3,7 @@
  */
 package com.example.simpsonsinfo.view.simpsons
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,11 +26,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.room.Room
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.simpsonsinfo.R
+import com.example.simpsonsinfo.data.repository.local.DataBaseRoom
 import com.example.simpsonsinfo.view.core.components.IOSStyleSegmentedControl
 import com.example.simpsonsinfo.view.favorite.FavouritesScreen
 import com.example.simpsonsinfo.view.location.LocationScreen
@@ -40,6 +43,13 @@ fun MainPager(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
     onNavigationDetail: () -> Unit
 ) {
+
+//    val db: DataBaseRoom = Room.databaseBuilder(
+//        context = context,
+//        klass = DataBaseRoom::class.java,
+//        name = "database-simpsons"
+//    ).build()
+
     val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
     val pageState = rememberPagerState { 3 }
     val options = listOf(0, 1, 2)
@@ -83,9 +93,8 @@ fun MainPager(
                 when (page) {
                     0 -> SimpsonsScreen(
                         simpsonsViewModel,
-                        onNavigationDetail,
+                        onNavigationDetail
                     )
-
                     1 -> LocationScreen()
                     2 -> FavouritesScreen()
                 }
