@@ -64,12 +64,13 @@ import com.example.simpsonsinfo.view.core.components.SpaceV20
 @Composable
 fun SimpsonsScreen(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
+    darkThemeParam: Boolean,
     onNavigationDetail: () -> Unit,
     onSetDarkMode: (Boolean) -> Unit,
 ) {
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
-    var isDarkThemeMode by remember { mutableStateOf(true) }
+    var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
     val listState = rememberLazyListState()
     var lastVisibleItem by remember { mutableIntStateOf(0) }
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()

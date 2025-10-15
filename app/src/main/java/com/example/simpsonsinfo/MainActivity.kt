@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
             var isDarkMode by remember { mutableStateOf(true) }
             SimpsonsInfoTheme(darkTheme = isDarkMode) {
                 NavigationWrapper(
-                    context = applicationContext,
+                    darkThemeParam = isDarkMode,
                     simpsonsViewModel = simpsonsViewModel,
                     onSetDarkMode = { it ->
                         isDarkMode = it

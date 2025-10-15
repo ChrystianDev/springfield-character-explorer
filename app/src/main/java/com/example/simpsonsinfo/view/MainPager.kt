@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainPager(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
+    darkThemeParam: Boolean,
     onNavigationDetail: () -> Unit,
     onSetDarkMode: (Boolean) -> Unit
 ) {
@@ -55,6 +56,7 @@ fun MainPager(
                 when (page) {
                     0 -> SimpsonsScreen(
                         simpsonsViewModel,
+                        darkThemeParam,
                         onNavigationDetail,
                         onSetDarkMode,
                     )

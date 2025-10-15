@@ -1,6 +1,5 @@
 package com.example.simpsonsinfo.view.core.navigation
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,7 +10,7 @@ import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @Composable
 fun NavigationWrapper(
-    context: Context,
+    darkThemeParam: Boolean,
     simpsonsViewModel: SimpsonsViewModel,
     onSetDarkMode: (Boolean) -> Unit
 ) {
@@ -21,6 +20,7 @@ fun NavigationWrapper(
         composable<Main> {
             MainPager(
                 simpsonsViewModel = simpsonsViewModel,
+                darkThemeParam = darkThemeParam,
                 onNavigationDetail = {
                     navController.navigate(route = Character)
                 },
@@ -38,24 +38,5 @@ fun NavigationWrapper(
                 }
             )
         }
-
-//        composable<Simpsons> {
-//            SimpsonsScreen(
-//                simpsonsViewModel = simpsonsViewModel,
-//                onNavigationDetail = {
-//                    navController.navigate(route = Character)
-//                }
-//            )
-//        }
-//
-//        composable<Locations> {
-//            LocationScreen()
-//        }
-//
-//        composable<Favourites> {
-//            FavouritesScreen()
-//        }
     }
-
-
 }
