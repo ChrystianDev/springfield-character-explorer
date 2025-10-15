@@ -7,20 +7,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,10 +30,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
-import com.example.simpsonsinfo.view.core.components.CustomBiographyText
+import com.example.simpsonsinfo.view.core.components.CustomBodyText
 import com.example.simpsonsinfo.view.core.components.CustomHomerLoading
 import com.example.simpsonsinfo.view.core.components.SpaceV10
-import com.example.simpsonsinfo.view.core.components.SpaceV20
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -42,10 +41,11 @@ fun LocationScreen(
 ) {
     val uiState by locationsViewModel.uiState.collectAsStateWithLifecycle()
     val isLoading by locationsViewModel.isLoading.collectAsStateWithLifecycle()
+    var counter by remember { mutableIntStateOf(0) }
 
-    if(isLoading){
+    if (isLoading) {
         CustomHomerLoading()
-    }else {
+    } else {
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -78,41 +78,38 @@ fun LocationScreen(
                             enabled = false,
                             onClick = {}) {
                             Text(
-                                uiState.entity.results[index].use,
-                                color = MaterialTheme.colorScheme.onPrimary
+                                uiState.entity.results[index].name,
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         }
-                        Button(
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Transparent,
-                                contentColor = MaterialTheme.colorScheme.onBackground
-                            ),
-                            onClick = {}
-                        ) {
-                            Icon(
-                                painterResource(R.drawable.icon_thumb_up_unselected),
-                                contentDescription = "enable/disable sound",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            CustomBodyText(if (counter != 0) "+$counter" else "")
+                            IconButton(onClick = {
+                                counter++
+                            }) {
+                                Icon(
+                                    painterResource(if (counter != 0) R.drawable.icon_thumb_up_selected else R.drawable.icon_thumb_up_unselected),
+                                    contentDescription = "enable/disable sound",
+                                    tint = if (counter != 0)
+                                        MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                            IconButton(onClick = {
+                                if (counter > 0) {
+                                    counter--
+                                }
+
+                            }) {
+                                Icon(
+                                    painterResource(R.drawable.icon_thumb_down),
+                                    contentDescription = "enable/disable sound",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
                         }
                     }
-                    SpaceV10()
-                    HorizontalDivider(
-                        modifier = Modifier.padding(
-                            horizontal = 20.dp,
-                            vertical = 10.dp
-                        ),
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    SpaceV10()
-                    CustomBiographyText(
-                        text = uiState.entity.results[index].name,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    SpaceV10()
                 }
-                SpaceV20()
+                SpaceV10()
             }
         }
     }
