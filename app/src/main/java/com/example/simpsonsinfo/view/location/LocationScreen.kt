@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -74,27 +75,36 @@ fun LocationScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         TextButton(
+                            modifier = Modifier.weight(2f),
                             enabled = false,
                             onClick = {}) {
                             Text(
-                                uiState.entity.results[index].name,
+                                modifier = Modifier.fillMaxWidth(),
+                                text = uiState.entity.results[index].name,
+                                textAlign = TextAlign.Start,
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        ) {
                             CustomBodyText(
-                                text = if (likesList[index].like > 0) "+${likesList[index].like}" else "${likesList[index].like}",
-                                color = if (likesList[index].like >= 0)  MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
+                                text = if (likesList[index].like > 0) "+${likesList[index].like}" else " ${likesList[index].like}",
+                                color = if (likesList[index].like >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
 //                                enabled = (likesList[index].like > 0)
                             )
-                            IconButton(onClick = {
-                                locationsViewModel.updateLikes(index, +1)
-                            }) {
+                            IconButton(
+                                onClick = {
+                                    locationsViewModel.updateLikes(index, +1)
+                                }) {
                                 Icon(
                                     painterResource(if (likesList[index].like > 0) R.drawable.icon_thumb_up_selected else R.drawable.icon_thumb_up_unselected),
                                     contentDescription = "enable/disable sound",
-                                    tint = if (likesList[index].like > 0)
-                                        MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                                    tint = if (likesList[index].like > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                                 )
                             }
                             IconButton(onClick = {
