@@ -20,7 +20,7 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = WhiteDev,
     secondary = PurpleGrey80,
     onSecondary = WhiteDev,
-    tertiary = Pink80,
+    tertiary = PinkDev,
     onTertiary = GrayDev30,
 )
 
@@ -32,7 +32,7 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = GrayDev30,
     secondary = PurpleGrey80,
     onSecondary =GrayDev30,
-    tertiary = Pink80,
+    tertiary = PinkDev,
     onTertiary = GrayDev100,
 
 

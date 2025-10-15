@@ -16,9 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -32,7 +29,7 @@ import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
 import com.example.simpsonsinfo.view.core.components.CustomHomerLoading
-import com.example.simpsonsinfo.view.core.components.SpaceV10
+import com.example.simpsonsinfo.view.core.components.SpaceV20
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -41,7 +38,7 @@ fun LocationScreen(
 ) {
     val uiState by locationsViewModel.uiState.collectAsStateWithLifecycle()
     val isLoading by locationsViewModel.isLoading.collectAsStateWithLifecycle()
-    var counter by remember { mutableIntStateOf(0) }
+    val likesList by locationsViewModel.likesList.collectAsStateWithLifecycle()
 
     if (isLoading) {
         CustomHomerLoading()
@@ -55,7 +52,9 @@ fun LocationScreen(
                 .padding(bottom = 2.dp)
                 .padding(horizontal = 20.dp),
         ) {
-            items(uiState.entity.results.size) { index ->
+            items(
+                uiState.entity.results.size
+            ) { index ->
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.background,
@@ -83,22 +82,23 @@ fun LocationScreen(
                             )
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            CustomBodyText(if (counter != 0) "+$counter" else "")
+                            CustomBodyText(
+                                text = if (likesList[index].like > 0) "+${likesList[index].like}" else "${likesList[index].like}",
+                                color = if (likesList[index].like >= 0)  MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
+//                                enabled = (likesList[index].like > 0)
+                            )
                             IconButton(onClick = {
-                                counter++
+                                locationsViewModel.updateLikes(index, +1)
                             }) {
                                 Icon(
-                                    painterResource(if (counter != 0) R.drawable.icon_thumb_up_selected else R.drawable.icon_thumb_up_unselected),
+                                    painterResource(if (likesList[index].like > 0) R.drawable.icon_thumb_up_selected else R.drawable.icon_thumb_up_unselected),
                                     contentDescription = "enable/disable sound",
-                                    tint = if (counter != 0)
+                                    tint = if (likesList[index].like > 0)
                                         MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                                 )
                             }
                             IconButton(onClick = {
-                                if (counter > 0) {
-                                    counter--
-                                }
-
+                                locationsViewModel.updateLikes(index, -1)
                             }) {
                                 Icon(
                                     painterResource(R.drawable.icon_thumb_down),
@@ -109,7 +109,7 @@ fun LocationScreen(
                         }
                     }
                 }
-                SpaceV10()
+                SpaceV20()
             }
         }
     }

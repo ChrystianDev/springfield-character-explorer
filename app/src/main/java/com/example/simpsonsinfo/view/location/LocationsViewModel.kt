@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,12 +27,16 @@ class LocationsViewModel @Inject constructor(
     }
 
     private val _uiState = MutableStateFlow(LocationsUiState())
-    private val _isLike = MutableStateFlow(0)
     val uiState: StateFlow<LocationsUiState> = _uiState
-    val isLike: StateFlow<Int> = _isLike
+
     var isLoading = MutableStateFlow(false)
 
-    fun onFetchLocations(){
+
+    private var _likesList = MutableStateFlow<List<LikeUiState>>(emptyList())
+    val likesList = _likesList.asStateFlow()
+
+
+    fun onFetchLocations() {
         viewModelScope.launch(Dispatchers.IO) {
             isLoadingData()
             delay(2000)
@@ -43,7 +48,22 @@ class LocationsViewModel @Inject constructor(
                     state
                 }
             }
+            response?.results?.forEachIndexed { ind, item ->
+                _likesList.value = _likesList.value + LikeUiState(like = 0, index = ind)
+            }
             dataLoaded()
+        }
+    }
+
+    fun updateLikes(index: Int, like: Int) {
+        _likesList.update { state ->
+            state.mapIndexed { indexList, likeUiState ->
+                if (indexList == index) {
+                    likeUiState.copy(like = likeUiState.like + like)
+                } else {
+                    likeUiState
+                }
+            }
         }
     }
 
@@ -53,10 +73,6 @@ class LocationsViewModel @Inject constructor(
 
     fun dataLoaded() {
         isLoading.value = false
-    }
-
-    fun setLike(like: Int) {
-        _isLike.value = like
     }
 }
 
@@ -68,4 +84,9 @@ data class LocationsUiState(
         0,
         results = emptyList()
     )
+)
+
+data class LikeUiState(
+    val like: Int = 0,
+    val index: Int = 0
 )
