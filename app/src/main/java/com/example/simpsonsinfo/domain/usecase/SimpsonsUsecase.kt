@@ -10,6 +10,6 @@ class SimpsonsUsecase @Inject constructor(
     private val repository: SimpsonsRepository
 ) {
     suspend operator fun invoke(page: String): SimpsonsEntity? {
-        return repository.doSimpsons(page )
+        return repository.doSimpsons(page = page)
     }
 }

@@ -9,7 +9,7 @@ import javax.inject.Inject
 class LocationsUsecase @Inject constructor(
     private val repository: SimpsonsRepository
 ) {
-    suspend operator fun invoke(): LocationsSimpsonsEntity? {
-        return repository.fetchLocations()
+    suspend operator fun invoke(page: String): LocationsSimpsonsEntity? {
+        return repository.fetchLocations(page = page)
     }
 }

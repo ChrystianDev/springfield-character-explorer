@@ -23,9 +23,9 @@ class SimpsonsService @Inject constructor(
         }
     }
 
-    suspend fun fetchLocations(): Response<LocationsSimpsonsResponse> {
+    suspend fun fetchLocations(page: String): Response<LocationsSimpsonsResponse> {
         return withContext(Dispatchers.IO) {
-            simpsonsClient.fetchLocations()
+            simpsonsClient.fetchLocations(page = page)
         }
     }
 }

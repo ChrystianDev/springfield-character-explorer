@@ -3,6 +3,7 @@
  */
 package com.example.simpsonsinfo.data.repository
 
+import android.util.Log
 import com.example.simpsonsinfo.data.network.SimpsonsService
 import com.example.simpsonsinfo.data.response.toDomain
 import com.example.simpsonsinfo.domain.entity.LocationsSimpsonsEntity
@@ -15,19 +16,21 @@ class SimpsonsRepositoryImpl @Inject constructor(private val api: SimpsonsServic
 
     override suspend fun doSimpsons(page: String): SimpsonsEntity? {
         try {
-            val response = api.doSimpsons(page)
+            val response = api.doSimpsons(page = page)
             return response.body()?.toDomain()
         } catch (e: Exception) {
+            Log.e("doSimpsons", e.message.toString())
             return null
         }
 
     }
 
-    override suspend fun fetchLocations(): LocationsSimpsonsEntity? {
+    override suspend fun fetchLocations(page: String): LocationsSimpsonsEntity? {
         try {
-            val response = api.fetchLocations()
+            val response = api.fetchLocations(page = page)
             return response.body()?.toDomain()
         }catch (e: Exception){
+            Log.e("fetchLocations", e.message.toString())
             return null
         }
     }

@@ -62,6 +62,7 @@ fun FavouritesScreen(
             CustomBodyText("No se obtuvieron resultados, intentelos de nuevo__")
         }
     } else {
+        // TODO animar actualización del listado
         LazyVerticalGrid(
             columns = GridCells.Adaptive(150.dp),
             state = gridState,
@@ -71,7 +72,6 @@ fun FavouritesScreen(
                 .padding(horizontal = 10.dp)
                 .padding(top = 40.dp, bottom = 2.dp),
         ) {
-//            items(list.size) {
             items(uiState.size) { index ->
                 val item = uiState[index]
                 Card(
@@ -111,8 +111,7 @@ fun FavouritesScreen(
                                 tint = MaterialTheme.colorScheme.primary,
                                 painter = painterResource(R.drawable.icon_delete),
                                 contentDescription = "Delete from Favourites",
-
-                                )
+                            )
                         }
                     }
                     CustomBodyText(

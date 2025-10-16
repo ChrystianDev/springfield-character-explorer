@@ -31,24 +31,26 @@ class LocationsViewModel @Inject constructor(
 
     var isLoading = MutableStateFlow(false)
 
-
     private var _likesList = MutableStateFlow<List<LikeUiState>>(emptyList())
+
     val likesList = _likesList.asStateFlow()
 
+    private val _page = MutableStateFlow("1")
 
     fun onFetchLocations() {
         viewModelScope.launch(Dispatchers.IO) {
-            isLoadingData()
-            delay(2000)
-            val response = locationsUsecase()
+            loadingData()
+            delay(1000)
+            val response = locationsUsecase(page = _page.value)
             _uiState.update { state ->
                 if (response != null) {
-                    state.copy(entity = response)
+                    val newList = state.entity.results + response.results
+                    state.copy(entity = response.copy(results = newList))
                 } else {
                     state
                 }
             }
-            response?.results?.forEachIndexed { ind, item ->
+            _uiState.value.entity.results.forEachIndexed { ind, item ->
                 _likesList.value = _likesList.value + LikeUiState(like = 0, index = ind)
             }
             dataLoaded()
@@ -67,12 +69,20 @@ class LocationsViewModel @Inject constructor(
         }
     }
 
-    fun isLoadingData() {
+    fun loadingData() {
         isLoading.value = true
     }
 
     fun dataLoaded() {
         isLoading.value = false
+    }
+
+    fun downloadMore() {
+        var pageNumber = _page.value.toIntOrNull()
+        if (pageNumber != null) {
+            pageNumber++
+            _page.value = pageNumber.toString()
+        }
     }
 }
 

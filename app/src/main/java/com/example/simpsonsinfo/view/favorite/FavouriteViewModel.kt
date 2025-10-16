@@ -25,8 +25,7 @@ class FavouriteViewModel @Inject constructor(
         onGetFavourites()
     }
 
-   lateinit var uiState : Flow<List<FavouriteCharacterEntity>>
-
+   var uiState : Flow<List<FavouriteCharacterEntity>> = MutableStateFlow(emptyList())
 
     private val _isFavourite = MutableStateFlow(false)
     val isFavourite: StateFlow<Boolean> = _isFavourite

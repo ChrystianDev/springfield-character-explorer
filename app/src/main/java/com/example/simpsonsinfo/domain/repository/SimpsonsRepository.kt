@@ -6,5 +6,5 @@ import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
 interface SimpsonsRepository {
     suspend fun doSimpsons(page: String): SimpsonsEntity?
 
-    suspend fun fetchLocations(): LocationsSimpsonsEntity?
+    suspend fun fetchLocations(page: String): LocationsSimpsonsEntity?
 }

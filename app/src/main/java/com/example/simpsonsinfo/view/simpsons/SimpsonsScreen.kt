@@ -247,7 +247,6 @@ fun SimpsonsScreen(
                             simpsonsViewModel.setIndexSelected(index = indexSelected)
 
                         }),
-                    // TODO animar cambio de imagen
                     model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[indexSelected].portrait_path}",
                     contentDescription = "image webp"
                 )

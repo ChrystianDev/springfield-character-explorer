@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -15,7 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -30,6 +33,7 @@ import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
 import com.example.simpsonsinfo.view.core.components.CustomHomerLoading
+import com.example.simpsonsinfo.view.core.components.CustomLoadingStyleIOS
 import com.example.simpsonsinfo.view.core.components.SpaceV20
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -40,12 +44,28 @@ fun LocationScreen(
     val uiState by locationsViewModel.uiState.collectAsStateWithLifecycle()
     val isLoading by locationsViewModel.isLoading.collectAsStateWithLifecycle()
     val likesList by locationsViewModel.likesList.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
 
-    if (isLoading) {
-        CustomHomerLoading()
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            listState.canScrollForward
+        }.collect { canScrollForward ->
+            if (!canScrollForward) {
+                if (uiState.entity.results.isNotEmpty() && !isLoading) {
+                    locationsViewModel.downloadMore()
+                    locationsViewModel.onFetchLocations()
+                }
+            }
+        }
+    }
+
+
+    if (uiState.entity.results.isEmpty() && isLoading) {
+        CustomHomerLoading(background = MaterialTheme.colorScheme.onTertiary)
     } else {
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.onTertiary)
@@ -89,13 +109,12 @@ fun LocationScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.End,
                             modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
+                                .fillMaxWidth()
+                                .weight(1f),
                         ) {
                             CustomBodyText(
                                 text = if (likesList[index].like > 0) "+${likesList[index].like}" else " ${likesList[index].like}",
                                 color = if (likesList[index].like >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
-//                                enabled = (likesList[index].like > 0)
                             )
                             IconButton(
                                 onClick = {
@@ -121,6 +140,10 @@ fun LocationScreen(
                 }
                 SpaceV20()
             }
+            if (isLoading)
+                item {
+                    CustomLoadingStyleIOS(padding = 30.dp)
+                }
         }
     }
 }

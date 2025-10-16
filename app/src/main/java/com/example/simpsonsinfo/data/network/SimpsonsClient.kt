@@ -11,6 +11,6 @@ interface SimpsonsClient {
     suspend fun doSimpsons(@Query("page") page: String): Response<SimpsonsResponse>
 
     @GET("locations")
-    suspend fun fetchLocations(): Response<LocationsSimpsonsResponse>
+    suspend fun fetchLocations(@Query("page") page: String): Response<LocationsSimpsonsResponse>
 }
 
