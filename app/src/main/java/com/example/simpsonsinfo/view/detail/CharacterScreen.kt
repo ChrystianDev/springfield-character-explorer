@@ -3,6 +3,7 @@
  */
 package com.example.simpsonsinfo.view.detail
 
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,12 +22,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -46,6 +53,7 @@ import com.example.simpsonsinfo.view.core.components.SpaceV10
 import com.example.simpsonsinfo.view.favorite.FavouriteViewModel
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +64,8 @@ fun CharacterScreen(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    var isSpeaking by remember { mutableStateOf(false) }
+    val tts = rememberTextToSpeech()
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
@@ -203,7 +213,18 @@ fun CharacterScreen(
                         CustomItemCharacter(
                             text = character.phrases[index],
                             isLastItem = character.phrases.size == index + 1,
-                            onClick = { }
+                            isPlaying = isSpeaking,
+                            onClick = {
+                                if (tts.value?.isSpeaking == true) {
+                                    tts.value?.stop()
+                                    isSpeaking = false
+                                } else {
+                                    tts.value?.speak(
+                                        character.phrases[index], TextToSpeech.QUEUE_FLUSH, null, ""
+                                    )
+                                    isSpeaking = true
+                                }
+                            }
                         )
                     }
                 }
@@ -214,3 +235,23 @@ fun CharacterScreen(
 }
 
 
+@Composable
+fun rememberTextToSpeech(): MutableState<TextToSpeech?> {
+    val context = LocalContext.current
+    val tts = remember { mutableStateOf<TextToSpeech?>(null) }
+
+    DisposableEffect(context) {
+        val textToSpeech = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                tts.value?.language = Locale.US
+            }
+        }
+        tts.value = textToSpeech
+
+        onDispose {
+            textToSpeech.stop()
+            textToSpeech.shutdown()
+        }
+    }
+    return tts
+}

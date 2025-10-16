@@ -6,13 +6,6 @@ import kotlinx.serialization.Serializable
 object Main
 
 @Serializable
-object Simpsons
-
-@Serializable
 object Character
 
-@Serializable
-object Locations
 
-@Serializable
-object Favourites

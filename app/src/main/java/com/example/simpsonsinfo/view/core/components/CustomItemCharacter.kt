@@ -17,7 +17,8 @@ import com.example.simpsonsinfo.R
 fun CustomItemCharacter(
     text: String,
     onClick: () -> Unit,
-    isLastItem: Boolean = false
+    isLastItem: Boolean = false,
+    isPlaying: Boolean = false,
 ) {
     Column {
         Row(
@@ -33,7 +34,9 @@ fun CustomItemCharacter(
             )
             CustomIconButton(
                 modifier = Modifier.weight(1f),
-                icon = R.drawable.icon_play,
+//                icon = if(isPlaying) R.drawable.icon_pause else R.drawable.icon_play,
+                // TODO Capturar el final de la reproducción
+                icon = if(isPlaying) R.drawable.icon_play else R.drawable.icon_play,
                 iconDescription = "Play audio",
                 onClick = {
                     onClick()
