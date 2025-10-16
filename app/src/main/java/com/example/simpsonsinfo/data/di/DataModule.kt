@@ -12,7 +12,7 @@ import com.example.simpsonsinfo.data.repository.SimpsonsRepositoryImpl
 import com.example.simpsonsinfo.data.repository.local.DataBaseRoom
 import com.example.simpsonsinfo.data.repository.local.FavouriteCharacterDao
 import com.example.simpsonsinfo.domain.repository.SimpsonsRepository
-import com.example.simpsonsinfo.domain.usecase.SimpsonsUsecase
+import com.example.simpsonsinfo.view.core.mediaplayer.VoiceMediaPlayer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,7 +30,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
-
 
 
     // ****** PLUGINS or DEPENDENCIES ******
@@ -64,7 +63,7 @@ object DataModule {
 
     // ****** REPOSITORIES ******
     @Provides
-    fun provideSimpsonsRepository(simpsonsService: SimpsonsService): SimpsonsRepository{
+    fun provideSimpsonsRepository(simpsonsService: SimpsonsService): SimpsonsRepository {
         return SimpsonsRepositoryImpl(simpsonsService)
     }
 
@@ -81,6 +80,16 @@ object DataModule {
     }
 
     @Provides
-    fun provideFavouriteCharacterDao(db: DataBaseRoom): FavouriteCharacterDao = db.favouriteCharacterDao()
+    fun provideFavouriteCharacterDao(db: DataBaseRoom): FavouriteCharacterDao =
+        db.favouriteCharacterDao()
 
+
+    // TODO: Eliminar si no se usa !!!
+    @Provides
+    @Singleton
+    fun provideMediaPlayer(
+        @ApplicationContext context: Context
+    ): VoiceMediaPlayer {
+        return VoiceMediaPlayer(context)
+    }
 }

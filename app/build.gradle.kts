@@ -75,6 +75,11 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.lottie.compose)
 
+    // TODO: Eliminar si no se usa !!!
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.common)
+
     // Local DB
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
