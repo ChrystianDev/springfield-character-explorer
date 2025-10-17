@@ -3,6 +3,8 @@
  */
 package com.example.simpsonsinfo.view.simpsons
 
+import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -59,6 +61,7 @@ import com.example.simpsonsinfo.view.core.components.CustomIconButton
 import com.example.simpsonsinfo.view.core.components.SpaceH10
 import com.example.simpsonsinfo.view.core.components.SpaceV10
 import com.example.simpsonsinfo.view.core.components.SpaceV20
+import com.example.simpsonsinfo.view.core.components.rememberTextToSpeech
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,10 +73,15 @@ fun SimpsonsScreen(
 ) {
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
-    var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
-    val listState = rememberLazyListState()
-    var lastVisibleItem by remember { mutableIntStateOf(0) }
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
+
+    var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
+    var lastVisibleItem by remember { mutableIntStateOf(0) }
+    var isSpeaking by remember { mutableStateOf(false) } // TODO: requiere un listener tts
+    var isMuted by remember { mutableStateOf(false) }
+
+    val listState = rememberLazyListState()
+    val tts = rememberTextToSpeech()
 
     LaunchedEffect(listState) {
         snapshotFlow {
@@ -83,11 +91,42 @@ fun SimpsonsScreen(
                 lastVisibleItem = visibleItems - 3
             }
             simpsonsViewModel.setIndexSelected(lastVisibleItem)
+            if (uiState.entity.results[lastVisibleItem].phrases.isNotEmpty()) {
+                var text = "There are no phrases"
+                if (uiState.entity.results[lastVisibleItem].phrases.isNotEmpty()) {
+                    text = uiState.entity.results[lastVisibleItem].phrases[0]
+                }
+                val parameters = Bundle().apply {
+                    putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, if (isMuted) 0.0f else 1.0f)
+                }
+                tts.value?.speak(
+                    text,
+                    TextToSpeech.QUEUE_FLUSH,
+                    parameters,
+                    ""
+                )
+            }
             val totalItems = listState.layoutInfo.totalItemsCount
             if (visibleItems >= totalItems && totalItems > 0) {
                 Log.i("LIST-STATE", "End of list reached")
             }
         }
+    }
+
+    fun textToSpeech(index: Int) {
+        var text = "There are no phrases"
+        if (uiState.entity.results[index].phrases.isNotEmpty()) {
+            text = uiState.entity.results[index].phrases[0]
+        }
+        val parameters = Bundle().apply {
+            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, if (isMuted) 0.0f else 1.0f)
+        }
+        tts.value?.speak(
+            text,
+            TextToSpeech.QUEUE_FLUSH,
+            parameters,
+            "tts_simpsons"
+        )
     }
 
     Column(
@@ -140,12 +179,14 @@ fun SimpsonsScreen(
                             containerColor = Color.Transparent,
                             contentColor = MaterialTheme.colorScheme.onBackground
                         ),
-                        onClick = {}
+                        onClick = {
+                            isMuted = !isMuted
+                        }
                     ) {
                         Icon(
-                            painterResource(R.drawable.icon_volume_disabled),
+                            painterResource(if (isMuted) R.drawable.icon_volume_disabled else R.drawable.icon_volume_active),
                             contentDescription = "enable/disable sound",
-                            tint = MaterialTheme.colorScheme.onTertiary
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     CustomIconButton(
@@ -185,6 +226,7 @@ fun SimpsonsScreen(
                                     )
                                     .clickable(onClick = {
                                         simpsonsViewModel.setIndexSelected(index)
+                                        textToSpeech(index)
                                     }),
                                 model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].portrait_path}",
                                 contentDescription = "image webp"

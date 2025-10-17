@@ -22,9 +22,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -50,10 +46,10 @@ import com.example.simpsonsinfo.view.core.components.CustomItemCharacter
 import com.example.simpsonsinfo.view.core.components.CustomSnackBar
 import com.example.simpsonsinfo.view.core.components.CustomTitleText
 import com.example.simpsonsinfo.view.core.components.SpaceV10
+import com.example.simpsonsinfo.view.core.components.rememberTextToSpeech
 import com.example.simpsonsinfo.view.favorite.FavouriteViewModel
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -232,26 +228,4 @@ fun CharacterScreen(
             }
         }
     }
-}
-
-
-@Composable
-fun rememberTextToSpeech(): MutableState<TextToSpeech?> {
-    val context = LocalContext.current
-    val tts = remember { mutableStateOf<TextToSpeech?>(null) }
-
-    DisposableEffect(context) {
-        val textToSpeech = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts.value?.language = Locale.US
-            }
-        }
-        tts.value = textToSpeech
-
-        onDispose {
-            textToSpeech.stop()
-            textToSpeech.shutdown()
-        }
-    }
-    return tts
 }
