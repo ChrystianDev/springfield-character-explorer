@@ -3,9 +3,6 @@
  */
 package com.example.simpsonsinfo.view.simpsons
 
-import android.os.Bundle
-import android.speech.tts.TextToSpeech
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -74,11 +71,11 @@ fun SimpsonsScreen(
 
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
+    val isMuted by simpsonsViewModel.isMuted.collectAsStateWithLifecycle()
 
     var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
     var lastVisibleItem by remember { mutableIntStateOf(0) }
     var isSpeaking by remember { mutableStateOf(false) } // TODO: requiere un listener tts
-    var isMuted by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
     val tts = rememberTextToSpeech()
@@ -91,42 +88,8 @@ fun SimpsonsScreen(
                 lastVisibleItem = visibleItems - 3
             }
             simpsonsViewModel.setIndexSelected(lastVisibleItem)
-            if (uiState.entity.results[lastVisibleItem].phrases.isNotEmpty()) {
-                var text = "There are no phrases"
-                if (uiState.entity.results[lastVisibleItem].phrases.isNotEmpty()) {
-                    text = uiState.entity.results[lastVisibleItem].phrases[0]
-                }
-                val parameters = Bundle().apply {
-                    putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, if (isMuted) 0.0f else 1.0f)
-                }
-                tts.value?.speak(
-                    text,
-                    TextToSpeech.QUEUE_FLUSH,
-                    parameters,
-                    ""
-                )
-            }
-            val totalItems = listState.layoutInfo.totalItemsCount
-            if (visibleItems >= totalItems && totalItems > 0) {
-                Log.i("LIST-STATE", "End of list reached")
-            }
+            simpsonsViewModel.textToSpeech(lastVisibleItem, tts)
         }
-    }
-
-    fun textToSpeech(index: Int) {
-        var text = "There are no phrases"
-        if (uiState.entity.results[index].phrases.isNotEmpty()) {
-            text = uiState.entity.results[index].phrases[0]
-        }
-        val parameters = Bundle().apply {
-            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, if (isMuted) 0.0f else 1.0f)
-        }
-        tts.value?.speak(
-            text,
-            TextToSpeech.QUEUE_FLUSH,
-            parameters,
-            "tts_simpsons"
-        )
     }
 
     Column(
@@ -180,7 +143,7 @@ fun SimpsonsScreen(
                             contentColor = MaterialTheme.colorScheme.onBackground
                         ),
                         onClick = {
-                            isMuted = !isMuted
+                            simpsonsViewModel.toogleMute()
                         }
                     ) {
                         Icon(
@@ -226,7 +189,7 @@ fun SimpsonsScreen(
                                     )
                                     .clickable(onClick = {
                                         simpsonsViewModel.setIndexSelected(index)
-                                        textToSpeech(index)
+                                        simpsonsViewModel.textToSpeech(index, tts)
                                     }),
                                 model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].portrait_path}",
                                 contentDescription = "image webp"

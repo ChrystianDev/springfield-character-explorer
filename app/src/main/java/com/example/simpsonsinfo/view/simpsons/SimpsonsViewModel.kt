@@ -3,7 +3,10 @@
  */
 package com.example.simpsonsinfo.view.simpsons
 
+import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
@@ -34,6 +37,9 @@ class SimpsonsViewModel @Inject constructor(
 
     private val _page = MutableStateFlow("1")
 
+    private val _isMuted = MutableStateFlow(false)
+    val isMuted : StateFlow<Boolean> = _isMuted
+
     fun onGetSimpsons() {
         viewModelScope.launch(Dispatchers.IO) {
             isLoadingData()
@@ -63,7 +69,7 @@ class SimpsonsViewModel @Inject constructor(
         _indexSelected.value = index
     }
 
-    fun upPage(){
+    fun upPage() {
         var pageNumber = _page.value.toIntOrNull()
         if (pageNumber != null) {
             pageNumber++
@@ -71,7 +77,7 @@ class SimpsonsViewModel @Inject constructor(
         }
     }
 
-    fun downPage(){
+    fun downPage() {
         var pageNumber = _page.value.toIntOrNull()
         if (pageNumber != null) {
             pageNumber--
@@ -79,6 +85,26 @@ class SimpsonsViewModel @Inject constructor(
         }
     }
 
+
+    fun textToSpeech(index: Int, tts: MutableState<TextToSpeech?>) {
+        var text = "There are no phrases"
+        if (uiState.value.entity.results[index].phrases.isNotEmpty()) {
+            text = uiState.value.entity.results[index].phrases[0]
+        }
+        val parameters = Bundle().apply {
+            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, if (isMuted.value) 0.0f else 1.0f)
+        }
+        tts.value?.speak(
+            text,
+            TextToSpeech.QUEUE_FLUSH,
+            parameters,
+            "tts_simpsons"
+        )
+    }
+
+    fun toogleMute(){
+        _isMuted.value = !_isMuted.value
+    }
 }
 
 data class SimpsonsUiState(
