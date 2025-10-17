@@ -75,6 +75,15 @@ fun CharacterScreen(
         urlImage = character.portrait_path
     )
 
+    fun speak(index: Int) {
+        tts.value?.speak(
+            character.phrases[index],
+            TextToSpeech.QUEUE_FLUSH,
+            null,
+            ""
+        )
+    }
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -213,11 +222,10 @@ fun CharacterScreen(
                             onClick = {
                                 if (tts.value?.isSpeaking == true) {
                                     tts.value?.stop()
+                                    speak(index)
                                     isSpeaking = false
                                 } else {
-                                    tts.value?.speak(
-                                        character.phrases[index], TextToSpeech.QUEUE_FLUSH, null, ""
-                                    )
+                                    speak(index)
                                     isSpeaking = true
                                 }
                             }
