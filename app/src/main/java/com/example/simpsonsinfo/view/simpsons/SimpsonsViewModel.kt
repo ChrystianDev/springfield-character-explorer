@@ -38,7 +38,7 @@ class SimpsonsViewModel @Inject constructor(
     private val _page = MutableStateFlow("1")
 
     private val _isMuted = MutableStateFlow(false)
-    val isMuted : StateFlow<Boolean> = _isMuted
+    val isMuted: StateFlow<Boolean> = _isMuted
 
     fun onGetSimpsons() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -86,7 +86,7 @@ class SimpsonsViewModel @Inject constructor(
     }
 
 
-    fun textToSpeech(index: Int, tts: MutableState<TextToSpeech?>) {
+    fun speakItemCharacters(index: Int, tts: MutableState<TextToSpeech?>) {
         var text = "There are no phrases"
         if (uiState.value.entity.results[index].phrases.isNotEmpty()) {
             text = uiState.value.entity.results[index].phrases[0]
@@ -102,7 +102,22 @@ class SimpsonsViewModel @Inject constructor(
         )
     }
 
-    fun toogleMute(){
+    fun speakItemDetail(tts: MutableState<TextToSpeech?>, text: String) {
+        if (tts.value?.isSpeaking == true) {
+            tts.value?.stop()
+        }
+        tts.value?.speak(
+            text,
+            TextToSpeech.QUEUE_FLUSH,
+            null,
+            ""
+        )
+    }
+
+    fun toggleMute(tts: MutableState<TextToSpeech?>) {
+        if (tts.value?.isSpeaking == true) {
+            tts.value?.stop()
+        }
         _isMuted.value = !_isMuted.value
     }
 }

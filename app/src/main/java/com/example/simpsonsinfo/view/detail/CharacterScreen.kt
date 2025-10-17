@@ -3,7 +3,6 @@
  */
 package com.example.simpsonsinfo.view.detail
 
-import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -74,15 +73,6 @@ fun CharacterScreen(
         name = character.name,
         urlImage = character.portrait_path
     )
-
-    fun speak(index: Int) {
-        tts.value?.speak(
-            character.phrases[index],
-            TextToSpeech.QUEUE_FLUSH,
-            null,
-            ""
-        )
-    }
 
     Scaffold(
         snackbarHost = {
@@ -215,19 +205,16 @@ fun CharacterScreen(
             ) {
                 LazyColumn(modifier = Modifier.padding(10.dp)) {
                     items(character.phrases.size) { index ->
+                        val phrase = character.phrases[index]
                         CustomItemCharacter(
-                            text = character.phrases[index],
+                            text = phrase,
                             isLastItem = character.phrases.size == index + 1,
                             isPlaying = isSpeaking,
                             onClick = {
-                                if (tts.value?.isSpeaking == true) {
-                                    tts.value?.stop()
-                                    speak(index)
-                                    isSpeaking = false
-                                } else {
-                                    speak(index)
-                                    isSpeaking = true
-                                }
+                                simpsonsViewModel.speakItemDetail(
+                                    tts = tts,
+                                    phrase,
+                                )
                             }
                         )
                     }

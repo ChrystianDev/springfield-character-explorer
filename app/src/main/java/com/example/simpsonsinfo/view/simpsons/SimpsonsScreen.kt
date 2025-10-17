@@ -88,7 +88,7 @@ fun SimpsonsScreen(
                 lastVisibleItem = visibleItems - 3
             }
             simpsonsViewModel.setIndexSelected(lastVisibleItem)
-            simpsonsViewModel.textToSpeech(lastVisibleItem, tts)
+            simpsonsViewModel.speakItemCharacters(lastVisibleItem, tts)
         }
     }
 
@@ -143,7 +143,7 @@ fun SimpsonsScreen(
                             contentColor = MaterialTheme.colorScheme.onBackground
                         ),
                         onClick = {
-                            simpsonsViewModel.toogleMute()
+                            simpsonsViewModel.toggleMute(tts = tts)
                         }
                     ) {
                         Icon(
@@ -189,7 +189,7 @@ fun SimpsonsScreen(
                                     )
                                     .clickable(onClick = {
                                         simpsonsViewModel.setIndexSelected(index)
-                                        simpsonsViewModel.textToSpeech(index, tts)
+                                        simpsonsViewModel.speakItemCharacters(index, tts)
                                     }),
                                 model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].portrait_path}",
                                 contentDescription = "image webp"
