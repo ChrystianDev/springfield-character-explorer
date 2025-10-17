@@ -26,7 +26,7 @@ class SimpsonsViewModel @Inject constructor(
 ) : ViewModel() {
 
     init {
-        onGetSimpsons()
+        onGetCharacters()
     }
 
     private val _uiState = MutableStateFlow(SimpsonsUiState())
@@ -40,7 +40,7 @@ class SimpsonsViewModel @Inject constructor(
     private val _isMuted = MutableStateFlow(false)
     val isMuted: StateFlow<Boolean> = _isMuted
 
-    fun onGetSimpsons() {
+    fun onGetCharacters() {
         viewModelScope.launch(Dispatchers.IO) {
             isLoadingData()
             delay(2000)

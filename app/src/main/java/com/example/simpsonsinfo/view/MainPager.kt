@@ -22,7 +22,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.simpsonsinfo.view.core.components.CustomHomerLoading
 import com.example.simpsonsinfo.view.core.components.IOSStyleSegmentedControl
-import com.example.simpsonsinfo.view.favorite.FavouritesScreen
+import com.example.simpsonsinfo.view.favorite.FavouriteScreen
 import com.example.simpsonsinfo.view.location.LocationScreen
 import com.example.simpsonsinfo.view.simpsons.SimpsonsScreen
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
@@ -61,7 +61,7 @@ fun MainPager(
                         onSetDarkMode,
                     )
                     1 -> LocationScreen()
-                    2 -> FavouritesScreen()
+                    2 -> FavouriteScreen()
                 }
             }
             Box(

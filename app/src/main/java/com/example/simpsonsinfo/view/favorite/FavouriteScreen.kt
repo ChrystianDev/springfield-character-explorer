@@ -38,10 +38,9 @@ import com.example.simpsonsinfo.view.core.components.SpaceV10
 import com.example.simpsonsinfo.view.core.components.SpaceV20
 
 @Composable
-fun FavouritesScreen(
+fun FavouriteScreen(
     favouriteViewModel: FavouriteViewModel = hiltViewModel()
 ) {
-
     val gridState = rememberLazyGridState(0)
 
     val uiState by favouriteViewModel.uiState.collectAsStateWithLifecycle(initialValue = emptyList())

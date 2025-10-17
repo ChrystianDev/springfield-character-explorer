@@ -3,7 +3,6 @@
  */
 package com.example.simpsonsinfo.view.simpsons
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,10 +40,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -53,11 +49,8 @@ import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
 import com.example.simpsonsinfo.ui.theme.shapes
-import com.example.simpsonsinfo.view.core.components.CustomBodyText
 import com.example.simpsonsinfo.view.core.components.CustomIconButton
-import com.example.simpsonsinfo.view.core.components.SpaceH10
 import com.example.simpsonsinfo.view.core.components.SpaceV10
-import com.example.simpsonsinfo.view.core.components.SpaceV20
 import com.example.simpsonsinfo.view.core.components.rememberTextToSpeech
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,9 +79,9 @@ fun SimpsonsScreen(
         }.collect { visibleItems ->
             if (visibleItems > 3) {
                 lastVisibleItem = visibleItems - 3
+                simpsonsViewModel.setIndexSelected(lastVisibleItem)
+                simpsonsViewModel.speakItemCharacters(lastVisibleItem, tts)
             }
-            simpsonsViewModel.setIndexSelected(lastVisibleItem)
-            simpsonsViewModel.speakItemCharacters(lastVisibleItem, tts)
         }
     }
 
@@ -100,37 +93,7 @@ fun SimpsonsScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         if (uiState.entity.results.isEmpty()) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Image(painterResource(R.drawable.doh_homer_simpson), contentDescription = null)
-                SpaceV20()
-                Text(
-                    text = "opssss ...",
-                    fontSize = 40.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                SpaceV10()
-                CustomBodyText("No se obtuvieron resultados, intentelos de nuevo__")
-
-                TextButton(
-                    enabled = true,
-                    onClick = {
-                        simpsonsViewModel.onGetSimpsons()
-                    }) {
-                    CustomBodyText(
-                        stringResource(R.string.main_get_characters),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    SpaceH10()
-                    Icon(
-                        painterResource(R.drawable.icon_download),
-                        contentDescription = "Download characters",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
+            SimpsonsEmptyListScreen(onGetCharacters = simpsonsViewModel::onGetCharacters)
         } else {
             Column {
                 Row(
@@ -206,7 +169,7 @@ fun SimpsonsScreen(
                         enabled = uiState.entity.prev.isNotEmpty(),
                         onClick = {
                             simpsonsViewModel.downPage()
-                            simpsonsViewModel.onGetSimpsons()
+                            simpsonsViewModel.onGetCharacters()
                         }
                     ) {
                         Icon(
@@ -222,7 +185,7 @@ fun SimpsonsScreen(
                         enabled = uiState.entity.next.isNotEmpty(),
                         onClick = {
                             simpsonsViewModel.upPage()
-                            simpsonsViewModel.onGetSimpsons()
+                            simpsonsViewModel.onGetCharacters()
                         }) {
                         Icon(
                             painterResource(R.drawable.icon_arrow_forward),
@@ -263,7 +226,6 @@ fun SimpsonsScreen(
                     textAlign = TextAlign.Center
                 )
             }
-
 
             Icon(
                 modifier = Modifier.width(130.dp),
