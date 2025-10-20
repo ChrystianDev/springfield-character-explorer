@@ -14,7 +14,7 @@ class FavouritesUsecase @Inject constructor(
     //    operator fun invoke(): Flow<List<FavouriteCharacterEntity>> {
 //        return localRepository.getAllFavourites()
 //    }
-    suspend operator fun invoke() = localRepository.getAllFavourites()
+    operator fun invoke() = localRepository.getAllFavourites()
 
 
     suspend fun existsItem(fid: Int) = localRepository.existsItem(fid)
