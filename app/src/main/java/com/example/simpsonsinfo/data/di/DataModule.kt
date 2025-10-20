@@ -5,7 +5,7 @@ package com.example.simpsonsinfo.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.simpsonsinfo.config.Constants.BASE_URL
+import com.example.simpsonsinfo.BuildConfig
 import com.example.simpsonsinfo.data.network.SimpsonsClient
 import com.example.simpsonsinfo.data.network.SimpsonsService
 import com.example.simpsonsinfo.data.repository.SimpsonsRepositoryImpl
@@ -36,8 +36,9 @@ object DataModule {
     @Singleton
     @Provides
     fun provideRetrofit(): Retrofit {
+        val buildConfig = BuildConfig.BASE_URL
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(buildConfig)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

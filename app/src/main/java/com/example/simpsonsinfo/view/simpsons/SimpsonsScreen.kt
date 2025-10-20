@@ -45,10 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.example.simpsonsinfo.BuildConfig
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
 import com.example.simpsonsinfo.ui.theme.shapes
+import com.example.simpsonsinfo.view.core.components.CustomBiographyText
 import com.example.simpsonsinfo.view.core.components.CustomIconButton
 import com.example.simpsonsinfo.view.core.components.SpaceV10
 import com.example.simpsonsinfo.view.core.components.rememberTextToSpeech
@@ -227,12 +229,18 @@ fun SimpsonsScreen(
                 )
             }
 
-            Icon(
-                modifier = Modifier.width(130.dp),
-                painter = painterResource(R.drawable.simpsons_logo),
-                contentDescription = "simpsons",
-                tint = MaterialTheme.colorScheme.primary
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    modifier = Modifier.width(130.dp),
+                    painter = painterResource(R.drawable.simpsons_logo),
+                    contentDescription = "simpsons",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                CustomBiographyText("BuildType: ${BuildConfig.BUILD_TYPE}, Flavor: ${BuildConfig.FLAVOR}")
+            }
         }
     }
 }
