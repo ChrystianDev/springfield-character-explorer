@@ -15,6 +15,7 @@ composeBom = "2025.09.01"
 # TODO: Eliminar si no se usa !!!
 media3Exoplayer = "1.8.0"
 
+mockk = "1.14.6"
 navigationCompose = "2.9.5"
 kotlinSerialization = "1.9.0"
 #kotlinParcelize = "2.2.20"
@@ -63,6 +64,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 google-dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "daggerHilt" }
 google-dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "daggerHilt" }
 hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 squareup-retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
