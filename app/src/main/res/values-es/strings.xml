@@ -10,5 +10,7 @@
     <string name="locations_text">"Lugar: "</string>
     <string name="favourite_character_added">El personaje se añadio a favoritos</string>
     <string name="favourite_character_deleted">El personaje fue eliminado de favoritos</string>
+    <string name="favourite_subtitle_empty_message">Para guardar personajes favoritos, haz click en el icono favoritos desde la pantalla del personaje</string>
+    <string name="favourite_title_empty_message">No hay favoritos…</string>
 
 </resources>

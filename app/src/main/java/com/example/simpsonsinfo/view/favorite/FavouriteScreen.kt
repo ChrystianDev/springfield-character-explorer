@@ -1,10 +1,8 @@
 package com.example.simpsonsinfo.view.favorite
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,15 +14,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -34,8 +29,6 @@ import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
 import com.example.simpsonsinfo.ui.theme.BlackDev
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
-import com.example.simpsonsinfo.view.core.components.SpaceV10
-import com.example.simpsonsinfo.view.core.components.SpaceV20
 
 @Composable
 fun FavouriteScreen(
@@ -43,23 +36,10 @@ fun FavouriteScreen(
 ) {
     val gridState = rememberLazyGridState(0)
 
-    val uiState by favouriteViewModel.uiState.collectAsStateWithLifecycle(initialValue = emptyList())
+    val uiState = favouriteViewModel.uiState.collectAsStateWithLifecycle(initialValue = emptyList())
 
-    if (uiState.isEmpty()) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Image(painterResource(R.drawable.doh_homer_simpson), contentDescription = null)
-            SpaceV20()
-            Text(
-                text = "There are not favourites ...",
-                fontSize = 40.sp,
-                color = MaterialTheme.colorScheme.primary
-            )
-            SpaceV10()
-            CustomBodyText("No se obtuvieron resultados, intentelos de nuevo__")
-        }
+    if (uiState.value.isEmpty()) {
+        FavouriteEmptyListScreen()
     } else {
         // TODO animar actualización del listado
         LazyVerticalGrid(
@@ -71,8 +51,8 @@ fun FavouriteScreen(
                 .padding(horizontal = 10.dp)
                 .padding(top = 40.dp, bottom = 2.dp),
         ) {
-            items(uiState.size) { index ->
-                val item = uiState[index]
+            items(uiState.value.size) { index ->
+                val item = uiState.value[index]
                 Card(
                     modifier = Modifier.padding(5.dp),
                     colors = CardDefaults.cardColors(

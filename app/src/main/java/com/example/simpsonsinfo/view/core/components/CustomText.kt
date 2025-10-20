@@ -1,6 +1,5 @@
 package com.example.simpsonsinfo.view.core.components
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,7 +17,6 @@ import androidx.compose.ui.unit.sp
 fun CustomTitleText(
     text: String,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 15.sp,
     color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign = TextAlign.Center,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
@@ -26,7 +24,6 @@ fun CustomTitleText(
     Text(
         text = text,
         modifier = modifier,
-        fontSize = fontSize,
         color = color,
         textAlign = textAlign,
         style = style
@@ -37,7 +34,6 @@ fun CustomTitleText(
 fun CustomBodyText(
     text: String,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 15.sp,
     padding: Dp = 10.dp,
     color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign = TextAlign.Center,
@@ -46,7 +42,6 @@ fun CustomBodyText(
     Text(
         text = text,
         modifier = modifier.padding(padding),
-        fontSize = fontSize,
         color = color,
         textAlign = textAlign,
         style = style

@@ -11,5 +11,7 @@
     <string name="locations_text">"Location: "</string>
     <string name="favourite_character_added">The character was added to favourites</string>
     <string name="favourite_character_deleted">The character was deleted from favourites</string>
+    <string name="favourite_subtitle_empty_message">To save favourite characters, click on the favourites icon on the character screen.</string>
+    <string name="favourite_title_empty_message">There are no favourites…</string>
 
 </resources>

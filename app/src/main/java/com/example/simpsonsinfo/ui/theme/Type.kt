@@ -18,6 +18,14 @@ val bitcount = FontFamily(
     Font(R.font.bitcount, FontWeight.Normal),
 )
 val Typography = Typography(
+    labelLarge = TextStyle(
+//        fontFamily = bitcount,
+        fontFamily = open_sans,
+        fontWeight = FontWeight.Normal,
+        fontSize = 40.sp,
+        lineHeight = 40.sp,
+        letterSpacing = 0.5.sp
+    ),
     bodyLarge = TextStyle(
 //        fontFamily = bitcount,
         fontFamily = open_sans,

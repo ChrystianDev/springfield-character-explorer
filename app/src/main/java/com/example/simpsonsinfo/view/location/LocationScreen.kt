@@ -102,7 +102,8 @@ fun LocationScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 text = uiState.entity.results[index].name,
                                 textAlign = TextAlign.Start,
-                                color = MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                         Row(
@@ -115,6 +116,7 @@ fun LocationScreen(
                             CustomBodyText(
                                 text = if (likesList[index].like > 0) "+${likesList[index].like}" else " ${likesList[index].like}",
                                 color = if (likesList[index].like >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                             IconButton(
                                 onClick = {
