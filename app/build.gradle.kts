@@ -5,7 +5,63 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    jacoco
 }
+
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDevDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*"
+    )
+
+    // Ruta para variantes con flavors (devDebug)
+//    val debugTree = fileTree(
+//        mapOf(
+//            "dir" to "${layout.buildDirectory}/tmp/kotlin-classes/devDebug",
+//            "excludes" to fileFilter
+//        )
+//    )
+    val debugTree = fileTree(
+        "${layout.buildDirectory}/intermediates/javac/devDebug/classes"
+    ) {
+        exclude(fileFilter)
+    }
+
+    val kotlinDebugTree = fileTree(
+        "${layout.buildDirectory}/tmp/kotlin-classes/devDebug"
+    ) {
+        exclude(fileFilter)
+    }
+
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include("jacoco/testDevDebugUnitTest.exec")
+        }
+    )
+
+//    sourceDirectories.setFrom(files(listOf(mainSrc)))
+//    classDirectories.setFrom(files(listOf(debugTree)))
+//    executionData.setFrom(
+//        files("${layout.buildDirectory}/jacoco/testDevDebugUnitTest.exec")
+//    )
+}
+
 
 android {
     namespace = "com.example.simpsonsinfo"
@@ -53,6 +109,12 @@ android {
             manifestPlaceholders["hostName"] = "com.example.simpsonsinfo"
             applicationIdSuffix = ".debugStaging"
         }
+        debug {
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
+            manifestPlaceholders["hostName"] = "com.example.simpsonsinfo"
+            applicationIdSuffix = ".debug"
+        }
     }
 
     buildFeatures{
@@ -93,12 +155,21 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+
+
+    kotlin {
+        jvmToolchain {
+            languageVersion.set(JavaLanguageVersion.of(11))
+        }
     }
+//    kotlinOptions {
+//        jvmTarget = "11"
+//    }
+
     buildFeatures {
         compose = true
     }
+
 }
 
 dependencies {
