@@ -43,7 +43,7 @@ class SimpsonsViewModel @Inject constructor(
     fun onGetCharacters() {
         viewModelScope.launch(Dispatchers.IO) {
             isLoadingData()
-            delay(2000)
+            delay(1000)
             val response = simpsonsUsecase(page = _page.value)
             _uiState.update { state ->
                 if (response != null) {
