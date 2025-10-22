@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.simpsonsinfo.domain.entity.LocationsSimpsonsEntity
 import com.example.simpsonsinfo.domain.usecase.LocationsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LocationsViewModel @Inject constructor(
-    private val locationsUsecase: LocationsUsecase
+    private val locationsUsecase: LocationsUsecase,
+    private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     init {
@@ -37,23 +38,38 @@ class LocationsViewModel @Inject constructor(
 
     private val _page = MutableStateFlow("1")
 
+    val page = _page.asStateFlow()
+
+
+
+    private fun updateUiStateWithResponse(response: LocationsSimpsonsEntity?) {
+        _uiState.update { state ->
+            response?.let {
+                val newList = state.entity.results + it.results
+                state.copy(entity = it.copy(results = newList))
+            } ?: state
+        }
+    }
+
+    private fun generateLikesList() {
+        _likesList.value = _uiState.value.entity.results.mapIndexed { index, _ ->
+            LikeUiState(like = 0, index = index)
+        }
+    }
+
+    fun toggleLoading() {
+        isLoading.value = !isLoading.value
+    }
+
+
     fun onFetchLocations() {
-        viewModelScope.launch(Dispatchers.IO) {
-            loadingData()
+        viewModelScope.launch(dispatcher) {
+            toggleLoading()
             delay(1000)
             val response = locationsUsecase(page = _page.value)
-            _uiState.update { state ->
-                if (response != null) {
-                    val newList = state.entity.results + response.results
-                    state.copy(entity = response.copy(results = newList))
-                } else {
-                    state
-                }
-            }
-            _uiState.value.entity.results.forEachIndexed { ind, item ->
-                _likesList.value = _likesList.value + LikeUiState(like = 0, index = ind)
-            }
-            dataLoaded()
+            updateUiStateWithResponse(response)
+            generateLikesList()
+            toggleLoading()
         }
     }
 
@@ -69,15 +85,7 @@ class LocationsViewModel @Inject constructor(
         }
     }
 
-    fun loadingData() {
-        isLoading.value = true
-    }
-
-    fun dataLoaded() {
-        isLoading.value = false
-    }
-
-    fun downloadMore() {
+    fun incrementPage() {
         var pageNumber = _page.value.toIntOrNull()
         if (pageNumber != null) {
             pageNumber++

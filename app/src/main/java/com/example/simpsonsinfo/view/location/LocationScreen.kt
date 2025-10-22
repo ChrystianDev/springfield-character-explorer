@@ -52,7 +52,7 @@ fun LocationScreen(
         }.collect { canScrollForward ->
             if (!canScrollForward) {
                 if (uiState.entity.results.isNotEmpty() && !isLoading) {
-                    locationsViewModel.downloadMore()
+                    locationsViewModel.incrementPage()
                     locationsViewModel.onFetchLocations()
                 }
             }
