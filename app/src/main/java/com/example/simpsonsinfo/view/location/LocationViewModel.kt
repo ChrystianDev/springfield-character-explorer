@@ -40,8 +40,6 @@ class LocationsViewModel @Inject constructor(
 
     val page = _page.asStateFlow()
 
-
-
     private fun updateUiStateWithResponse(response: LocationsSimpsonsEntity?) {
         _uiState.update { state ->
             response?.let {
@@ -61,11 +59,11 @@ class LocationsViewModel @Inject constructor(
         isLoading.value = !isLoading.value
     }
 
-
     fun onFetchLocations() {
         viewModelScope.launch(dispatcher) {
-            toggleLoading()
+            // TODO: Delete thos delay. This delay allow crash app, when the user navigate from home to favourite screens
             delay(1000)
+            toggleLoading()
             val response = locationsUsecase(page = _page.value)
             updateUiStateWithResponse(response)
             generateLikesList()
