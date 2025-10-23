@@ -16,8 +16,9 @@ interface FavouriteCharacterDao {
     suspend fun existsItem(fid: Int): Boolean
 
     @Insert
-    fun insertAll(vararg favouriteCharacters: FavouriteCharacterEntity)
+    fun insertAll(favouriteCharacters: FavouriteCharacterEntity): Long
 
     @Delete
-    fun delete(favouriteCharacter: FavouriteCharacterEntity)
+    fun delete(favouriteCharacter: FavouriteCharacterEntity): Int
+
 }

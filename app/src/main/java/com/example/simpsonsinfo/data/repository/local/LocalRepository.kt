@@ -10,14 +10,9 @@ class LocalRepository @Inject constructor(
 
     suspend fun existsItem(fid: Int) = favouriteCharacterDao.existsItem(fid)
 
-    suspend fun existItemV2(fid:Int) : Boolean {
-        return favouriteCharacterDao.existsItem(fid)
-    }
-
     fun insertFavourite(favouriteCharacter: FavouriteCharacterEntity) =
-        favouriteCharacterDao.insertAll(favouriteCharacter)
+         favouriteCharacterDao.insertAll(favouriteCharacter)
 
     fun deleteFavourite(favouriteCharacter: FavouriteCharacterEntity) =
         favouriteCharacterDao.delete(favouriteCharacter)
-
 }

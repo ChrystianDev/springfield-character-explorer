@@ -8,8 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
 import com.example.simpsonsinfo.domain.usecase.FavouritesUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -18,27 +17,32 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavouriteViewModel @Inject constructor(
-    private val favouritesUsecase: FavouritesUsecase
+    private val favouritesUsecase: FavouritesUsecase,
+    private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     init {
         onGetFavourites()
     }
 
-   var uiState : Flow<List<FavouriteCharacterEntity>> = MutableStateFlow(emptyList())
+    private val _uiState =
+        MutableStateFlow<List<FavouriteCharacterEntity>>(emptyList())
+    val uiState: StateFlow<List<FavouriteCharacterEntity>> = _uiState
 
     private val _isFavourite = MutableStateFlow(false)
     val isFavourite: StateFlow<Boolean> = _isFavourite
 
     fun onGetFavourites() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatcher) {
             val response = favouritesUsecase()
-            uiState = response
+            response.collect { list ->
+                _uiState.value = list
+            }
         }
     }
 
-    fun existsItem(fid: Int){
-        viewModelScope.launch(Dispatchers.IO) {
+    fun existsItem(fid: Int) {
+        viewModelScope.launch(dispatcher) {
             val response = favouritesUsecase.existsItem(fid)
             _isFavourite.update {
                 response
@@ -47,17 +51,21 @@ class FavouriteViewModel @Inject constructor(
     }
 
     fun onSaveFavourite(favouriteCharacter: FavouriteCharacterEntity) {
-        viewModelScope.launch(Dispatchers.IO) {
-            favouritesUsecase.saveFavourite(favouriteCharacter)
-            existsItem(favouriteCharacter.fid)
+        viewModelScope.launch(dispatcher) {
+            val response = favouritesUsecase.saveFavourite(favouriteCharacter)
+            if(response.toInt() == favouriteCharacter.fid){
+                _isFavourite.value = true
+            }
             onGetFavourites()
         }
     }
 
     fun onDeleteFavourite(favouriteCharacter: FavouriteCharacterEntity) {
-        viewModelScope.launch(Dispatchers.IO) {
-            favouritesUsecase.deleteFavourite(favouriteCharacter)
-            existsItem(favouriteCharacter.fid)
+        viewModelScope.launch(dispatcher) {
+            val response = favouritesUsecase.deleteFavourite(favouriteCharacter)
+            if(response == favouriteCharacter.fid){
+                _isFavourite.value = false
+            }
             onGetFavourites()
         }
     }
