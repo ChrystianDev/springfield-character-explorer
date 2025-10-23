@@ -170,7 +170,7 @@ fun SimpsonsScreen(
                     IconButton(
                         enabled = uiState.entity.prev.isNotEmpty(),
                         onClick = {
-                            simpsonsViewModel.downPage()
+                            simpsonsViewModel.decrementPage()
                             simpsonsViewModel.onGetCharacters()
                         }
                     ) {
@@ -186,7 +186,7 @@ fun SimpsonsScreen(
                     IconButton(
                         enabled = uiState.entity.next.isNotEmpty(),
                         onClick = {
-                            simpsonsViewModel.upPage()
+                            simpsonsViewModel.incrementPage()
                             simpsonsViewModel.onGetCharacters()
                         }) {
                         Icon(

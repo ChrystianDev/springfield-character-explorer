@@ -5,10 +5,10 @@ import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
 
 object SimpsonsMocks {
     fun aSimpsonsEntityMock(
-        count: Int = 0,
-        next: String = "",
-        prev: String = "",
-        pages: Int = 0,
+        count: Int = 1182,
+        next: String = "https://thesimpsonsapi.com/api/characters?page=n",
+        prev: String = "https://thesimpsonsapi.com/api/characters?page=m",
+        pages: Int = 60,
         results: List<CharacterEntity> = listOf(
             aCharacterEntityMock(),
             aCharacterEntityMock(

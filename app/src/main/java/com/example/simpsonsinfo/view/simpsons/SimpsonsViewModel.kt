@@ -5,14 +5,13 @@ package com.example.simpsonsinfo.view.simpsons
 
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
 import com.example.simpsonsinfo.domain.usecase.SimpsonsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SimpsonsViewModel @Inject constructor(
-    private val simpsonsUsecase: SimpsonsUsecase
+    private val simpsonsUsecase: SimpsonsUsecase,
+    private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     init {
@@ -30,46 +30,47 @@ class SimpsonsViewModel @Inject constructor(
     }
 
     private val _uiState = MutableStateFlow(SimpsonsUiState())
+
     val uiState: StateFlow<SimpsonsUiState> = _uiState
+
     private val _indexSelected = MutableStateFlow(0)
+
     val indexSelected: StateFlow<Int> = _indexSelected
+
     var isLoading = MutableStateFlow(false)
 
     private val _page = MutableStateFlow("1")
 
+    val page: StateFlow<String> = _page
+
+
     private val _isMuted = MutableStateFlow(false)
+
     val isMuted: StateFlow<Boolean> = _isMuted
 
     fun onGetCharacters() {
-        viewModelScope.launch(Dispatchers.IO) {
-            isLoadingData()
+        viewModelScope.launch(dispatcher) {
+            toggleLoading()
             delay(1000)
             val response = simpsonsUsecase(page = _page.value)
             _uiState.update { state ->
-                if (response != null) {
-                    state.copy(entity = response)
-                } else {
-                    state
-                }
+                response?.let { entity ->
+                    state.copy(entity = entity)
+                } ?: state
             }
-            dataLoaded()
+            toggleLoading()
         }
     }
 
-    fun isLoadingData() {
-        isLoading.value = true
-    }
-
-    fun dataLoaded() {
-        isLoading.value = false
+    fun toggleLoading() {
+        isLoading.value = !isLoading.value
     }
 
     fun setIndexSelected(index: Int) {
-        Log.i("indexSelected", index.toString())
         _indexSelected.value = index
     }
 
-    fun upPage() {
+    fun incrementPage() {
         var pageNumber = _page.value.toIntOrNull()
         if (pageNumber != null) {
             pageNumber++
@@ -77,14 +78,13 @@ class SimpsonsViewModel @Inject constructor(
         }
     }
 
-    fun downPage() {
+    fun decrementPage() {
         var pageNumber = _page.value.toIntOrNull()
         if (pageNumber != null) {
             pageNumber--
             _page.value = pageNumber.toString()
         }
     }
-
 
     fun speakItemCharacters(index: Int, tts: MutableState<TextToSpeech?>) {
         var text = "There are no phrases"
