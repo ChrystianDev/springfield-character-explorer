@@ -4,7 +4,9 @@ import com.example.simpsonsinfo.domain.usecase.LocationsUsecase
 import com.example.simpsonsinfo.utils.mock.LocationMocks.aLocationsSimpsonsEntityMock
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
@@ -42,54 +44,54 @@ class LocationsViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        assert(locationsViewModel.uiState.value.entity.results == aLocationsSimpsonsEntityMock().results)
+        assertEquals(true, locationsViewModel.uiState.value.entity.results == aLocationsSimpsonsEntityMock().results)
     }
 
     @Test
     fun toggleLoading() {
         setDispatcherAndViewModel()
-        assert(!locationsViewModel.isLoading.value)
+        assertEquals(false, locationsViewModel.isLoading.value)
         locationsViewModel.toggleLoading()
-        assert(locationsViewModel.isLoading.value)
+        assertEquals(true, locationsViewModel.isLoading.value)
         locationsViewModel.toggleLoading()
-        assert(!locationsViewModel.isLoading.value)
+        assertEquals(false, locationsViewModel.isLoading.value)
     }
 
 
     @Test
-    fun addLike() = runTest {
+    fun incrementLike() = runTest {
         val like = 1
         getLocations()
-        assert(locationsViewModel.likesList.value[0].like == 0)
+        assertEquals(0, locationsViewModel.likesList.value[0].like)
         locationsViewModel.updateLikes(index = 0, like = like)
-        assert(locationsViewModel.likesList.value[0].like == 1)
+        assertEquals(1, locationsViewModel.likesList.value[0].like)
     }
 
     @Test
-    fun removeLike() = runTest {
+    fun decrementLike() = runTest {
         val like = -1
         // Add elements to list
         getLocations()
         // First add like to item
         locationsViewModel.updateLikes(index = 0, like = 1)
         // Check like
-        assert(locationsViewModel.likesList.value[0].like == 1)
+        assertEquals(1, locationsViewModel.likesList.value[0].like)
 
         // Remove like to item
         locationsViewModel.updateLikes(index = 0, like = like)
         // Check like
-        assert(locationsViewModel.likesList.value[0].like == 0)
+        assertEquals(0, locationsViewModel.likesList.value[0].like)
     }
 
     @Test
     fun incrementPage() {
         setDispatcherAndViewModel()
-        assert(locationsViewModel.page.value == "1")
+        assertEquals("1", locationsViewModel.page.value)
 
         // Increment page from 1 to 2
         locationsViewModel.incrementPage()
         val page = "2"
-        assert(locationsViewModel.page.value == page)
+        assertEquals(page, locationsViewModel.page.value)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -106,14 +108,14 @@ class LocationsViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assert(locationsViewModel.likesList.value.size == aLocationsSimpsonsEntityMock().results.size)
-        assert(locationsViewModel.likesList.value[0].like == 0)
-        assert(locationsViewModel.likesList.value[0].index == 0)
+        coVerify(exactly = 1) { locationsUsecase(page = "1") }
+        assertEquals(true, locationsViewModel.likesList.value.size == aLocationsSimpsonsEntityMock().results.size)
+        assertEquals(0, locationsViewModel.likesList.value[0].like)
+        assertEquals(0, locationsViewModel.likesList.value[0].index)
     }
 
     fun setDispatcherAndViewModel() {
         dispatcher = StandardTestDispatcher()
         locationsViewModel = LocationsViewModel(locationsUsecase, dispatcher)
     }
-
 }
