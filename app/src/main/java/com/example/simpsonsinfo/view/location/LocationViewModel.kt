@@ -62,8 +62,9 @@ class LocationsViewModel @Inject constructor(
     fun onFetchLocations() {
         viewModelScope.launch(dispatcher) {
             // TODO: Delete thos delay. This delay allow crash app, when the user navigate from home to favourite screens
-            delay(1000)
+            delay(500)
             toggleLoading()
+            delay(500)
             val response = locationsUsecase(page = _page.value)
             updateUiStateWithResponse(response)
             generateLikesList()

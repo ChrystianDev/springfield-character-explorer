@@ -1,8 +1,7 @@
 package com.example.simpsonsinfo.view.location
 
-import com.example.simpsonsinfo.domain.entity.LocationEntity
-import com.example.simpsonsinfo.domain.entity.LocationsSimpsonsEntity
 import com.example.simpsonsinfo.domain.usecase.LocationsUsecase
+import com.example.simpsonsinfo.utils.mock.LocationMocks.aLocationsSimpsonsEntityMock
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.RelaxedMockK
@@ -23,29 +22,6 @@ class LocationsViewModelTest {
 
     private lateinit var dispatcher: TestDispatcher
 
-    val entityMock = LocationsSimpsonsEntity(
-        count = 100,
-        prev = "",
-        next = "",
-        pages = 10,
-        results = listOf(
-            LocationEntity(
-                id = 1,
-                name = "Springfield",
-                imagePath = "photo.webp",
-                town = "Springfield",
-                use = "Place"
-            ),
-            LocationEntity(
-                id = 2,
-                name = "Mou's Bar",
-                imagePath = "photo-1.webp",
-                town = "Springfield",
-                use = "Leisure"
-            )
-        )
-    )
-
 
     @Before
     fun onBefore() {
@@ -59,14 +35,14 @@ class LocationsViewModelTest {
         locationsViewModel = LocationsViewModel(locationsUsecase, dispatcher)
 
         // GIVEN
-        coEvery { locationsUsecase(page = "1") } returns entityMock
+        coEvery { locationsUsecase(page = "1") } returns aLocationsSimpsonsEntityMock()
 
         // WHEN
         locationsViewModel
         advanceUntilIdle()
 
         // THEN
-        assert(locationsViewModel.uiState.value.entity.results == entityMock.results)
+        assert(locationsViewModel.uiState.value.entity.results == aLocationsSimpsonsEntityMock().results)
     }
 
     @Test
@@ -106,11 +82,13 @@ class LocationsViewModelTest {
     }
 
     @Test
-    fun incrementPage(){
+    fun incrementPage() {
         setDispatcherAndViewModel()
-        val page = "2"
         assert(locationsViewModel.page.value == "1")
+
+        // Increment page from 1 to 2
         locationsViewModel.incrementPage()
+        val page = "2"
         assert(locationsViewModel.page.value == page)
     }
 
@@ -121,19 +99,19 @@ class LocationsViewModelTest {
         locationsViewModel = LocationsViewModel(locationsUsecase, dispatcher)
 
         // Given
-        coEvery { locationsUsecase(page = "1") } returns entityMock
+        coEvery { locationsUsecase(page = "1") } returns aLocationsSimpsonsEntityMock()
 
         // When
         locationsViewModel
         advanceUntilIdle()
 
         // Then
-        assert(locationsViewModel.likesList.value.size == entityMock.results.size)
+        assert(locationsViewModel.likesList.value.size == aLocationsSimpsonsEntityMock().results.size)
         assert(locationsViewModel.likesList.value[0].like == 0)
         assert(locationsViewModel.likesList.value[0].index == 0)
     }
 
-    fun setDispatcherAndViewModel(){
+    fun setDispatcherAndViewModel() {
         dispatcher = StandardTestDispatcher()
         locationsViewModel = LocationsViewModel(locationsUsecase, dispatcher)
     }

@@ -2,12 +2,16 @@ package com.example.simpsonsinfo.view.favorite
 
 import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
 import com.example.simpsonsinfo.domain.usecase.FavouritesUsecase
+import com.example.simpsonsinfo.utils.mock.FavouriteMocks.aFavouriteCharacterList
+import com.example.simpsonsinfo.utils.mock.FavouriteMocks.aFavouriteEntityMock
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -23,32 +27,6 @@ class FavouriteViewModelTest {
 
     private lateinit var favouriteViewModel: FavouriteViewModel
 
-    val entityMock = MutableStateFlow(
-        listOf(
-            FavouriteCharacterEntity(
-                fid = 1,
-                name = "Homer Simpson",
-                urlImage = "photo.webp"
-            ),
-            FavouriteCharacterEntity(
-                fid = 2,
-                name = "Marge Simpson",
-                urlImage = "photo-1.webp"
-            ),
-            FavouriteCharacterEntity(
-                fid = 3,
-                name = "Bart Simpson",
-                urlImage = "photo-2.webp"
-            )
-        )
-    )
-
-    val favouriteCharacterMock = FavouriteCharacterEntity(
-        fid = 1,
-        name = "Homer Simpson",
-        urlImage = "photo.webp"
-    )
-
     @Before
     fun onBefore() {
         MockKAnnotations.init(this)
@@ -60,14 +38,19 @@ class FavouriteViewModelTest {
         favouriteViewModel = FavouriteViewModel(favouritesUsecase, dispatcher)
 
         //When
-        coEvery { favouritesUsecase() } returns entityMock
+        coEvery { favouritesUsecase() } returns aFavouriteCharacterList
 
         //Given
         favouriteViewModel
         advanceUntilIdle()
 
         //Then
-        assert(favouriteViewModel.uiState.value == entityMock.value)
+        coVerify(exactly = 1) { favouritesUsecase() }
+
+        assertEquals(
+            true,
+            favouriteViewModel.uiState.value == aFavouriteCharacterList.value
+        )
     }
 
     @Test
@@ -80,10 +63,15 @@ class FavouriteViewModelTest {
         assertEquals(false, favouriteViewModel.isFavourite.value)
 
         // When
-        coEvery { favouritesUsecase.saveFavourite(favouriteCharacterMock) } returns favouriteCharacterMock.fid.toLong()
+        coEvery {
+            favouritesUsecase.saveFavourite(
+                aFavouriteEntityMock()
+
+            )
+        } returns aFavouriteEntityMock().fid.toLong()
 
         // Given
-        favouriteViewModel.onSaveFavourite(favouriteCharacterMock)
+        favouriteViewModel.onSaveFavourite(aFavouriteEntityMock())
         advanceUntilIdle()
 
         // Then
@@ -116,19 +104,19 @@ class FavouriteViewModelTest {
         favouriteViewModel = FavouriteViewModel(favouritesUsecase, dispatcher)
 
         // Check favourite initial value
-        assertEquals(false,favouriteViewModel.isFavourite.value)
+        assertEquals(false, favouriteViewModel.isFavourite.value)
         // Save character to favourite
-        coEvery { favouritesUsecase.saveFavourite(favouriteCharacterMock) } returns favouriteCharacterMock.fid.toLong()
-        favouriteViewModel.onSaveFavourite(favouriteCharacterMock)
+        coEvery { favouritesUsecase.saveFavourite(aFavouriteEntityMock()) } returns aFavouriteEntityMock().fid.toLong()
+        favouriteViewModel.onSaveFavourite(aFavouriteEntityMock())
         advanceUntilIdle()
         //Check favourite value
         assertEquals(true, favouriteViewModel.isFavourite.value)
 
         // When
-        coEvery { favouritesUsecase.deleteFavourite(favouriteCharacterMock) } returns favouriteCharacterMock.fid
+        coEvery { favouritesUsecase.deleteFavourite(aFavouriteEntityMock()) } returns aFavouriteEntityMock().fid
 
         // Given
-        favouriteViewModel.onDeleteFavourite(favouriteCharacterMock)
+        favouriteViewModel.onDeleteFavourite(aFavouriteEntityMock())
         advanceUntilIdle()
 
         // Then
@@ -141,25 +129,23 @@ class FavouriteViewModelTest {
         favouriteViewModel = FavouriteViewModel(favouritesUsecase, dispatcher)
 
         // Check favourite initial value
-        assertEquals(false,favouriteViewModel.isFavourite.value)
+        assertEquals(false, favouriteViewModel.isFavourite.value)
         // Save character to favourite
-        coEvery { favouritesUsecase.saveFavourite(favouriteCharacterMock) } returns favouriteCharacterMock.fid.toLong()
-        favouriteViewModel.onSaveFavourite(favouriteCharacterMock)
+        coEvery { favouritesUsecase.saveFavourite(aFavouriteEntityMock()) } returns aFavouriteEntityMock().fid.toLong()
+        favouriteViewModel.onSaveFavourite(aFavouriteEntityMock())
         advanceUntilIdle()
         //Check favourite value
         assertEquals(true, favouriteViewModel.isFavourite.value)
 
         // When
-        coEvery { favouritesUsecase.deleteFavourite(entityMock.value.last()) } returns favouriteCharacterMock.fid
+        coEvery { favouritesUsecase.deleteFavourite(aFavouriteCharacterList.value.last()) } returns aFavouriteEntityMock().fid
 
 
         // Given
-        favouriteViewModel.onDeleteFavourite(entityMock.value.last())
+        favouriteViewModel.onDeleteFavourite(aFavouriteCharacterList.value.last())
         advanceUntilIdle()
 
         // Then
         assertEquals(true, favouriteViewModel.isFavourite.value)
     }
-
-
 }

@@ -1,13 +1,12 @@
 package com.example.simpsonsinfo.domain.usecase
 
 import com.example.simpsonsinfo.data.repository.local.LocalRepository
-import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
+import com.example.simpsonsinfo.utils.mock.FavouriteMocks.aFavouriteCharacterEmptyList
+import com.example.simpsonsinfo.utils.mock.FavouriteMocks.aFavouriteCharacterList
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -28,37 +27,31 @@ class FavouritesUsecaseTest {
     @Test
     fun getFavouritesEmpty() =
         runBlocking {
-            val list: Flow<List<FavouriteCharacterEntity>> = MutableStateFlow(listOf())
 
             // GIVEN
-            coEvery { repository.getAllFavourites() } returns list
+            coEvery { repository.getAllFavourites() } returns aFavouriteCharacterEmptyList
 
             // WHEN
             val response = favouritesUsecase()
 
             // THEN
             coVerify(exactly = 1) { repository.getAllFavourites() }
-            assert(response == list)
+            assert(response == aFavouriteCharacterEmptyList)
         }
 
     @Test
     fun getFavourites() =
         runBlocking {
-            val list: Flow<List<FavouriteCharacterEntity>> = MutableStateFlow(listOf(
-                FavouriteCharacterEntity(0, "Bart", "bart.png"),
-                FavouriteCharacterEntity(1, "Homer", "homer.png"),
-                FavouriteCharacterEntity(3, "Lisa", "lisa.png"),
-            ))
 
             // GIVEN
-            coEvery { repository.getAllFavourites() } returns list
+            coEvery { repository.getAllFavourites() } returns aFavouriteCharacterList
 
             // WHEN
             val response = favouritesUsecase()
 
             // THEN
             coVerify(exactly = 1) { repository.getAllFavourites() }
-            assert(response == list)
+            assert(response == aFavouriteCharacterList)
         }
 }
 

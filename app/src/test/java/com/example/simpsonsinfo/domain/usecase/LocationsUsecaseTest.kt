@@ -1,7 +1,7 @@
 package com.example.simpsonsinfo.domain.usecase
 
-import com.example.simpsonsinfo.domain.entity.LocationsSimpsonsEntity
 import com.example.simpsonsinfo.domain.repository.SimpsonsRepository
+import com.example.simpsonsinfo.utils.mock.LocationMocks.aLocationsSimpsonsEntityMock
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -39,21 +39,14 @@ class LocationsUsecaseTest {
 
     @Test
     fun getLocations() = runBlocking {
-        val entity = LocationsSimpsonsEntity(
-            count = 100,
-            prev = "",
-            next = "",
-            pages = 10,
-            results = listOf()
-        )
         // Given
-        coEvery { repository.fetchLocations("1") } returns entity
+        coEvery { repository.fetchLocations("1") } returns aLocationsSimpsonsEntityMock()
 
         // When
         val response = locationsUsecase(page = "1")
 
         // Then
         coVerify(exactly = 1) { repository.fetchLocations(page = "1") }
-        assert(response == entity)
+        assert(response == aLocationsSimpsonsEntityMock())
     }
 }

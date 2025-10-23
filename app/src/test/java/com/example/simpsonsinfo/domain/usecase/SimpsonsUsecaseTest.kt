@@ -1,8 +1,8 @@
 package com.example.simpsonsinfo.domain.usecase
 
-import com.example.simpsonsinfo.domain.entity.CharacterEntity
-import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
 import com.example.simpsonsinfo.domain.repository.SimpsonsRepository
+import com.example.simpsonsinfo.utils.mock.SimpsonsMocks.aSimpsonsEmptyListEntityMock
+import com.example.simpsonsinfo.utils.mock.SimpsonsMocks.aSimpsonsEntityMock
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -28,56 +28,27 @@ class SimpsonsUsecaseTest {
     @Test
     fun getSimpsonsEmptyList() = runBlocking {
         // GIVEN
-        val entity =
-            SimpsonsEntity(count = 0, next = "", prev = "", pages = 0, results = emptyList())
-        coEvery { repository.doSimpsons("1") } returns entity
+        coEvery { repository.doSimpsons("1") } returns aSimpsonsEmptyListEntityMock()
 
         // WHEN
         val response = simpsonsUsecase(page = "1")
 
         // THEN
         coVerify(exactly = 1) { repository.doSimpsons(page = "1") }
-        assert(response == entity)
+        assert(response == aSimpsonsEmptyListEntityMock())
     }
 
     @Test
     fun getSimpsonsList() = runBlocking {
         // GIVEN
-        val entity =
-            SimpsonsEntity(
-                count = 0, next = "", prev = "", pages = 0, results = listOf(
-                    CharacterEntity(
-                        id = 1,
-                        age = 34,
-                        birthdate = "01/01/1991",
-                        name = "Homer",
-                        gender = "Male",
-                        occupation = "secure_inspector",
-                        portrait_path = "...homer.png",
-                        phrases = listOf("Hi, my name is Homer"),
-                        status = "Alive"
-                    ),
-                    CharacterEntity(
-                        id = 2,
-                        age = 12,
-                        birthdate = "01/01/2010",
-                        name = "Bart",
-                        gender = "Male",
-                        occupation = "student",
-                        portrait_path = "...bart.png",
-                        phrases = listOf("Hello World"),
-                        status = "Alive"
-                    )
-                )
-            )
-        coEvery { repository.doSimpsons("1") } returns entity
+        coEvery { repository.doSimpsons("1") } returns aSimpsonsEntityMock()
 
         // WHEN
         val response = simpsonsUsecase(page = "1")
 
         // THEN
         coVerify(exactly = 1) { repository.doSimpsons(page = "1") }
-        assert(response == entity)
+        assert(response == aSimpsonsEntityMock())
     }
 
 }
