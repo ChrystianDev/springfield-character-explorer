@@ -5,61 +5,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    jacoco
-}
-
-
-tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDevDebugUnitTest")
-
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
-
-    val fileFilter = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*"
-    )
-
-    // Ruta para variantes con flavors (devDebug)
-//    val debugTree = fileTree(
-//        mapOf(
-//            "dir" to "${layout.buildDirectory}/tmp/kotlin-classes/devDebug",
-//            "excludes" to fileFilter
-//        )
-//    )
-    val debugTree = fileTree(
-        "${layout.buildDirectory}/intermediates/javac/devDebug/classes"
-    ) {
-        exclude(fileFilter)
-    }
-
-    val kotlinDebugTree = fileTree(
-        "${layout.buildDirectory}/tmp/kotlin-classes/devDebug"
-    ) {
-        exclude(fileFilter)
-    }
-
-    val mainSrc = "${project.projectDir}/src/main/java"
-
-    sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
-    executionData.setFrom(
-        fileTree(layout.buildDirectory) {
-            include("jacoco/testDevDebugUnitTest.exec")
-        }
-    )
-
-//    sourceDirectories.setFrom(files(listOf(mainSrc)))
-//    classDirectories.setFrom(files(listOf(debugTree)))
-//    executionData.setFrom(
-//        files("${layout.buildDirectory}/jacoco/testDevDebugUnitTest.exec")
-//    )
 }
 
 
@@ -79,24 +24,66 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Specifies one flavor dimension.
+    flavorDimensions += "version"
+    productFlavors {
+        create("prod") {
+            dimension = "version"
+            applicationIdSuffix = ".prod"
+            versionNameSuffix = "-prod"
+            buildConfigField(
+                type = "String",
+                name = "BASE_URL",
+                value = "\"https://pro.thesimpsonsapi.com/api/\""
+            )
+        }
+        create("qa") {
+            dimension = "version"
+            applicationIdSuffix = ".qa"
+            versionNameSuffix = "-qa"
+            buildConfigField(
+                type = "String",
+                name = "BASE_URL",
+                value = "\"https://qa.thesimpsonsapi.com/api/\""
+            )
+
+        }
+        create("dev") {
+            // Assigns this product flavor to the "version" flavor dimension.
+            // If you are using only one dimension, this property is optional,
+            // and the plugin automatically assigns all the module's flavors to
+            // that dimension.
+            dimension = "version"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField(
+                type = "String",
+                name = "BASE_URL",
+                value = "\"https://thesimpsonsapi.com/api/\""
+            )
+        }
+    }
+
+
     buildTypes {
-//        release {
-//            isMinifyEnabled = false
-//            proguardFiles(
-//                getDefaultProguardFile("proguard-android-optimize.txt"),
-//                "proguard-rules.pro"
-//            )
-//            applicationIdSuffix = ".release"
-//            versionNameSuffix = "-release"
-//        }
-        getByName("release") {
+        release {
+//        getByName("release") {
+            applicationIdSuffix = ".release"
+            versionNameSuffix = "-release"
             isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
 
-        getByName("debug") {
+        debug {
+//        getByName("debug") {
             applicationIdSuffix = ".debug"
             isDebuggable = true
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
+            manifestPlaceholders["hostName"] = "com.example.simpsonsinfo"
         }
 
         /**
@@ -109,47 +96,13 @@ android {
             manifestPlaceholders["hostName"] = "com.example.simpsonsinfo"
             applicationIdSuffix = ".debugStaging"
         }
-        debug {
-            enableAndroidTestCoverage = true
-            enableUnitTestCoverage = true
-            manifestPlaceholders["hostName"] = "com.example.simpsonsinfo"
-            applicationIdSuffix = ".debug"
-        }
     }
 
-    buildFeatures{
+    buildFeatures {
         compose = true
         buildConfig = true
     }
 
-    // Specifies one flavor dimension.
-    flavorDimensions += "version"
-    productFlavors {
-        create("prod") {
-            dimension = "version"
-            applicationIdSuffix = ".prod"
-            versionNameSuffix = "-prod"
-            buildConfigField(type = "String", name = "BASE_URL", value = "\"https://pro.thesimpsonsapi.com/api/\"")
-        }
-        create("qa") {
-            dimension = "version"
-            applicationIdSuffix = ".qa"
-            versionNameSuffix = "-qa"
-            buildConfigField(type = "String", name = "BASE_URL", value = "\"https://qa.thesimpsonsapi.com/api/\"")
-
-        }
-        create("dev") {
-            // Assigns this product flavor to the "version" flavor dimension.
-            // If you are using only one dimension, this property is optional,
-            // and the plugin automatically assigns all the module's flavors to
-            // that dimension.
-            dimension = "version"
-            applicationIdSuffix = ".dev"
-            versionNameSuffix = "-dev"
-            buildConfigField(type = "String", name = "BASE_URL", value = "\"https://thesimpsonsapi.com/api/\"")
-        }
-
-    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -232,3 +185,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
+
+apply(from = "jacoco.gradle.kts")
