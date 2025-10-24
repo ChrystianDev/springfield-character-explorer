@@ -16,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import com.example.simpsonsinfo.BuildConfig
 import com.example.simpsonsinfo.R
+import com.example.simpsonsinfo.view.core.components.CustomBiographyText
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
 import com.example.simpsonsinfo.view.core.components.SpaceH10
 import com.example.simpsonsinfo.view.core.components.SpaceV10
@@ -24,7 +26,7 @@ import com.example.simpsonsinfo.view.core.components.SpaceV20
 
 @Composable
 fun SimpsonsEmptyListScreen(
-    onGetCharacters:() -> Unit
+    onGetCharacters: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -56,5 +58,7 @@ fun SimpsonsEmptyListScreen(
                 tint = MaterialTheme.colorScheme.primary
             )
         }
+        SpaceV20()
+        CustomBiographyText("BuildType: ${BuildConfig.BUILD_TYPE}, Flavor: ${BuildConfig.FLAVOR}")
     }
 }
