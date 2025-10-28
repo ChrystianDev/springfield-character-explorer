@@ -13,6 +13,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
@@ -32,15 +33,18 @@ fun SimpsonsEmptyListScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Image(painterResource(R.drawable.doh_homer_simpson), contentDescription = null)
+        Image(painterResource(R.drawable.doh_homer_simpson), contentDescription = "doh_homer_simpson")
         SpaceV20()
         Text(
-            text = "opssss ...",
+            text = stringResource(R.string.error_exclamation_no_results),
             fontSize = 40.sp,
             color = MaterialTheme.colorScheme.primary
         )
         SpaceV10()
-        CustomBodyText("No se obtuvieron resultados, intentelos de nuevo__")
+        CustomBodyText(
+            modifier = Modifier.testTag(tag = "simpsonsNoResults"),
+            text = stringResource(R.string.empty_screen_no_results)
+        )
 
         TextButton(
             enabled = true,
@@ -48,7 +52,8 @@ fun SimpsonsEmptyListScreen(
                 onGetCharacters()
             }) {
             CustomBodyText(
-                stringResource(R.string.main_get_characters),
+                modifier = Modifier.testTag(tag = "getCharacters"),
+                text = stringResource(R.string.main_get_characters),
                 color = MaterialTheme.colorScheme.primary
             )
             SpaceH10()

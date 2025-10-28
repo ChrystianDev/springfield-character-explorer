@@ -12,5 +12,7 @@
     <string name="favourite_character_deleted">El personaje fue eliminado de favoritos</string>
     <string name="favourite_subtitle_empty_message">Para guardar personajes favoritos, haz click en el icono favoritos desde la pantalla del personaje</string>
     <string name="favourite_title_empty_message">No hay favoritos…</string>
+    <string name="empty_screen_no_results">No se obtuvieron resultados. Por favor inténtelo de nuevo</string>
+    <string name="error_exclamation_no_results">opssss</string>
 
 </resources>
