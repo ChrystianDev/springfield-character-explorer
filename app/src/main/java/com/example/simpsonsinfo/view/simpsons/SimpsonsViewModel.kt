@@ -87,19 +87,25 @@ class SimpsonsViewModel @Inject constructor(
     }
 
     fun speakItemCharacters(index: Int, tts: MutableState<TextToSpeech?>) {
-        var text = "There are no phrases"
-        if (uiState.value.entity.results[index].phrases.isNotEmpty()) {
-            text = uiState.value.entity.results[index].phrases[0]
+        if (isLoading.value) {
+            if (tts.value?.isSpeaking == true) {
+                tts.value?.stop()
+            }
+        } else {
+            var text = "There are no phrases"
+            if (uiState.value.entity.results[index].phrases.isNotEmpty()) {
+                text = uiState.value.entity.results[index].phrases[0]
+            }
+            val parameters = Bundle().apply {
+                putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, if (isMuted.value) 0.0f else 1.0f)
+            }
+            tts.value?.speak(
+                text,
+                TextToSpeech.QUEUE_FLUSH,
+                parameters,
+                "tts_simpsons"
+            )
         }
-        val parameters = Bundle().apply {
-            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, if (isMuted.value) 0.0f else 1.0f)
-        }
-        tts.value?.speak(
-            text,
-            TextToSpeech.QUEUE_FLUSH,
-            parameters,
-            "tts_simpsons"
-        )
     }
 
     fun speakItemDetail(tts: MutableState<TextToSpeech?>, text: String) {

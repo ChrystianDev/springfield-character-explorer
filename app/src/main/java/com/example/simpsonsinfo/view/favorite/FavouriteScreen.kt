@@ -41,7 +41,6 @@ fun FavouriteScreen(
     if (uiState.value.isEmpty()) {
         FavouriteEmptyListScreen()
     } else {
-        // TODO animar actualización del listado
         LazyVerticalGrid(
             columns = GridCells.Adaptive(150.dp),
             state = gridState,
@@ -54,7 +53,9 @@ fun FavouriteScreen(
             items(uiState.value.size) { index ->
                 val item = uiState.value[index]
                 Card(
-                    modifier = Modifier.padding(5.dp),
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .animateItem(),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.background,
                     )
@@ -87,7 +88,7 @@ fun FavouriteScreen(
                                 )
                         ) {
                             Icon(
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = MaterialTheme.colorScheme.surface,
                                 painter = painterResource(R.drawable.icon_delete),
                                 contentDescription = "Delete from Favourites",
                             )

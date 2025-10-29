@@ -25,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,8 +49,11 @@ import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_SHORT
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBiographyText
+import com.example.simpsonsinfo.view.core.components.CustomHomerLoading
 import com.example.simpsonsinfo.view.core.components.CustomIconButton
+import com.example.simpsonsinfo.view.core.components.CustomItemHomerLoading
 import com.example.simpsonsinfo.view.core.components.SpaceV10
+import com.example.simpsonsinfo.view.core.components.TitleMainImage
 import com.example.simpsonsinfo.view.core.components.rememberTextToSpeech
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,6 +68,7 @@ fun SimpsonsScreen(
     val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
     val isMuted by simpsonsViewModel.isMuted.collectAsStateWithLifecycle()
+    val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
 
     var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
     var lastVisibleItem by remember { mutableIntStateOf(0) }
@@ -95,7 +97,13 @@ fun SimpsonsScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         if (uiState.entity.results.isEmpty()) {
-            SimpsonsEmptyListScreen(onGetCharacters = simpsonsViewModel::onGetCharacters)
+            if (isLoading) {
+                CustomHomerLoading()
+            } else {
+                SimpsonsEmptyListScreen(
+                    onGetCharacters = simpsonsViewModel::onGetCharacters
+                )
+            }
         } else {
             Column {
                 Row(
@@ -138,29 +146,33 @@ fun SimpsonsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier,
                         state = listState,
-
-                        ) {
-                        items(uiState.entity.results.size) { index ->
-                            AsyncImage(
-                                modifier = Modifier
-                                    .clip(shape = shapes.large)
-                                    .padding(horizontal = 5.dp)
-                                    .background(MaterialTheme.colorScheme.background)
-                                    .height(if (index == indexSelected) 100.dp else 90.dp)
-                                    .padding(vertical = 10.dp, horizontal = 5.dp)
-                                    .scale(
-                                        scaleX = if (index == indexSelected) 1.5f else 1f,
-                                        scaleY = if (index == indexSelected) 1.5f else 1f
-                                    )
-                                    .clickable(onClick = {
-                                        simpsonsViewModel.setIndexSelected(index)
-                                        simpsonsViewModel.speakItemCharacters(index, tts)
-                                    }),
-                                model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].portrait_path}",
-                                contentDescription = "image webp"
-                            )
+                    ) {
+                        if (isLoading) {
+                            items(10) { index ->
+                                CustomItemHomerLoading(indexSelected = index == indexSelected)
+                            }
+                        } else {
+                            items(uiState.entity.results.size) { index ->
+                                AsyncImage(
+                                    modifier = Modifier
+                                        .clip(shape = shapes.large)
+                                        .padding(horizontal = 5.dp)
+                                        .background(MaterialTheme.colorScheme.background)
+                                        .height(if (index == indexSelected) 100.dp else 90.dp)
+                                        .padding(vertical = 10.dp, horizontal = 5.dp)
+                                        .scale(
+                                            scaleX = if (index == indexSelected) 1.5f else 1f,
+                                            scaleY = if (index == indexSelected) 1.5f else 1f
+                                        )
+                                        .clickable(onClick = {
+                                            simpsonsViewModel.setIndexSelected(index)
+                                            simpsonsViewModel.speakItemCharacters(index, tts)
+                                        }),
+                                    model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].portrait_path}",
+                                    contentDescription = "image webp"
+                                )
+                            }
                         }
-
                     }
                 }
                 Row(
@@ -201,32 +213,36 @@ fun SimpsonsScreen(
                 }
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(CircleShape)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = CircleShape
-                        )
-                        .padding(10.dp)
-                        .clickable(onClick = {
-                            onNavigationDetail()
-                            simpsonsViewModel.setIndexSelected(index = indexSelected)
 
-                        }),
-                    model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[indexSelected].portrait_path}",
-                    contentDescription = "image webp"
-                )
-                SpaceV10()
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = uiState.entity.results[indexSelected].name,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center
-                )
+            if (isLoading) {
+                Column (horizontalAlignment = Alignment.CenterHorizontally){
+                    CustomItemHomerLoading(size = 200.dp)
+                    SpaceV10()
+                    TitleMainImage("Loading ...__")
+                }
+            } else {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(200.dp)
+                            .clip(CircleShape)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = CircleShape
+                            )
+                            .padding(10.dp)
+                            .clickable(onClick = {
+                                onNavigationDetail()
+                                simpsonsViewModel.setIndexSelected(index = indexSelected)
+
+                            }),
+                        model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[indexSelected].portrait_path}",
+                        contentDescription = "image webp"
+                    )
+                    SpaceV10()
+                    TitleMainImage(uiState.entity.results[indexSelected].name)
+                }
             }
 
             Column(

@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -63,7 +64,9 @@ fun CustomBiographyText(
         fontSize = fontSize,
         color = color,
         textAlign = textAlign,
-        style = style
+        style = style,
+        maxLines = 3,
+        overflow = TextOverflow.Ellipsis
     )
 }
 

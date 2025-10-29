@@ -4,10 +4,10 @@
 package com.example.simpsonsinfo.view.core.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,10 +26,9 @@ import com.example.simpsonsinfo.R
 @Composable
 fun CustomHomerLoading(background: Color = MaterialTheme.colorScheme.background) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_gray))
-    Box(
-        contentAlignment = Alignment.Center,
-//        modifier = Modifier.fillMaxWidth()
-
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxSize()
             .background(background)
@@ -41,8 +40,7 @@ fun CustomHomerLoading(background: Color = MaterialTheme.colorScheme.background)
         )
         LottieAnimation(
             modifier = Modifier
-                .height(50.dp)
-                .offset(50.dp, -100.dp),
+                .height(100.dp),
             composition = composition,
             speed = 1f,
             reverseOnRepeat = false,
