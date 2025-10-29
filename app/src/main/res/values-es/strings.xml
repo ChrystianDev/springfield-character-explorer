@@ -14,5 +14,6 @@
     <string name="favourite_title_empty_message">No hay favoritos…</string>
     <string name="empty_screen_no_results">No se obtuvieron resultados. Por favor inténtelo de nuevo</string>
     <string name="error_exclamation_no_results">opssss</string>
+    <string name="main_loading_text">Cargando …</string>
 
 </resources>

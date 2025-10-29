@@ -36,7 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
-import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBiographyText
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
@@ -62,17 +61,12 @@ fun CharacterScreen(
     var isSpeaking by remember { mutableStateOf(false) }
     val tts = rememberTextToSpeech()
 
-    val uiState by simpsonsViewModel.uiState.collectAsStateWithLifecycle()
-    val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
+    val character by simpsonsViewModel.characterSelected.collectAsStateWithLifecycle()
     val isFavourite by favouriteViewModel.isFavourite.collectAsStateWithLifecycle()
 
-    val character = uiState.entity.results[indexSelected]
     favouriteViewModel.existsItem(character.id)
-    val favouriteItem = FavouriteCharacterEntity(
-        fid = character.id,
-        name = character.name,
-        urlImage = character.portrait_path
-    )
+    val favouriteItem = character.toFavouriteCharacterEntity()
+
 
     Scaffold(
         snackbarHost = {
@@ -129,7 +123,7 @@ fun CharacterScreen(
                             .fillMaxWidth()
                             .clip(shapes.large)
                             .padding(10.dp),
-                        model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[indexSelected].portrait_path}",
+                        model = "$BASE_URL_IMAGE_LARGE${character.portrait_path}",
                         contentDescription = "image webp"
                     )
                     Row(

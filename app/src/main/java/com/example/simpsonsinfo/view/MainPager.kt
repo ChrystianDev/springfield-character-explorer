@@ -55,7 +55,10 @@ fun MainPager(
                 )
 
                 1 -> LocationScreen()
-                2 -> FavouriteScreen()
+                2 -> FavouriteScreen(
+                    simpsonsViewModel = simpsonsViewModel,
+                    onNavigationDetail = onNavigationDetail
+                )
             }
         }
         Box(

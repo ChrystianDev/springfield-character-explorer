@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.simpsonsinfo.view.detail.CharacterScreen
 import com.example.simpsonsinfo.view.MainPager
+import com.example.simpsonsinfo.view.favorite.FavouriteScreen
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @Composable
@@ -27,6 +28,15 @@ fun NavigationWrapper(
                 onSetDarkMode = { isDarkMode ->
                     onSetDarkMode(isDarkMode)
                 }
+            )
+        }
+
+        composable<Favourite> {
+            FavouriteScreen(
+                simpsonsViewModel = simpsonsViewModel,
+                onNavigationDetail = {
+                    navController.navigate(route = Character)
+                },
             )
         }
 

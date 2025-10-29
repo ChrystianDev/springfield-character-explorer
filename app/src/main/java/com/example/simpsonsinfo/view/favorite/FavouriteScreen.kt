@@ -25,14 +25,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
-import com.example.simpsonsinfo.domain.entity.FavouriteCharacterEntity
 import com.example.simpsonsinfo.ui.theme.BlackDev
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
+import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @Composable
 fun FavouriteScreen(
-    favouriteViewModel: FavouriteViewModel = hiltViewModel()
+    favouriteViewModel: FavouriteViewModel = hiltViewModel(),
+    simpsonsViewModel: SimpsonsViewModel,
+    onNavigationDetail: () -> Unit,
 ) {
     val gridState = rememberLazyGridState(0)
 
@@ -66,7 +68,11 @@ fun FavouriteScreen(
                         AsyncImage(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(shapes.large),
+                                .clip(shapes.large)
+                                .clickable {
+                                    onNavigationDetail()
+                                    simpsonsViewModel.setCharacterSelected(item.toCharacterEntity())
+                                },
                             model = "$BASE_URL_IMAGE_LARGE${item.urlImage}",
                             contentDescription = "image webp"
                         )
@@ -78,11 +84,7 @@ fun FavouriteScreen(
                                 .clickable(
                                     onClick = {
                                         favouriteViewModel.onDeleteFavourite(
-                                            FavouriteCharacterEntity(
-                                                fid = item.fid,
-                                                name = item.name,
-                                                urlImage = item.urlImage,
-                                            )
+                                            favouriteCharacter = item
                                         )
                                     }
                                 )
@@ -95,7 +97,7 @@ fun FavouriteScreen(
                         }
                     }
                     CustomBodyText(
-                        text = item.name ?: "-",
+                        text = item.name,
                     )
                 }
             }

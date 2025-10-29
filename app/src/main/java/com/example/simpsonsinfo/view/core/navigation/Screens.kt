@@ -8,4 +8,5 @@ object Main
 @Serializable
 object Character
 
-
+@Serializable
+object Favourite

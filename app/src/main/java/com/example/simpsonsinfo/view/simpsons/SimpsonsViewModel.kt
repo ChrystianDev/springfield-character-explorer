@@ -8,6 +8,7 @@ import android.speech.tts.TextToSpeech
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.simpsonsinfo.domain.entity.CharacterEntity
 import com.example.simpsonsinfo.domain.entity.SimpsonsEntity
 import com.example.simpsonsinfo.domain.usecase.SimpsonsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,12 +38,15 @@ class SimpsonsViewModel @Inject constructor(
 
     val indexSelected: StateFlow<Int> = _indexSelected
 
+    private val _characterSelected = MutableStateFlow(CharacterEntity())
+
+    val characterSelected: StateFlow<CharacterEntity> = _characterSelected
+
     var isLoading = MutableStateFlow(false)
 
     private val _page = MutableStateFlow("1")
 
     val page: StateFlow<String> = _page
-
 
     private val _isMuted = MutableStateFlow(false)
 
@@ -50,6 +54,7 @@ class SimpsonsViewModel @Inject constructor(
 
     fun onGetCharacters() {
         viewModelScope.launch(dispatcher) {
+            delay(100)
             toggleLoading()
             delay(1000)
             val response = simpsonsUsecase(page = _page.value)
@@ -68,6 +73,10 @@ class SimpsonsViewModel @Inject constructor(
 
     fun setIndexSelected(index: Int) {
         _indexSelected.value = index
+    }
+
+    fun setCharacterSelected(character: CharacterEntity) {
+        _characterSelected.value = character
     }
 
     fun incrementPage() {

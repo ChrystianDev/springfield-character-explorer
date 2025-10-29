@@ -62,10 +62,8 @@ class FavouriteViewModel @Inject constructor(
 
     fun onDeleteFavourite(favouriteCharacter: FavouriteCharacterEntity) {
         viewModelScope.launch(dispatcher) {
-            val response = favouritesUsecase.deleteFavourite(favouriteCharacter)
-            if(response == favouriteCharacter.fid){
-                _isFavourite.value = false
-            }
+            favouritesUsecase.deleteFavourite(favouriteCharacter)
+            _isFavourite.value = false
             onGetFavourites()
         }
     }
