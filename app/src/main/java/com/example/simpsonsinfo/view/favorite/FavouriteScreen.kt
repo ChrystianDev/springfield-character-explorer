@@ -27,7 +27,6 @@ import com.example.simpsonsinfo.R
 import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.ui.theme.BlackDev
 import com.example.simpsonsinfo.ui.theme.shapes
-import com.example.simpsonsinfo.view.core.components.CustomBodyText
 import com.example.simpsonsinfo.view.core.components.CustomSubtitleText
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
@@ -50,8 +49,8 @@ fun FavouriteScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.onTertiary)
-                .padding(horizontal = 10.dp)
-                .padding(top = 40.dp, bottom = 2.dp),
+                .padding(horizontal = 5.dp)
+                .padding(vertical = 2.dp),
         ) {
             items(uiState.value.size) { index ->
                 val item = uiState.value[index]
