@@ -65,7 +65,9 @@ fun MainPager(
         }
         Box(
             modifier = Modifier
-                .padding(vertical = 30.dp)
+                .padding(vertical = 8.dp)
+                .padding(horizontal = 8.dp)
+
         ) {
             IOSStyleSegmentedControl(
                 options,
