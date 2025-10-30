@@ -30,6 +30,23 @@ fun CustomTitleText(
         style = style
     )
 }
+@Composable
+fun CustomSubtitleText(
+    text: String,
+    modifier: Modifier = Modifier,
+    padding: Dp = 10.dp,
+    color: Color = MaterialTheme.colorScheme.primary,
+    textAlign: TextAlign = TextAlign.Center,
+    style: TextStyle = MaterialTheme.typography.bodySmall,
+) {
+    Text(
+        text = text,
+        modifier = modifier.padding(padding),
+        color = color,
+        textAlign = textAlign,
+        style = style
+    )
+}
 
 @Composable
 fun CustomBodyText(

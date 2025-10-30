@@ -48,7 +48,7 @@ val Typography = Typography(
 //        fontFamily = bitcount,
         fontFamily = open_sans,
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
+        fontSize = 10.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     ),

@@ -28,6 +28,7 @@ import com.example.simpsonsinfo.config.Constants.BASE_URL_IMAGE_LARGE
 import com.example.simpsonsinfo.ui.theme.BlackDev
 import com.example.simpsonsinfo.ui.theme.shapes
 import com.example.simpsonsinfo.view.core.components.CustomBodyText
+import com.example.simpsonsinfo.view.core.components.CustomSubtitleText
 import com.example.simpsonsinfo.view.simpsons.SimpsonsViewModel
 
 @Composable
@@ -96,7 +97,7 @@ fun FavouriteScreen(
                             )
                         }
                     }
-                    CustomBodyText(
+                    CustomSubtitleText(
                         text = item.name,
                     )
                 }
