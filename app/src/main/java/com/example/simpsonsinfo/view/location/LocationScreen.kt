@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
@@ -69,9 +70,8 @@ fun LocationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.onTertiary)
-                .padding(top = 40.dp)
-                .padding(bottom = 2.dp)
-                .padding(horizontal = 20.dp),
+                .padding(vertical = 3.dp)
+                .padding(horizontal = 10.dp),
         ) {
             items(
                 uiState.entity.results.size
@@ -114,25 +114,33 @@ fun LocationScreen(
                                 .weight(1f),
                         ) {
                             CustomBodyText(
-                                text = if (likesList[index].like > 0) "+${likesList[index].like}" else " ${likesList[index].like}",
+                                modifier = Modifier.weight(1f),
+                                text = if (likesList[index].like > 0) "+${likesList[index].like}" else "${likesList[index].like}",
                                 color = if (likesList[index].like >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             IconButton(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .width(20.dp),
                                 onClick = {
                                     locationsViewModel.updateLikes(index, +1)
                                 }) {
                                 Icon(
-                                    painterResource(if (likesList[index].like > 0) R.drawable.icon_thumb_up_selected else R.drawable.icon_thumb_up_unselected),
+                                    painter = painterResource(if (likesList[index].like > 0) R.drawable.icon_thumb_up_selected else R.drawable.icon_thumb_up_unselected),
                                     contentDescription = "enable/disable sound",
                                     tint = if (likesList[index].like > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                                 )
                             }
-                            IconButton(onClick = {
-                                locationsViewModel.updateLikes(index, -1)
-                            }) {
+                            IconButton(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .width(20.dp),
+                                onClick = {
+                                    locationsViewModel.updateLikes(index, -1)
+                                }) {
                                 Icon(
-                                    painterResource(R.drawable.icon_thumb_down),
+                                    painter = painterResource(R.drawable.icon_thumb_down),
                                     contentDescription = "enable/disable sound",
                                     tint = MaterialTheme.colorScheme.onBackground
                                 )
