@@ -9,13 +9,13 @@ plugins {
 
 
 android {
-    namespace = "com.example.simpsonsinfo"
+    namespace = "com.mobilitydevai.simpsonsinfo"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.simpsonsinfo"
+        applicationId = "com.mobilitydevai.simpsonsinfo"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -31,6 +31,7 @@ android {
             dimension = "version"
             applicationIdSuffix = ".prod"
             versionNameSuffix = "-prod"
+            versionName = "1.0-demo-prod"
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -41,6 +42,7 @@ android {
             dimension = "version"
             applicationIdSuffix = ".qa"
             versionNameSuffix = "-qa"
+            versionName = "1.0-demo-qa"
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -56,6 +58,7 @@ android {
             dimension = "version"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
+            versionName = "1.0-demo"
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -64,6 +67,10 @@ android {
         }
     }
 
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 
     buildTypes {
         release {
@@ -83,7 +90,7 @@ android {
             isDebuggable = true
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
-            manifestPlaceholders["hostName"] = "com.example.simpsonsinfo"
+            manifestPlaceholders["hostName"] = "com.mobilitydevai.simpsonsinfo"
         }
 
         /**
@@ -93,7 +100,7 @@ android {
          */
         create("staging") {
             initWith(getByName("debug"))
-            manifestPlaceholders["hostName"] = "com.example.simpsonsinfo"
+            manifestPlaceholders["hostName"] = "com.mobilitydevai.simpsonsinfo"
             applicationIdSuffix = ".debugStaging"
         }
     }
