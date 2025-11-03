@@ -30,7 +30,24 @@ object FavouriteMocks {
 
     fun aFavouriteEntityMock(
         fid: Int = 1,
+        age: Int = 40,
+        birthdate: String = "1977-04-01",
+        gender: String = "male",
         name: String = "Homer Simpson",
-        urlImage: String = "photo.webp"
-    ) = FavouriteCharacterEntity(fid, name, urlImage)
+        occupation: String = "Nuclear Technician",
+        urlImage: String = "photo.webp",
+        phrases: List<String> = listOf("ohh Marge"),
+        status: String = "alive",
+
+        ) = FavouriteCharacterEntity(
+        fid,
+        age,
+        birthdate,
+        gender,
+        name,
+        occupation,
+        urlImage,
+        phrases,
+        status
+    )
 }
