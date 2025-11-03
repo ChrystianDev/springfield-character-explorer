@@ -14,12 +14,8 @@ val open_sans = FontFamily(
     Font(R.font.open_sans, FontWeight.Normal),
 )
 
-val bitcount = FontFamily(
-    Font(R.font.bitcount, FontWeight.Normal),
-)
 val Typography = Typography(
     labelLarge = TextStyle(
-//        fontFamily = bitcount,
         fontFamily = open_sans,
         fontWeight = FontWeight.Normal,
         fontSize = 40.sp,
@@ -27,7 +23,6 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     ),
     bodyLarge = TextStyle(
-//        fontFamily = bitcount,
         fontFamily = open_sans,
         fontWeight = FontWeight.Normal,
         fontSize = 20.sp,
@@ -36,7 +31,6 @@ val Typography = Typography(
     ),
 
     bodyMedium = TextStyle(
-//        fontFamily = bitcount,
         fontFamily = open_sans,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
@@ -45,7 +39,6 @@ val Typography = Typography(
     ),
 
     bodySmall = TextStyle(
-//        fontFamily = bitcount,
         fontFamily = open_sans,
         fontWeight = FontWeight.Normal,
         fontSize = 10.sp,
@@ -54,27 +47,10 @@ val Typography = Typography(
     ),
 
     titleMedium = TextStyle(
-//        fontFamily = bitcount,
         fontFamily = open_sans,
         fontWeight = FontWeight.Normal,
         fontSize = 20.sp,
         lineHeight = 26.sp,
         letterSpacing = 0.sp
     )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
 )

@@ -34,7 +34,7 @@ import com.example.simpsonsinfo.R
 @Preview(showBackground = true, showSystemUi = true)
 
 @Composable
-fun ExampleComponent(modifier: Modifier = Modifier) {
+fun ExampleComponent() {
 
     val gridState = rememberLazyGridState(0)
 
