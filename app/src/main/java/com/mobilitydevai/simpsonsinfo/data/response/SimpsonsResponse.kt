@@ -4,9 +4,9 @@ import com.mobilitydevai.simpsonsinfo.domain.entity.SimpsonsEntity
 import com.google.gson.annotations.SerializedName
 
 /**
- * [characters] debe ser el nombre de la key que me devuelve la peticion http,
- * para el el convertidor GJson a Kotlin lo encuentre y haga match con el
- * nombre de la variable
+ * "@SerializedName" indica que la variable "characters" debe ser el nombre
+ * de la key que me devuelve la peticion http, para el el convertidor
+ * GJson a Kotlin lo encuentre y haga match con el nombre de la variable
  *  {
  *      "characters": "https://thesimpsonsapi.com/api/characters",
  *      "episodes": "https://thesimpsonsapi.com/api/episodes",
@@ -23,7 +23,6 @@ import com.google.gson.annotations.SerializedName
  *      "locations": "https://thesimpsonsapi.com/api/locations"
  *  }
  */
-//data class SimpsonsResponse(@SerializedName ("characters") val personajes: String)
 data class SimpsonsResponse(
     @SerializedName ("count")
 //    val count: Int,
@@ -43,10 +42,6 @@ data class SimpsonsResponse(
 
 fun SimpsonsResponse.toDomain() : SimpsonsEntity {
     return SimpsonsEntity(
-//        count = count,
-//        next = next ?: "",
-//        prev = prev ?: "",
-//        pages = pages ?: 0,
         count = contador,
         next = siguiente ?: "",
         prev = anterior ?: "",

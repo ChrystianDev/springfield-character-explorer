@@ -71,7 +71,6 @@ fun SimpsonsScreen(
 
     var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
     var lastVisibleItem by remember { mutableIntStateOf(0) }
-    var isSpeaking by remember { mutableStateOf(false) } // TODO: requiere un listener tts
 
     val listState = rememberLazyListState()
     val tts = rememberTextToSpeech()
