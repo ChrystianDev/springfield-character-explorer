@@ -56,7 +56,6 @@ class SimpsonsViewModel @Inject constructor(
         viewModelScope.launch(dispatcher) {
             delay(100)
             toggleLoading()
-            delay(1000)
             val response = simpsonsUsecase(page = _page.value)
             _uiState.update { state ->
                 response?.let { entity ->
