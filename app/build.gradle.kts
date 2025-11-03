@@ -9,13 +9,13 @@ plugins {
 
 
 android {
-    namespace = "com.mobilitydevai.simpsonsinfo"
+    namespace = "com.mobilitydevai.sce"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.mobilitydevai.simpsonsinfo"
+        applicationId = "com.mobilitydevai.sce"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -90,7 +90,7 @@ android {
             isDebuggable = true
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
-            manifestPlaceholders["hostName"] = "com.mobilitydevai.simpsonsinfo"
+            manifestPlaceholders["hostName"] = "com.mobilitydevai.sce"
         }
 
         /**
@@ -100,7 +100,7 @@ android {
          */
         create("staging") {
             initWith(getByName("debug"))
-            manifestPlaceholders["hostName"] = "com.mobilitydevai.simpsonsinfo"
+            manifestPlaceholders["hostName"] = "com.mobilitydevai.sce"
             applicationIdSuffix = ".debugStaging"
         }
     }
