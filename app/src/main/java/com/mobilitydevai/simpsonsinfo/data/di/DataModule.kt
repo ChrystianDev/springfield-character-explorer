@@ -12,7 +12,6 @@ import com.mobilitydevai.simpsonsinfo.data.repository.SimpsonsRepositoryImpl
 import com.mobilitydevai.simpsonsinfo.data.repository.local.DataBaseRoom
 import com.mobilitydevai.simpsonsinfo.data.repository.local.FavouriteCharacterDao
 import com.mobilitydevai.simpsonsinfo.domain.repository.SimpsonsRepository
-import com.mobilitydevai.simpsonsinfo.view.core.mediaplayer.VoiceMediaPlayer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -89,13 +88,4 @@ object DataModule {
     @Provides
     fun provideLocationsDispatcher(): CoroutineDispatcher = Dispatchers.IO
 
-
-    // TODO: Eliminar si no se usa !!!
-    @Provides
-    @Singleton
-    fun provideMediaPlayer(
-        @ApplicationContext context: Context
-    ): VoiceMediaPlayer {
-        return VoiceMediaPlayer(context)
-    }
 }

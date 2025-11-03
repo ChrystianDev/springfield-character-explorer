@@ -148,7 +148,6 @@ dependencies {
     implementation(libs.androidx.core.common)
     implementation(libs.androidx.core.runtime)
 
-
     // Navigation
     implementation(libs.androidx.navigation.compose)
 
@@ -165,11 +164,6 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.lottie.compose)
-
-    // TODO: Eliminar si no se usa !!!
-    implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.ui)
-    implementation(libs.androidx.media3.common)
 
     // Local DB
     implementation(libs.androidx.room.runtime)
