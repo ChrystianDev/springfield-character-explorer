@@ -118,15 +118,19 @@ class SimpsonsViewModel @Inject constructor(
     }
 
     fun speakItemDetail(tts: MutableState<TextToSpeech?>, text: String) {
-        if (tts.value?.isSpeaking == true) {
-            tts.value?.stop()
-        }
+        stopSpeak(tts)
         tts.value?.speak(
             text,
             TextToSpeech.QUEUE_FLUSH,
             null,
             ""
         )
+    }
+
+    fun stopSpeak(tts: MutableState<TextToSpeech?>) {
+        if (tts.value?.isSpeaking == true) {
+            tts.value?.stop()
+        }
     }
 
     fun toggleMute(tts: MutableState<TextToSpeech?>) {

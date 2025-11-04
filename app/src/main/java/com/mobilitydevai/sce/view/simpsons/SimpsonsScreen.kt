@@ -81,8 +81,8 @@ fun SimpsonsScreen(
         }.collect { visibleItems ->
             if (visibleItems > 3) {
                 lastVisibleItem = visibleItems - 3
-                simpsonsViewModel.setIndexSelected(lastVisibleItem)
-                simpsonsViewModel.speakItemCharacters(lastVisibleItem, tts)
+                simpsonsViewModel.setIndexSelected(index = lastVisibleItem)
+                simpsonsViewModel.stopSpeak(tts = tts)
             }
         }
     }
