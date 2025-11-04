@@ -18,8 +18,8 @@ android {
         applicationId = "com.mobilitydevai.sce"
         minSdk = 24
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 1
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,7 +31,7 @@ android {
             dimension = "version"
             applicationIdSuffix = ".prod"
             versionNameSuffix = "-prod"
-            versionName = "1.1"
+            versionName = "1.0.1"
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -42,7 +42,7 @@ android {
             dimension = "version"
             applicationIdSuffix = ".qa"
             versionNameSuffix = "-qa"
-            versionName = "1.1"
+            versionName = "1.0.1"
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -58,7 +58,7 @@ android {
             dimension = "version"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            versionName = "1.1"
+            versionName = "1.0.1"
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
