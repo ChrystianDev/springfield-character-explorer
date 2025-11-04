@@ -9,6 +9,7 @@ import com.mobilitydevai.sce.domain.entity.LocationsSimpsonsEntity
 import com.mobilitydevai.sce.domain.usecase.LocationsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,6 +61,8 @@ class LocationsViewModel @Inject constructor(
 
     fun onFetchLocations() {
         viewModelScope.launch(dispatcher) {
+            //TODO: Eliminar delay
+            delay(100)
             toggleLoading()
             val response = locationsUsecase(page = _page.value)
             updateUiStateWithResponse(response)
