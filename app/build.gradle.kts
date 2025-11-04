@@ -9,6 +9,9 @@ plugins {
 
 
 android {
+    val aVersionName = "1.0.2"
+    val aVersionCode = 2
+
     namespace = "com.mobilitydevai.sce"
     compileSdk {
         version = release(36)
@@ -18,8 +21,8 @@ android {
         applicationId = "com.mobilitydevai.sce"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.1"
+        versionCode = aVersionCode
+        versionName = aVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,7 +34,7 @@ android {
             dimension = "version"
             applicationIdSuffix = ".prod"
             versionNameSuffix = "-prod"
-            versionName = "1.0.1"
+            versionName = "$aVersionName:prod"
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -42,7 +45,7 @@ android {
             dimension = "version"
             applicationIdSuffix = ".qa"
             versionNameSuffix = "-qa"
-            versionName = "1.0.1"
+            versionName = "$aVersionName:qa"
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -58,7 +61,7 @@ android {
             dimension = "version"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            versionName = "1.0.1"
+            versionName = "$aVersionName:dev"
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -87,6 +90,7 @@ android {
         debug {
 //        getByName("debug") {
             applicationIdSuffix = ".deb"
+            versionNameSuffix = "-debug"
             isDebuggable = true
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
