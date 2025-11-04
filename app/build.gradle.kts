@@ -9,8 +9,9 @@ plugins {
 
 
 android {
-    val aVersionName = "1.0.2"
-    val aVersionCode = 2
+    val psVersionCode = 3
+    val psVersionName = "1.0.2"
+    val psVersionNameSuffix = "-demo"
 
     namespace = "com.mobilitydevai.sce"
     compileSdk {
@@ -21,8 +22,8 @@ android {
         applicationId = "com.mobilitydevai.sce"
         minSdk = 24
         targetSdk = 36
-        versionCode = aVersionCode
-        versionName = aVersionName
+        versionCode = psVersionCode
+        versionName = psVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,8 +34,8 @@ android {
         create("prod") {
             dimension = "version"
             applicationIdSuffix = ".prod"
-            versionNameSuffix = "-prod"
-            versionName = "$aVersionName:prod"
+            versionNameSuffix = "$psVersionNameSuffix.prod"
+            versionName = psVersionName
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -44,8 +45,8 @@ android {
         create("qa") {
             dimension = "version"
             applicationIdSuffix = ".qa"
-            versionNameSuffix = "-qa"
-            versionName = "$aVersionName:qa"
+            versionNameSuffix = "$psVersionNameSuffix.qa"
+            versionName = psVersionName
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -60,8 +61,8 @@ android {
             // that dimension.
             dimension = "version"
             applicationIdSuffix = ".dev"
-            versionNameSuffix = "-dev"
-            versionName = "$aVersionName:dev"
+            versionNameSuffix = psVersionNameSuffix
+            versionName = psVersionName
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
@@ -79,7 +80,7 @@ android {
         release {
 //        getByName("release") {
             applicationIdSuffix = ".release"
-            versionNameSuffix = "-rel"
+            versionNameSuffix = ""
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
