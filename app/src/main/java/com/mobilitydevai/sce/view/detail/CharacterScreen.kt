@@ -94,7 +94,7 @@ fun CharacterScreen(
                     )
                 },
                 title = {
-                    CustomTitleText(text = "Details")
+                    CustomTitleText(text = stringResource(R.string.character_details_text))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.onTertiary,
