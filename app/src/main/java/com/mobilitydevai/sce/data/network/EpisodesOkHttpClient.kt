@@ -29,7 +29,7 @@ class EpisodesOkHttpClient @Inject constructor(
                 val response = okHttpClient.newCall(request).execute()
 
                 if (response.isSuccessful) {
-                    response.body?.string()?.let { jsonString ->
+                    response.body.string().let { jsonString ->
                         gson.fromJson(jsonString, EpisodesResponse::class.java)
                     }
                 } else {
