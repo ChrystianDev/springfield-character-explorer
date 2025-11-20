@@ -32,12 +32,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.mobilitydevai.sce.config.Constants
 import com.mobilitydevai.sce.ui.theme.shapes
 import com.mobilitydevai.sce.view.core.components.CustomHomerLoading
+import com.mobilitydevai.sce.view.core.components.SpaceV20
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -88,15 +90,17 @@ fun EpisodesScreen(
                 } else {
                     "Episodes"
                 },
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .padding(horizontal = 50.dp)
+                    .padding(bottom = 40.dp),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+            SpaceV20()
 
             // LazyRow for episodes
             LazyRow(
@@ -132,13 +136,13 @@ fun EpisodeCard(
 ) {
     Card(
         modifier = Modifier
-            .width(300.dp)
+            .width(350.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(
             defaultElevation = if (isSelected) 8.dp else 4.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.primary.copy(0.1f)
         )
     ) {
         Column(
@@ -161,21 +165,23 @@ fun EpisodeCard(
             // Synopsis
             Text(
                 text = synopsis,
+                fontSize = 12.sp,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
                     .padding(top = 8.dp),
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis
             )
-
+            SpaceV20()
             // Season and Airdate
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
                     text = "Season $season",
