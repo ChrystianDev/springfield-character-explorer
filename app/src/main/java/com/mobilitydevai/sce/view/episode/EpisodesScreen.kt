@@ -5,9 +5,11 @@ package com.mobilitydevai.sce.view.episode
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,12 +24,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +46,8 @@ import com.mobilitydevai.sce.config.Constants
 import com.mobilitydevai.sce.ui.theme.shapes
 import com.mobilitydevai.sce.view.core.components.CustomHomerLoading
 import com.mobilitydevai.sce.view.core.components.SpaceV20
+import com.mobilitydevai.sce.view.core.components.SpaceVany
+import kotlinx.coroutines.launch
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -50,15 +58,33 @@ fun EpisodesScreen(
     val isLoading by episodesViewModel.isLoading.collectAsStateWithLifecycle()
     val selectedEpisodeIndex by episodesViewModel.selectedEpisodeIndex.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size
-        }.collect { visibleItems ->
-            if (visibleItems > 0) {
-                val centerIndex = listState.firstVisibleItemIndex
-                episodesViewModel.setSelectedEpisodeIndex(centerIndex)
-            }
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val cardWidth = 350.dp
+    val cardSpacing = 16.dp
+    val sidePadding = (screenWidth - cardWidth) / 2
+
+    val snapFlingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
+
+    // Calculate the centered item based on scroll position
+    val centeredItemIndex by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val viewportCenter = layoutInfo.viewportStartOffset + layoutInfo.viewportSize.width / 2
+
+            layoutInfo.visibleItemsInfo
+                .minByOrNull { item ->
+                    val itemCenter = item.offset + item.size / 2
+                    kotlin.math.abs(itemCenter - viewportCenter)
+                }?.index ?: 0
+        }
+    }
+
+    LaunchedEffect(centeredItemIndex) {
+        if (centeredItemIndex < uiState.entity.results.size) {
+            episodesViewModel.setSelectedEpisodeIndex(centeredItemIndex)
         }
     }
 
@@ -95,17 +121,19 @@ fun EpisodesScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 50.dp)
-                    .padding(bottom = 40.dp),
+                    .height(80.dp)
+                    .padding(horizontal = 50.dp),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-            SpaceV20()
+            SpaceVany(50.dp)
 
             // LazyRow for episodes
             LazyRow(
                 state = listState,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(cardSpacing),
+                contentPadding = PaddingValues(horizontal = sidePadding),
+                flingBehavior = snapFlingBehavior,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(uiState.entity.results.size) { index ->
@@ -117,6 +145,9 @@ fun EpisodesScreen(
                         isSelected = index == selectedEpisodeIndex,
                         onClick = {
                             episodesViewModel.setSelectedEpisodeIndex(index)
+                            scope.launch {
+                                listState.animateScrollToItem(index)
+                            }
                         }
                     )
                 }

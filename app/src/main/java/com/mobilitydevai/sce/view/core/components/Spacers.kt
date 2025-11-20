@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 // Vertical
@@ -16,6 +17,11 @@ fun SpaceV10() {
 @Composable
 fun SpaceV20() {
     Spacer(modifier = Modifier.height(20.dp))
+}
+
+@Composable
+fun SpaceVany(height: Dp) {
+    Spacer(modifier = Modifier.height(height))
 }
 
 
