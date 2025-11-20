@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "392839125176",
+    "project_id": "springfield-character-explorer",
+    "storage_bucket": "springfield-character-explorer.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392839125176:android:c5d0dda09c03724b9fbc4d",
+        "android_client_info": {
+          "package_name": "com.mobilitydevai.sce"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVuQU8oPLPDvxEyFCiJTR8bfo5fKCBg60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

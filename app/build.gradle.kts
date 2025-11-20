@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.services)
 }
 
 
@@ -60,7 +61,7 @@ android {
             // and the plugin automatically assigns all the module's flavors to
             // that dimension.
             dimension = "version"
-            applicationIdSuffix = ".dev"
+            applicationIdSuffix = ""
             versionNameSuffix = psVersionNameSuffix
             versionName = psVersionName
             buildConfigField(
@@ -90,7 +91,7 @@ android {
 
         debug {
 //        getByName("debug") {
-            applicationIdSuffix = ".deb"
+            applicationIdSuffix = ""
             versionNameSuffix = "-debug"
             isDebuggable = true
             enableUnitTestCoverage = true
@@ -152,6 +153,10 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.common)
     implementation(libs.androidx.core.runtime)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
