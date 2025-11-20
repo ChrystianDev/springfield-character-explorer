@@ -5,12 +5,16 @@ package com.mobilitydevai.sce.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.google.gson.Gson
 import com.mobilitydevai.sce.BuildConfig
+import com.mobilitydevai.sce.data.network.EpisodesOkHttpClient
 import com.mobilitydevai.sce.data.network.SimpsonsClient
 import com.mobilitydevai.sce.data.network.SimpsonsService
+import com.mobilitydevai.sce.data.repository.EpisodesRepositoryImpl
 import com.mobilitydevai.sce.data.repository.SimpsonsRepositoryImpl
 import com.mobilitydevai.sce.data.repository.local.DataBaseRoom
 import com.mobilitydevai.sce.data.repository.local.FavouriteCharacterDao
+import com.mobilitydevai.sce.domain.repository.EpisodesRepository
 import com.mobilitydevai.sce.domain.repository.SimpsonsRepository
 import dagger.Module
 import dagger.Provides
@@ -19,6 +23,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -50,6 +55,27 @@ object DataModule {
         return retrofit.create(SimpsonsClient::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder().build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideGson(): Gson {
+        return Gson()
+    }
+
+    @Singleton
+    @Provides
+    fun provideEpisodesOkHttpClient(
+        okHttpClient: OkHttpClient,
+        gson: Gson
+    ): EpisodesOkHttpClient {
+        return EpisodesOkHttpClient(okHttpClient, gson)
+    }
+
 
     // ****** API-REST ******
     @Provides
@@ -67,6 +93,11 @@ object DataModule {
     @Provides
     fun provideSimpsonsRepository(simpsonsService: SimpsonsService): SimpsonsRepository {
         return SimpsonsRepositoryImpl(simpsonsService)
+    }
+
+    @Provides
+    fun provideEpisodesRepository(episodesOkHttpClient: EpisodesOkHttpClient): EpisodesRepository {
+        return EpisodesRepositoryImpl(episodesOkHttpClient)
     }
 
     @Provides
