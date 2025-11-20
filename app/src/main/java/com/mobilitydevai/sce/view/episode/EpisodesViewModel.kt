@@ -42,7 +42,7 @@ class EpisodesViewModel @Inject constructor(
         viewModelScope.launch(dispatcher) {
             delay(100)
             toggleLoading()
-            delay(500)
+            delay(1000)
             val response = episodesUsecase(page = _currentPage.value)
             _uiState.update { state ->
                 response?.let { entity ->

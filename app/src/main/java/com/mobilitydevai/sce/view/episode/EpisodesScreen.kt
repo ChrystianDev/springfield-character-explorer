@@ -45,6 +45,7 @@ import coil3.compose.AsyncImage
 import com.mobilitydevai.sce.config.Constants
 import com.mobilitydevai.sce.ui.theme.shapes
 import com.mobilitydevai.sce.view.core.components.CustomHomerLoading
+import com.mobilitydevai.sce.view.core.components.CustomLoadingStyleIOS
 import com.mobilitydevai.sce.view.core.components.SpaceV20
 import com.mobilitydevai.sce.view.core.components.SpaceVany
 import kotlinx.coroutines.launch
@@ -130,6 +131,7 @@ fun EpisodesScreen(
 
             // LazyRow for episodes
             LazyRow(
+                verticalAlignment = Alignment.CenterVertically,
                 state = listState,
                 horizontalArrangement = Arrangement.spacedBy(cardSpacing),
                 contentPadding = PaddingValues(horizontal = sidePadding),
@@ -151,6 +153,10 @@ fun EpisodesScreen(
                         }
                     )
                 }
+                if (isLoading)
+                    item {
+                        CustomLoadingStyleIOS(padding = 30.dp)
+                    }
             }
         }
     }

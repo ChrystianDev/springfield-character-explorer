@@ -29,9 +29,10 @@ class EpisodesOkHttpClient @Inject constructor(
                 val response = okHttpClient.newCall(request).execute()
 
                 if (response.isSuccessful) {
-                    response.body.string().let { jsonString ->
-                        gson.fromJson(jsonString, EpisodesResponse::class.java)
-                    }
+//                    response.body.string().let { jsonString ->
+//                        gson.fromJson(jsonString, EpisodesResponse::class.java)
+//                    }
+                    gson.fromJsonCustom<EpisodesResponse>(response.body.string())
                 } else {
                     null
                 }
@@ -41,4 +42,7 @@ class EpisodesOkHttpClient @Inject constructor(
             }
         }
     }
+
+    inline fun <reified T> Gson.fromJsonCustom(json: String): T =
+        this.fromJson(json, T::class.java)
 }
