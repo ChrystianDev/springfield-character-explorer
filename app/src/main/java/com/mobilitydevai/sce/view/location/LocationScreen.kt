@@ -115,8 +115,8 @@ fun LocationScreen(
                         ) {
                             CustomBodyText(
                                 modifier = Modifier.weight(1f),
-                                text = if (likesList[index].like > 0) "+${likesList[index].like}" else "${likesList[index].like}",
-                                color = if (likesList[index].like >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
+                                text = "${likesList[index].likeCount}",
+                                color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             IconButton(
@@ -127,11 +127,17 @@ fun LocationScreen(
                                     locationsViewModel.updateLikes(index, +1)
                                 }) {
                                 Icon(
-                                    painter = painterResource(if (likesList[index].like > 0) R.drawable.icon_thumb_up_selected else R.drawable.icon_thumb_up_unselected),
-                                    contentDescription = "enable/disable sound",
-                                    tint = if (likesList[index].like > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                                    painter = painterResource(R.drawable.icon_thumb_up_unselected),
+                                    contentDescription = "like button",
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             }
+                            CustomBodyText(
+                                modifier = Modifier.weight(1f),
+                                text = "${likesList[index].unlikeCount}",
+                                color = MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                             IconButton(
                                 modifier = Modifier
                                     .weight(1f)
@@ -141,8 +147,8 @@ fun LocationScreen(
                                 }) {
                                 Icon(
                                     painter = painterResource(R.drawable.icon_thumb_down),
-                                    contentDescription = "enable/disable sound",
-                                    tint = MaterialTheme.colorScheme.onBackground
+                                    contentDescription = "unlike button",
+                                    tint = MaterialTheme.colorScheme.tertiary
                                 )
                             }
                         }
