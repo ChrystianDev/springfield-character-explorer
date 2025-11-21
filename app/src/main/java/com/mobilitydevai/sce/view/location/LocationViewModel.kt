@@ -5,7 +5,10 @@ package com.mobilitydevai.sce.view.location
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mobilitydevai.sce.config.Constants
+import com.mobilitydevai.sce.domain.entity.ImageEntity
 import com.mobilitydevai.sce.domain.entity.LocationsSimpsonsEntity
+import com.mobilitydevai.sce.domain.repository.ImageRepository
 import com.mobilitydevai.sce.domain.repository.UserRepository
 import com.mobilitydevai.sce.domain.usecase.LocationsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +25,7 @@ import javax.inject.Inject
 class LocationsViewModel @Inject constructor(
     private val locationsUsecase: LocationsUsecase,
     private val userRepository: UserRepository,
+    private val imageRepository: ImageRepository,
     private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -76,6 +80,13 @@ class LocationsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Formats the location ID as imgXXX (e.g., 1 -> img001, 12 -> img012, 123 -> img123)
+     */
+    private fun formatImageId(id: Int): String {
+        return "img${id.toString().padStart(3, '0')}"
+    }
+
     fun updateLikes(index: Int, like: Int) {
         // Update local state
         _likesList.update { state ->
@@ -92,16 +103,33 @@ class LocationsViewModel @Inject constructor(
         viewModelScope.launch(dispatcher) {
             val uid = userRepository.getCurrentUserUid()
             if (uid != null) {
-                val result = if (like > 0) {
-                    // User liked
-                    userRepository.updateLikes(uid, increment = true)
-                } else {
-                    // User unliked
-                    userRepository.updateUnlikes(uid, increment = true)
-                }
+                val location = _uiState.value.entity.results.getOrNull(index)
+                if (location != null) {
+                    val imageId = formatImageId(location.id)
+                    val url = "${Constants.BASE_URL_IMAGE_LARGE}${location.imagePath}"
 
-                result.onFailure { exception ->
-                    _errorState.value = "Error updating likes: ${exception.message}"
+                    // Ensure image document exists
+                    val existingImage = imageRepository.getImage(imageId).getOrNull()
+                    if (existingImage == null) {
+                        // Create the image document
+                        val newImage = ImageEntity(
+                            imageId = imageId,
+                            url = url,
+                            description = location.name,
+                            likeCount = 0,
+                            unlikeCount = 0,
+                            timestamp = System.currentTimeMillis().toString()
+                        )
+                        imageRepository.createOrUpdateImage(newImage)
+                    }
+
+                    // Add or update vote
+                    val voteType = if (like > 0) "like" else "unlike"
+                    val result = imageRepository.addOrUpdateVote(imageId, uid, voteType)
+
+                    result.onFailure { exception ->
+                        _errorState.value = "Error updating vote: ${exception.message}"
+                    }
                 }
             } else {
                 _errorState.value = "User not authenticated"

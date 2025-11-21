@@ -7,7 +7,5 @@ data class UserEntity(
     val uid: String = "",
     val name: String = "",
     val email: String = "",
-    val like: Long = 0,
-    val unlike: Long = 0,
-    val imageId: Long = 0
+    val createdAt: String = ""
 )
