@@ -31,7 +31,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.mobilitydevai.sce.R
-import com.mobilitydevai.sce.config.Constants.BASE_URL_IMAGE_SHORT
+import com.mobilitydevai.sce.config.Constants.BASE_URL_IMAGE_LARGE
 import com.mobilitydevai.sce.view.core.components.CustomBodyText
 import com.mobilitydevai.sce.view.core.components.CustomHomerLoading
 import com.mobilitydevai.sce.view.core.components.CustomLoadingStyleIOS
@@ -85,7 +85,7 @@ fun LocationScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.background),
-                        model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].imagePath}",
+                        model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[index].imagePath}",
                         contentDescription = "image webp",
                         contentScale = ContentScale.FillWidth,
 

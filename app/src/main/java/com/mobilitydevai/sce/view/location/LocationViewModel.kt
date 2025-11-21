@@ -6,6 +6,7 @@ package com.mobilitydevai.sce.view.location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mobilitydevai.sce.domain.entity.LocationsSimpsonsEntity
+import com.mobilitydevai.sce.domain.repository.UserRepository
 import com.mobilitydevai.sce.domain.usecase.LocationsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LocationsViewModel @Inject constructor(
     private val locationsUsecase: LocationsUsecase,
+    private val userRepository: UserRepository,
     private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -39,6 +41,9 @@ class LocationsViewModel @Inject constructor(
     private val _page = MutableStateFlow("1")
 
     val page = _page.asStateFlow()
+
+    private val _errorState = MutableStateFlow<String?>(null)
+    val errorState = _errorState.asStateFlow()
 
     private fun updateUiStateWithResponse(response: LocationsSimpsonsEntity?) {
         _uiState.update { state ->
@@ -72,6 +77,7 @@ class LocationsViewModel @Inject constructor(
     }
 
     fun updateLikes(index: Int, like: Int) {
+        // Update local state
         _likesList.update { state ->
             state.mapIndexed { indexList, likeUiState ->
                 if (indexList == index) {
@@ -81,6 +87,30 @@ class LocationsViewModel @Inject constructor(
                 }
             }
         }
+
+        // Update Firestore
+        viewModelScope.launch(dispatcher) {
+            val uid = userRepository.getCurrentUserUid()
+            if (uid != null) {
+                val result = if (like > 0) {
+                    // User liked
+                    userRepository.updateLikes(uid, increment = true)
+                } else {
+                    // User unliked
+                    userRepository.updateUnlikes(uid, increment = true)
+                }
+
+                result.onFailure { exception ->
+                    _errorState.value = "Error updating likes: ${exception.message}"
+                }
+            } else {
+                _errorState.value = "User not authenticated"
+            }
+        }
+    }
+
+    fun clearError() {
+        _errorState.value = null
     }
 
     fun incrementPage() {

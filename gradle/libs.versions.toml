@@ -26,8 +26,11 @@ lottieCompose = "6.6.10"
 roomRuntime = "2.8.2"
 
 # Firebase
-firebaseBom = "33.7.0"
+firebaseBom = "34.6.0"
 googleServices = "4.4.4"
+firebaseAnalytics = "23.0.0"
+firebaseFirestore = "25.1.4"
+firebaseAuth = "23.2.1"
 
 
 [libraries]
@@ -70,7 +73,9 @@ lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "
 
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebaseFirestore" }
+firebase-auth = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuth" }
 
 
 [plugins]
