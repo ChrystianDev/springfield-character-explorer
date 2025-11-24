@@ -172,6 +172,7 @@ dependencies {
     // API-Rest
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.converter.gson)
+    implementation(libs.squareup.okhttp)
 
     // Media
     implementation(libs.coil.compose)

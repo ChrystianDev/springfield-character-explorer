@@ -32,7 +32,7 @@ fun IOSStyleSegmentedControl(
     onOptionSelected: (Int) -> Unit,
 ) {
     val selectedIndex = options.indexOf(selectedOption)
-    val segmentWidth = 120.dp
+    val segmentWidth = 90.dp
     val thumbOffset by animateDpAsState(targetValue = segmentWidth * selectedIndex)
 
     Box(
@@ -57,6 +57,7 @@ fun IOSStyleSegmentedControl(
                     0 -> R.drawable.icon_home
                     1 -> R.drawable.icon_location
                     2 -> R.drawable.icon_favorite
+                    3 -> R.drawable.icon_local_movies
                     else -> R.drawable.icon_home
                 }
                 val isSelected = option == selectedOption

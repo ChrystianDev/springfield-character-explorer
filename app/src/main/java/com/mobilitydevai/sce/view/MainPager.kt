@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobilitydevai.sce.view.auth.AuthViewModel
 import com.mobilitydevai.sce.view.core.components.IOSStyleSegmentedControl
+import com.mobilitydevai.sce.view.episode.EpisodesScreen
 import com.mobilitydevai.sce.view.favorite.FavouriteScreen
 import com.mobilitydevai.sce.view.location.LocationScreen
 import com.mobilitydevai.sce.view.simpsons.SimpsonsScreen
@@ -35,8 +36,8 @@ fun MainPager(
     onNavigationDetail: () -> Unit,
     onSetDarkMode: (Boolean) -> Unit
 ) {
-    val pageState = rememberPagerState { 3 }
-    val options = listOf(0, 1, 2)
+    val pageState = rememberPagerState { 4 }
+    val options = listOf(0, 1, 2, 3)
     val scope = rememberCoroutineScope()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,6 +65,8 @@ fun MainPager(
                     simpsonsViewModel = simpsonsViewModel,
                     onNavigationDetail = onNavigationDetail
                 )
+
+                3 -> EpisodesScreen()
             }
         }
         Box(
