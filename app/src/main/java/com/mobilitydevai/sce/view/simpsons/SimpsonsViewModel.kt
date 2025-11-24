@@ -8,6 +8,8 @@ import android.speech.tts.TextToSpeech
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mobilitydevai.sce.analytics.AnalyticsManager
+import com.mobilitydevai.sce.analytics.CrashlyticsManager
 import com.mobilitydevai.sce.domain.entity.CharacterEntity
 import com.mobilitydevai.sce.domain.entity.SimpsonsEntity
 import com.mobilitydevai.sce.domain.usecase.SimpsonsUsecase
@@ -23,11 +25,16 @@ import javax.inject.Inject
 @HiltViewModel
 class SimpsonsViewModel @Inject constructor(
     private val simpsonsUsecase: SimpsonsUsecase,
+    private val analyticsManager: AnalyticsManager,
+    private val crashlyticsManager: CrashlyticsManager,
     private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     init {
         onGetCharacters()
+        // Log screen view
+        analyticsManager.logScreenView("SimpsonsScreen", "SimpsonsScreen")
+        crashlyticsManager.recordBreadcrumb("SimpsonsScreen", "screen_opened")
     }
 
     private val _uiState = MutableStateFlow(SimpsonsUiState())
@@ -77,6 +84,9 @@ class SimpsonsViewModel @Inject constructor(
 
     fun setCharacterSelected(character: CharacterEntity) {
         _characterSelected.value = character
+        // Log character selection
+        analyticsManager.logCharacterView(character.name, character.id.toString())
+        crashlyticsManager.recordBreadcrumb("SimpsonsScreen", "character_selected:${character.name}")
     }
 
     fun incrementPage() {
@@ -84,6 +94,8 @@ class SimpsonsViewModel @Inject constructor(
         if (pageNumber != null) {
             pageNumber++
             _page.value = pageNumber.toString()
+            // Log page navigation
+            analyticsManager.logPageView(pageNumber, "characters")
         }
     }
 
@@ -138,6 +150,9 @@ class SimpsonsViewModel @Inject constructor(
             tts.value?.stop()
         }
         _isMuted.value = !_isMuted.value
+        // Log audio toggle
+        analyticsManager.logAudioToggle(_isMuted.value)
+        crashlyticsManager.recordBreadcrumb("SimpsonsScreen", "audio_toggled:${_isMuted.value}")
     }
 }
 

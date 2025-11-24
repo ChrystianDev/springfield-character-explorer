@@ -80,6 +80,11 @@ fun SimpsonsScreen(
     var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
     var lastVisibleItem by remember { mutableIntStateOf(0) }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val analyticsManager = remember {
+        (context.applicationContext as? com.mobilitydevai.sce.SimpsonsInfoApp)?.analyticsManager
+    }
+
     val listState = rememberLazyListState()
     val tts = rememberTextToSpeech()
 
@@ -162,6 +167,8 @@ fun SimpsonsScreen(
                         onClick = {
                             isDarkThemeMode = !isDarkThemeMode
                             onSetDarkMode(isDarkThemeMode)
+                            // Log theme change
+                            analyticsManager?.logThemeChange(isDarkThemeMode)
                         }
                     )
                 }

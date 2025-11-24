@@ -5,6 +5,8 @@ package com.mobilitydevai.sce.view.location
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mobilitydevai.sce.analytics.AnalyticsManager
+import com.mobilitydevai.sce.analytics.CrashlyticsManager
 import com.mobilitydevai.sce.config.Constants
 import com.mobilitydevai.sce.domain.entity.ImageEntity
 import com.mobilitydevai.sce.domain.entity.LocationsSimpsonsEntity
@@ -26,11 +28,16 @@ class LocationsViewModel @Inject constructor(
     private val locationsUsecase: LocationsUsecase,
     private val userRepository: UserRepository,
     private val imageRepository: ImageRepository,
+    private val analyticsManager: AnalyticsManager,
+    private val crashlyticsManager: CrashlyticsManager,
     private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     init {
         onFetchLocations()
+        // Log screen view
+        analyticsManager.logScreenView("LocationScreen", "LocationScreen")
+        crashlyticsManager.recordBreadcrumb("LocationScreen", "screen_opened")
     }
 
     private val _uiState = MutableStateFlow(LocationsUiState())
@@ -124,6 +131,8 @@ class LocationsViewModel @Inject constructor(
             if (uid == null) {
                 // User not authenticated, trigger sign-in
                 _authRequired.value = true
+                crashlyticsManager.recordBreadcrumb("LocationScreen", "vote_attempted_unauthenticated")
+                analyticsManager.logCustomEvent("vote_blocked", mapOf("reason" to "not_authenticated"))
                 return@launch
             }
 
@@ -168,6 +177,10 @@ class LocationsViewModel @Inject constructor(
                 val result = imageRepository.addOrUpdateVote(imageId, uid, voteType)
 
                 result.onSuccess {
+                    // Log successful vote
+                    analyticsManager.logVote(imageId, voteType)
+                    crashlyticsManager.recordBreadcrumb("LocationScreen", "vote_success:$imageId:$voteType")
+
                     // Reload the actual counts from Firestore
                     val updatedImage = imageRepository.getImage(imageId).getOrNull()
                     if (updatedImage != null) {
@@ -188,6 +201,15 @@ class LocationsViewModel @Inject constructor(
 
                 result.onFailure { exception ->
                     _errorState.value = "Error updating vote: ${exception.message}"
+
+                    // Log error
+                    analyticsManager.logError("voting", exception.message ?: "Unknown error")
+                    crashlyticsManager.logVotingError(
+                        imageId = imageId,
+                        errorMessage = exception.message ?: "Vote update failed",
+                        exception = exception
+                    )
+
                     // Reload counts on failure to revert optimistic update
                     val reloadedImage = imageRepository.getImage(imageId).getOrNull()
                     if (reloadedImage != null) {
