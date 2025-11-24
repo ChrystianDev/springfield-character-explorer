@@ -49,6 +49,9 @@ class LocationsViewModel @Inject constructor(
     private val _errorState = MutableStateFlow<String?>(null)
     val errorState = _errorState.asStateFlow()
 
+    private val _authRequired = MutableStateFlow(false)
+    val authRequired = _authRequired.asStateFlow()
+
     private fun updateUiStateWithResponse(response: LocationsSimpsonsEntity?) {
         _uiState.update { state ->
             response?.let {
@@ -115,96 +118,103 @@ class LocationsViewModel @Inject constructor(
     }
 
     fun updateLikes(index: Int, like: Int) {
-        // Update local state optimistically
-        _likesList.update { state ->
-            state.mapIndexed { indexList, likeUiState ->
-                if (indexList == index) {
-                    if (like > 0) {
-                        likeUiState.copy(likeCount = likeUiState.likeCount + 1)
-                    } else {
-                        likeUiState.copy(unlikeCount = likeUiState.unlikeCount + 1)
-                    }
-                } else {
-                    likeUiState
-                }
-            }
-        }
-
-        // Update Firestore
+        // Check authentication first
         viewModelScope.launch(dispatcher) {
             val uid = userRepository.getCurrentUserUid()
-            if (uid != null) {
-                val location = _uiState.value.entity.results.getOrNull(index)
-                if (location != null) {
-                    val imageId = formatImageId(location.id)
-                    val url = "${Constants.BASE_URL_IMAGE_LARGE}${location.imagePath}"
+            if (uid == null) {
+                // User not authenticated, trigger sign-in
+                _authRequired.value = true
+                return@launch
+            }
 
-                    // Ensure image document exists
-                    val existingImage = imageRepository.getImage(imageId).getOrNull()
-                    if (existingImage == null) {
-                        // Create the image document
-                        val newImage = ImageEntity(
-                            imageId = imageId,
-                            url = url,
-                            description = location.name,
-                            likeCount = 0,
-                            unlikeCount = 0,
-                            timestamp = System.currentTimeMillis().toString()
-                        )
-                        imageRepository.createOrUpdateImage(newImage)
-                    }
-
-                    // Add or update vote
-                    val voteType = if (like > 0) "like" else "unlike"
-                    val result = imageRepository.addOrUpdateVote(imageId, uid, voteType)
-
-                    result.onSuccess {
-                        // Reload the actual counts from Firestore
-                        val updatedImage = imageRepository.getImage(imageId).getOrNull()
-                        if (updatedImage != null) {
-                            _likesList.update { state ->
-                                state.mapIndexed { listIndex, likeUiState ->
-                                    if (listIndex == index) {
-                                        likeUiState.copy(
-                                            likeCount = updatedImage.likeCount.toInt(),
-                                            unlikeCount = updatedImage.unlikeCount.toInt()
-                                        )
-                                    } else {
-                                        likeUiState
-                                    }
-                                }
-                            }
+            // Update local state optimistically
+            _likesList.update { state ->
+                state.mapIndexed { indexList, likeUiState ->
+                    if (indexList == index) {
+                        if (like > 0) {
+                            likeUiState.copy(likeCount = likeUiState.likeCount + 1)
+                        } else {
+                            likeUiState.copy(unlikeCount = likeUiState.unlikeCount + 1)
                         }
+                    } else {
+                        likeUiState
                     }
+                }
+            }
 
-                    result.onFailure { exception ->
-                        _errorState.value = "Error updating vote: ${exception.message}"
-                        // Reload counts on failure to revert optimistic update
-                        val reloadedImage = imageRepository.getImage(imageId).getOrNull()
-                        if (reloadedImage != null) {
-                            _likesList.update { state ->
-                                state.mapIndexed { listIndex, likeUiState ->
-                                    if (listIndex == index) {
-                                        likeUiState.copy(
-                                            likeCount = reloadedImage.likeCount.toInt(),
-                                            unlikeCount = reloadedImage.unlikeCount.toInt()
-                                        )
-                                    } else {
-                                        likeUiState
-                                    }
+            // Update Firestore
+            val location = _uiState.value.entity.results.getOrNull(index)
+            if (location != null) {
+                val imageId = formatImageId(location.id)
+                val url = "${Constants.BASE_URL_IMAGE_LARGE}${location.imagePath}"
+
+                // Ensure image document exists
+                val existingImage = imageRepository.getImage(imageId).getOrNull()
+                if (existingImage == null) {
+                    // Create the image document
+                    val newImage = ImageEntity(
+                        imageId = imageId,
+                        url = url,
+                        description = location.name,
+                        likeCount = 0,
+                        unlikeCount = 0,
+                        timestamp = System.currentTimeMillis().toString()
+                    )
+                    imageRepository.createOrUpdateImage(newImage)
+                }
+
+                // Add or update vote
+                val voteType = if (like > 0) "like" else "unlike"
+                val result = imageRepository.addOrUpdateVote(imageId, uid, voteType)
+
+                result.onSuccess {
+                    // Reload the actual counts from Firestore
+                    val updatedImage = imageRepository.getImage(imageId).getOrNull()
+                    if (updatedImage != null) {
+                        _likesList.update { state ->
+                            state.mapIndexed { listIndex, likeUiState ->
+                                if (listIndex == index) {
+                                    likeUiState.copy(
+                                        likeCount = updatedImage.likeCount.toInt(),
+                                        unlikeCount = updatedImage.unlikeCount.toInt()
+                                    )
+                                } else {
+                                    likeUiState
                                 }
                             }
                         }
                     }
                 }
-            } else {
-                _errorState.value = "User not authenticated"
+
+                result.onFailure { exception ->
+                    _errorState.value = "Error updating vote: ${exception.message}"
+                    // Reload counts on failure to revert optimistic update
+                    val reloadedImage = imageRepository.getImage(imageId).getOrNull()
+                    if (reloadedImage != null) {
+                        _likesList.update { state ->
+                            state.mapIndexed { listIndex, likeUiState ->
+                                if (listIndex == index) {
+                                    likeUiState.copy(
+                                        likeCount = reloadedImage.likeCount.toInt(),
+                                        unlikeCount = reloadedImage.unlikeCount.toInt()
+                                    )
+                                } else {
+                                    likeUiState
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
     fun clearError() {
         _errorState.value = null
+    }
+
+    fun clearAuthRequired() {
+        _authRequired.value = false
     }
 
     fun incrementPage() {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -32,6 +33,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.mobilitydevai.sce.R
 import com.mobilitydevai.sce.config.Constants.BASE_URL_IMAGE_LARGE
+import com.mobilitydevai.sce.view.auth.AuthViewModel
+import com.mobilitydevai.sce.view.auth.GoogleSignInButton
 import com.mobilitydevai.sce.view.core.components.CustomBodyText
 import com.mobilitydevai.sce.view.core.components.CustomHomerLoading
 import com.mobilitydevai.sce.view.core.components.CustomLoadingStyleIOS
@@ -40,11 +43,13 @@ import com.mobilitydevai.sce.view.core.components.SpaceV20
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LocationScreen(
-    locationsViewModel: LocationsViewModel = hiltViewModel()
+    locationsViewModel: LocationsViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by locationsViewModel.uiState.collectAsStateWithLifecycle()
     val isLoading by locationsViewModel.isLoading.collectAsStateWithLifecycle()
     val likesList by locationsViewModel.likesList.collectAsStateWithLifecycle()
+    val authRequired by locationsViewModel.authRequired.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
     LaunchedEffect(listState) {
@@ -161,5 +166,38 @@ fun LocationScreen(
                     CustomLoadingStyleIOS(padding = 30.dp)
                 }
         }
+    }
+
+    if (authRequired) {
+        AlertDialog(
+            onDismissRequest = {
+                locationsViewModel.clearAuthRequired()
+            },
+            title = {
+                Text(text = "Authentication Required")
+            },
+            text = {
+                Text(text = "Please sign in with Google to vote on images")
+            },
+            confirmButton = {
+                GoogleSignInButton(
+                    onSignInResult = { account ->
+                        account?.let {
+                            authViewModel.signInWithGoogle(it)
+                            locationsViewModel.clearAuthRequired()
+                        }
+                    }
+                )
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        locationsViewModel.clearAuthRequired()
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

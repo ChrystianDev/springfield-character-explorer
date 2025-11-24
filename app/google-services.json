@@ -12,7 +12,20 @@
           "package_name": "com.mobilitydevai.sce"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "392839125176-a1bk0enuv4g3ndlkgukan454abh8vt0k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mobilitydevai.sce",
+            "certificate_hash": "b4727efe7742cab5b433ad731e0e3b5c84bf4d08"
+          }
+        },
+        {
+          "client_id": "392839125176-5uc58bgsopcsmm7uuumkifoep3ch9f0m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDVuQU8oPLPDvxEyFCiJTR8bfo5fKCBg60"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "392839125176-5uc58bgsopcsmm7uuumkifoep3ch9f0m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

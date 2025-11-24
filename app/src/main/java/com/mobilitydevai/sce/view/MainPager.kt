@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.mobilitydevai.sce.view.auth.AuthViewModel
 import com.mobilitydevai.sce.view.core.components.IOSStyleSegmentedControl
 import com.mobilitydevai.sce.view.favorite.FavouriteScreen
 import com.mobilitydevai.sce.view.location.LocationScreen
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainPager(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
     darkThemeParam: Boolean,
     onNavigationDetail: () -> Unit,
     onSetDarkMode: (Boolean) -> Unit
@@ -51,6 +53,7 @@ fun MainPager(
             when (page) {
                 0 -> SimpsonsScreen(
                     simpsonsViewModel,
+                    authViewModel,
                     darkThemeParam,
                     onNavigationDetail,
                     onSetDarkMode,

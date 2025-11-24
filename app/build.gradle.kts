@@ -80,7 +80,7 @@ android {
     buildTypes {
         release {
 //        getByName("release") {
-            applicationIdSuffix = ".release"
+            applicationIdSuffix = ""
             versionNameSuffix = ""
             isMinifyEnabled = true
             proguardFiles(
@@ -159,6 +159,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
