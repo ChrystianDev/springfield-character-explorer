@@ -14,6 +14,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +38,7 @@ fun MainPager(
     onSetDarkMode: (Boolean) -> Unit
 ) {
     val pageState = rememberPagerState { 4 }
-    val options = listOf(0, 1, 2, 3)
+    val options = remember {listOf(0, 1, 2, 3)}
     val scope = rememberCoroutineScope()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -61,12 +62,12 @@ fun MainPager(
                 )
 
                 1 -> LocationScreen()
-                2 -> FavouriteScreen(
+                2 -> EpisodesScreen()
+                3 -> FavouriteScreen(
                     simpsonsViewModel = simpsonsViewModel,
                     onNavigationDetail = onNavigationDetail
                 )
 
-                3 -> EpisodesScreen()
             }
         }
         Box(

@@ -56,8 +56,8 @@ fun IOSStyleSegmentedControl(
                val icon =  when (option) {
                     0 -> R.drawable.icon_home
                     1 -> R.drawable.icon_location
-                    2 -> R.drawable.icon_favorite
-                    3 -> R.drawable.icon_local_movies
+                    2 -> R.drawable.icon_local_movies
+                    3 -> R.drawable.icon_favorite
                     else -> R.drawable.icon_home
                 }
                 val isSelected = option == selectedOption
