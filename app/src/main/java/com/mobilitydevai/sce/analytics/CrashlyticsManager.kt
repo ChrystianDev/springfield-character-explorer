@@ -147,4 +147,51 @@ class CrashlyticsManager @Inject constructor() {
         userName?.let { setCustomKey("user_name", it) }
         userEmail?.let { setCustomKey("user_email", it) }
     }
+
+    // ========== TESTING METHODS - For Debug/Testing Only ==========
+
+    /**
+     * Force a crash for testing Crashlytics
+     * WARNING: This will crash the app! Only use for testing.
+     */
+    fun forceCrash() {
+        setCustomKey("test_type", "forced_crash")
+        log("Testing Crashlytics - Force crash initiated")
+        throw RuntimeException("Test Crash - Crashlytics verification")
+    }
+
+    /**
+     * Test non-fatal exception logging
+     */
+    fun testNonFatalException() {
+        setCustomKey("test_type", "non_fatal_exception")
+        log("Testing Crashlytics - Non-fatal exception")
+        recordException(Exception("Test non-fatal exception for Crashlytics"))
+    }
+
+    /**
+     * Test custom error logging with context
+     */
+    fun testCustomError() {
+        setCustomKey("test_type", "custom_error")
+        setCustomKey("test_scenario", "simulated_network_failure")
+        log("Testing Crashlytics - Custom error with context")
+        logNetworkError(
+            "Simulated network timeout for testing",
+            Exception("Connection timeout after 30 seconds")
+        )
+    }
+
+    /**
+     * Test breadcrumb trail
+     */
+    fun testBreadcrumbs() {
+        recordBreadcrumb("TestScreen", "test_started")
+        log("Step 1: Initialized test")
+        recordBreadcrumb("TestScreen", "test_processing")
+        log("Step 2: Processing test data")
+        recordBreadcrumb("TestScreen", "test_completed")
+        log("Step 3: Test completed successfully")
+        testNonFatalException()
+    }
 }

@@ -35,7 +35,7 @@ android {
     productFlavors {
         create("prod") {
             dimension = "version"
-            applicationIdSuffix = ".prod"
+            applicationIdSuffix = ""
             versionNameSuffix = "$psVersionNameSuffix.prod"
             versionName = psVersionName
             buildConfigField(
@@ -46,7 +46,7 @@ android {
         }
         create("qa") {
             dimension = "version"
-            applicationIdSuffix = ".qa"
+            applicationIdSuffix = ""
             versionNameSuffix = "$psVersionNameSuffix.qa"
             versionName = psVersionName
             buildConfigField(

@@ -24,6 +24,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -118,7 +120,7 @@ fun SimpsonsScreen(
         } else {
             Column {
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -131,6 +133,7 @@ fun SimpsonsScreen(
                                 )
                             }
                         }
+
                         else -> {
                             GoogleSignInButton(
                                 onSignInResult = { account ->
@@ -292,6 +295,91 @@ fun SimpsonsScreen(
                     tint = MaterialTheme.colorScheme.primary
                 )
                 CustomBiographyText("BuildType: ${BuildConfig.BUILD_TYPE}, Flavor: ${BuildConfig.FLAVOR}")
+
+                // Crashlytics Test Buttons - Only visible in DEBUG builds
+                if (BuildConfig.DEBUG) {
+                    val crashlyticsManager = remember {
+                        (context.applicationContext as? com.mobilitydevai.sce.SimpsonsInfoApp)?.crashlyticsManager
+                    }
+
+                    SpaceV10()
+                    Text(
+                        text = "Crashlytics Testing",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        // Test Crash Button
+                        TextButton(
+                            onClick = {
+//                                throw RuntimeException("Test Crash - Crashlytics verification")
+                                crashlyticsManager?.forceCrash()
+                            },
+
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Force Crash",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        }
+
+                        // Test Non-Fatal Exception
+                        TextButton(
+                            onClick = {
+                                crashlyticsManager?.testNonFatalException()
+                            },
+
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Non-Fatal",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    ) {
+                        // Test Custom Error
+                        TextButton(
+                            onClick = {
+                                crashlyticsManager?.testCustomError()
+                            },
+
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Custom Error",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+
+                        // Test Breadcrumbs
+                        TextButton(
+                            onClick = {
+                                crashlyticsManager?.testBreadcrumbs()
+                            },
+
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Breadcrumbs",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
+                }
             }
         }
     }
