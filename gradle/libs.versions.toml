@@ -34,6 +34,7 @@ firebaseFirestore = "25.1.4"
 firebaseAuth = "23.2.1"
 firebaseCrashlytics = "19.4.4"
 firebaseCrashlyticsGradle = "2.9.9"
+firebaseMessaging = "24.1.0"
 playServicesAuth = "21.3.0"
 
 
@@ -82,6 +83,7 @@ firebase-analytics = { module = "com.google.firebase:firebase-analytics", versio
 firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebaseFirestore" }
 firebase-auth = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuth" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebaseCrashlytics" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessaging" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 
 
