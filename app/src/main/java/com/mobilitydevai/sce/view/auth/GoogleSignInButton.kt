@@ -64,7 +64,7 @@ fun GoogleSignInButton(
         modifier = modifier.padding(horizontal = 8.dp)
     ) {
         Text(
-            text = "Log in with Google",
+            text = "Log in",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.primary
         )
