@@ -11,8 +11,8 @@ plugins {
 
 
 android {
-    val psVersionCode = 3
-    val psVersionName = "1.0.2"
+    val psVersionCode = 4
+    val psVersionName = "1.1.0"
     val psVersionNameSuffix = "-demo"
 
     namespace = "com.mobilitydevai.sce"
