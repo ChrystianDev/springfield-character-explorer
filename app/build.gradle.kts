@@ -9,9 +9,8 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
-
 android {
-    val psVersionCode = 4
+    val psVersionCode = 5
     val psVersionName = "1.1.0"
     val psVersionNameSuffix = "-demo"
 
@@ -41,12 +40,12 @@ android {
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
-                value = "\"https://pro.thesimpsonsapi.com/api/\""
+                value = "\"https://thesimpsonsapi.com/api/\""
             )
         }
         create("qa") {
             dimension = "version"
-            applicationIdSuffix = ""
+            applicationIdSuffix = ".qa"
             versionNameSuffix = "$psVersionNameSuffix.qa"
             versionName = psVersionName
             buildConfigField(
@@ -62,7 +61,7 @@ android {
             // and the plugin automatically assigns all the module's flavors to
             // that dimension.
             dimension = "version"
-            applicationIdSuffix = ""
+            applicationIdSuffix = ".dev"
             versionNameSuffix = psVersionNameSuffix
             versionName = psVersionName
             buildConfigField(
@@ -81,7 +80,12 @@ android {
     buildTypes {
         release {
 //        getByName("release") {
-            applicationIdSuffix = ""
+            extensions.configure(
+                com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension::class.java
+            ) {
+                mappingFileUploadEnabled = false
+            }
+            applicationIdSuffix = ".release"
             versionNameSuffix = ""
             isMinifyEnabled = true
             proguardFiles(
@@ -92,8 +96,8 @@ android {
 
         debug {
 //        getByName("debug") {
-            applicationIdSuffix = ""
-            versionNameSuffix = "-debug"
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = ""
             isDebuggable = true
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
