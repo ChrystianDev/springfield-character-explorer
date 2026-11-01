@@ -52,10 +52,6 @@ import com.mobilitydevai.sce.R
 import com.mobilitydevai.sce.config.Constants.BASE_URL_IMAGE_LARGE
 import com.mobilitydevai.sce.config.Constants.BASE_URL_IMAGE_SHORT
 import com.mobilitydevai.sce.ui.theme.shapes
-import com.mobilitydevai.sce.view.auth.AuthState
-import com.mobilitydevai.sce.view.auth.AuthViewModel
-import com.mobilitydevai.sce.view.auth.GoogleSignInButton
-import com.mobilitydevai.sce.view.auth.UserInfoButton
 import com.mobilitydevai.sce.view.core.components.CustomBiographyText
 import com.mobilitydevai.sce.view.core.components.CustomHomerLoading
 import com.mobilitydevai.sce.view.core.components.CustomIconButton
@@ -67,7 +63,6 @@ import com.mobilitydevai.sce.view.core.components.rememberTextToSpeech
 @Composable
 fun SimpsonsScreen(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel(),
     darkThemeParam: Boolean,
     onNavigationDetail: () -> Unit,
     onSetDarkMode: (Boolean) -> Unit,
@@ -77,9 +72,6 @@ fun SimpsonsScreen(
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
     val isMuted by simpsonsViewModel.isMuted.collectAsStateWithLifecycle()
     val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
-
-    val authState by authViewModel.authState.collectAsStateWithLifecycle()
-    val currentUser by authViewModel.currentUser.collectAsStateWithLifecycle()
 
     var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
     var lastVisibleItem by remember { mutableIntStateOf(0) }
@@ -121,32 +113,6 @@ fun SimpsonsScreen(
             }
         } else {
             Column {
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    when (authState) {
-                        is AuthState.Authenticated -> {
-                            currentUser?.let { user ->
-                                UserInfoButton(
-                                    userName = user.name.ifEmpty { user.email },
-                                    onSignOut = { authViewModel.signOut() }
-                                )
-                            }
-                        }
-
-                        else -> {
-                            GoogleSignInButton(
-                                onSignInResult = { account ->
-                                    account?.let {
-                                        authViewModel.signInWithGoogle(it)
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()

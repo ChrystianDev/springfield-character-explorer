@@ -3,16 +3,16 @@
  */
 package com.mobilitydevai.sce.domain.repository
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.mobilitydevai.sce.domain.entity.UserEntity
-import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     suspend fun getUser(uid: String): Result<UserEntity?>
     suspend fun createUser(user: UserEntity): Result<Unit>
     suspend fun getCurrentUserUid(): String?
-    suspend fun signInWithGoogle(account: GoogleSignInAccount): Result<UserEntity>
-    suspend fun signOut(): Result<Unit>
-    fun getCurrentUser(): Flow<UserEntity?>
-    fun isUserAuthenticated(): Flow<Boolean>
+
+    /**
+     * Returns the uid of the current Firebase user, signing in anonymously first
+     * if there is no session. One anonymous uid per app installation.
+     */
+    suspend fun getOrCreateAnonymousUid(): Result<String>
 }

@@ -56,9 +56,6 @@ class LocationsViewModel @Inject constructor(
     private val _errorState = MutableStateFlow<String?>(null)
     val errorState = _errorState.asStateFlow()
 
-    private val _authRequired = MutableStateFlow(false)
-    val authRequired = _authRequired.asStateFlow()
-
     private fun updateUiStateWithResponse(response: LocationsSimpsonsEntity?) {
         _uiState.update { state ->
             response?.let {
@@ -125,14 +122,12 @@ class LocationsViewModel @Inject constructor(
     }
 
     fun updateLikes(index: Int, like: Int) {
-        // Check authentication first
         viewModelScope.launch(dispatcher) {
-            val uid = userRepository.getCurrentUserUid()
-            if (uid == null) {
-                // User not authenticated, trigger sign-in
-                _authRequired.value = true
-                crashlyticsManager.recordBreadcrumb("LocationScreen", "vote_attempted_unauthenticated")
-                analyticsManager.logCustomEvent("vote_blocked", mapOf("reason" to "not_authenticated"))
+            // Anonymous Firebase uid: one vote per installation
+            val uid = userRepository.getOrCreateAnonymousUid().getOrElse { exception ->
+                _errorState.value = "Error updating vote: ${exception.message}"
+                analyticsManager.logError("anonymous_auth", exception.message ?: "Unknown error")
+                crashlyticsManager.recordException(exception)
                 return@launch
             }
 
@@ -233,10 +228,6 @@ class LocationsViewModel @Inject constructor(
 
     fun clearError() {
         _errorState.value = null
-    }
-
-    fun clearAuthRequired() {
-        _authRequired.value = false
     }
 
     fun incrementPage() {

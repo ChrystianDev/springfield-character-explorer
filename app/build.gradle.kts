@@ -129,13 +129,10 @@ android {
 
 
     kotlin {
-        jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
-//    kotlinOptions {
-//        jvmTarget = "11"
-//    }
 
     buildFeatures {
         compose = true
@@ -166,7 +163,6 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)
-    implementation(libs.play.services.auth)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
