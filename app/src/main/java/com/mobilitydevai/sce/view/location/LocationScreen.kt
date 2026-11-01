@@ -114,17 +114,20 @@ fun LocationScreen(
                                 .weight(1f),
                         ) {
                             CustomBodyText(
-                                text = "${likesList[index].likeCount}",
+                                text = "${likesList.getOrNull(index)?.likeCount ?: 0}",
                                 padding = 0.dp,
                                 color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             IconButton(
                                 onClick = {
-                                    locationsViewModel.like(index)
+                                    locationsViewModel.toggleLike(index)
                                 }) {
                                 Icon(
-                                    painter = painterResource(R.drawable.icon_thumb_up_unselected),
+                                    painter = painterResource(
+                                        if (likesList.getOrNull(index)?.isLiked == true) R.drawable.icon_thumb_up_selected
+                                        else R.drawable.icon_thumb_up_unselected
+                                    ),
                                     contentDescription = "like button",
                                     tint = MaterialTheme.colorScheme.primary
                                 )

@@ -4,6 +4,9 @@
 package com.mobilitydevai.sce.data.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.google.gson.Gson
 import com.mobilitydevai.sce.BuildConfig
@@ -27,6 +30,8 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+
+private val Context.likesDataStore: DataStore<Preferences> by preferencesDataStore(name = "likes")
 
 /**
  * [@Module] indica que esta clase es un modulo de Hilt, y provee las instancias creadas en esta clase
@@ -115,6 +120,12 @@ object DataModule {
     @Provides
     fun provideFavouriteCharacterDao(db: DataBaseRoom): FavouriteCharacterDao =
         db.favouriteCharacterDao()
+
+    @Provides
+    @Singleton
+    fun provideLikesDataStore(
+        @ApplicationContext context: Context
+    ): DataStore<Preferences> = context.likesDataStore
 
     @Provides
     fun provideLocationsDispatcher(): CoroutineDispatcher = Dispatchers.IO

@@ -5,9 +5,11 @@ package com.mobilitydevai.sce.data.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.mobilitydevai.sce.data.repository.remote.ImageRepositoryImpl
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import com.mobilitydevai.sce.data.repository.remote.LikesRepositoryImpl
 import com.mobilitydevai.sce.data.repository.remote.UserRepositoryImpl
-import com.mobilitydevai.sce.domain.repository.ImageRepository
+import com.mobilitydevai.sce.domain.repository.LikesRepository
 import com.mobilitydevai.sce.domain.repository.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -42,9 +44,10 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideImageRepository(
-        firestore: FirebaseFirestore
-    ): ImageRepository {
-        return ImageRepositoryImpl(firestore)
+    fun provideLikesRepository(
+        firestore: FirebaseFirestore,
+        dataStore: DataStore<Preferences>
+    ): LikesRepository {
+        return LikesRepositoryImpl(firestore, dataStore)
     }
 }

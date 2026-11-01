@@ -185,6 +185,7 @@ dependencies {
     // Local DB
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.datastore.preferences)
 
     // Theme
     implementation(libs.accompanist.systemuicontroller)

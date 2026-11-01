@@ -25,6 +25,7 @@ retrofit = "3.0.0"
 okhttp = "5.3.2"
 lottieCompose = "6.6.10"
 roomRuntime = "2.8.2"
+datastorePreferences = "1.1.7"
 
 # Firebase
 firebaseBom = "34.6.0"
@@ -45,6 +46,7 @@ androidx-core-runtime = { module = "androidx.arch.core:core-runtime", version.re
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
