@@ -10,6 +10,20 @@ plugins {
 }
 
 android {
+    /**
+     * IMPORTANTE: versionCode ligado a Firebase Remote Config (actualización forzada).
+     *
+     * Al arrancar, la app compara este valor con el parámetro `min_version_code` de
+     * Remote Config (pestaña "Cliente", NO "Servidor"). Si versionCode < min_version_code,
+     * se muestra una pantalla de bloqueo que obliga a actualizar desde Google Play.
+     * Ver: update/ForceUpdateRepository.kt y update/ForceUpdateViewModel.kt
+     *
+     * Al cambiar este valor (nueva versión, mantenimiento o cualquier otra razón):
+     * - Nunca bajarlo: si queda por debajo de `min_version_code`, la app se bloqueará.
+     * - Subir `min_version_code` en la consola SOLO después de que Play haya distribuido
+     *   la nueva versión; si no, se bloquea a usuarios que aún no pueden actualizar.
+     * - Comprobarlo en Logcat (tag "ForceUpdate"): min_version_code = X, source = REMOTE.
+     */
     val psVersionCode = 5
     val psVersionName = "1.1.0"
     val psVersionNameSuffix = "-demo"
@@ -163,6 +177,10 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.config)
+
+    // Forced updates (Google Play In-App Updates)
+    implementation(libs.play.app.update)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)

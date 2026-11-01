@@ -5,6 +5,7 @@ package com.mobilitydevai.sce.data.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.mobilitydevai.sce.data.repository.remote.LikesRepositoryImpl
@@ -25,6 +26,13 @@ object FirebaseModule {
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseRemoteConfig(): FirebaseRemoteConfig {
+        // Settings and defaults are applied (and awaited) in ForceUpdateRepository
+        return FirebaseRemoteConfig.getInstance()
     }
 
     @Provides

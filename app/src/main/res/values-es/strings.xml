@@ -17,4 +17,9 @@
     <string name="main_loading_text">Cargando …</string>
     <string name="character_details_text">Detalles</string>
 
+    <!--    Actualización obligatoria: Español -->
+    <string name="force_update_title">Actualización necesaria</string>
+    <string name="force_update_message">Hay una nueva versión de la app disponible. Actualízala para seguir usando Springfield CE.</string>
+    <string name="force_update_button">Actualizar</string>
+
 </resources>
