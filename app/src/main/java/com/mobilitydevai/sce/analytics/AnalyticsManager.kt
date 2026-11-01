@@ -59,7 +59,7 @@ class AnalyticsManager @Inject constructor() {
     }
 
     /**
-     * Log like/unlike events
+     * Log like events
      */
     fun logVote(imageId: String, voteType: String) {
         analytics.logEvent("image_vote") {

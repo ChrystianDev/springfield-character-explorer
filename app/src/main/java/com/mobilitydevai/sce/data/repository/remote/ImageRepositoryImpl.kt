@@ -24,12 +24,10 @@ class ImageRepositoryImpl @Inject constructor(
         private const val FIELD_URL = "url"
         private const val FIELD_DESCRIPTION = "description"
         private const val FIELD_LIKE_COUNT = "likeCount"
-        private const val FIELD_UNLIKE_COUNT = "unlikeCount"
         private const val FIELD_TIMESTAMP = "timestamp"
 
         private const val FIELD_VOTE = "vote"
         private const val VOTE_LIKE = "like"
-        private const val VOTE_UNLIKE = "unlike"
     }
 
     /**
@@ -52,7 +50,6 @@ class ImageRepositoryImpl @Inject constructor(
                     url = document.getString(FIELD_URL) ?: "",
                     description = document.getString(FIELD_DESCRIPTION) ?: "",
                     likeCount = document.getLong(FIELD_LIKE_COUNT) ?: 0,
-                    unlikeCount = document.getLong(FIELD_UNLIKE_COUNT) ?: 0,
                     timestamp = document.getString(FIELD_TIMESTAMP) ?: ""
                 )
                 Result.success(image)
@@ -70,7 +67,6 @@ class ImageRepositoryImpl @Inject constructor(
                 FIELD_URL to image.url,
                 FIELD_DESCRIPTION to image.description,
                 FIELD_LIKE_COUNT to image.likeCount,
-                FIELD_UNLIKE_COUNT to image.unlikeCount,
                 FIELD_TIMESTAMP to image.timestamp
             )
 
@@ -109,18 +105,13 @@ class ImageRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addOrUpdateVote(
-        imageId: String,
-        userId: String,
-        vote: String
-    ): Result<Unit> {
+    override suspend fun addLike(imageId: String, userId: String): Result<Unit> {
         return try {
-            // Get the current vote if exists
-            val currentVoteResult = getUserVote(imageId, userId)
-            val currentVote = currentVoteResult.getOrNull()
-
-            // Start a batch write for atomic operations
-            val batch = firestore.batch()
+            val currentVote = getUserVote(imageId, userId).getOrNull()
+            if (currentVote?.vote == VOTE_LIKE) {
+                // Already liked by this user, nothing to do
+                return Result.success(Unit)
+            }
 
             val imageRef = firestore.collection(IMAGES_COLLECTION).document(imageId)
             val voteRef = firestore.collection(VOTES_COLLECTION)
@@ -128,36 +119,16 @@ class ImageRepositoryImpl @Inject constructor(
                 .collection(VOTES_SUBCOLLECTION)
                 .document(userId)
 
-            // Update vote counts based on previous and new vote
-            when {
-                currentVote == null -> {
-                    // New vote - increment the appropriate counter
-                    if (vote == VOTE_LIKE) {
-                        batch.update(imageRef, FIELD_LIKE_COUNT, FieldValue.increment(1))
-                    } else {
-                        batch.update(imageRef, FIELD_UNLIKE_COUNT, FieldValue.increment(1))
-                    }
-                }
-                currentVote.vote != vote -> {
-                    // Changed vote - decrement old and increment new
-                    if (currentVote.vote == VOTE_LIKE) {
-                        batch.update(imageRef, FIELD_LIKE_COUNT, FieldValue.increment(-1))
-                        batch.update(imageRef, FIELD_UNLIKE_COUNT, FieldValue.increment(1))
-                    } else {
-                        batch.update(imageRef, FIELD_UNLIKE_COUNT, FieldValue.increment(-1))
-                        batch.update(imageRef, FIELD_LIKE_COUNT, FieldValue.increment(1))
-                    }
-                }
-                // If vote is the same, do nothing
-            }
-
-            // Save or update the vote
-            val voteMap = hashMapOf(
-                FIELD_VOTE to vote,
-                FIELD_TIMESTAMP to System.currentTimeMillis().toString()
+            // Atomic: increment the counter and save the user's vote
+            val batch = firestore.batch()
+            batch.update(imageRef, FIELD_LIKE_COUNT, FieldValue.increment(1))
+            batch.set(
+                voteRef,
+                hashMapOf(
+                    FIELD_VOTE to VOTE_LIKE,
+                    FIELD_TIMESTAMP to System.currentTimeMillis().toString()
+                )
             )
-            batch.set(voteRef, voteMap)
-
             batch.commit().await()
             Result.success(Unit)
         } catch (e: Exception) {
@@ -167,32 +138,20 @@ class ImageRepositoryImpl @Inject constructor(
 
     override suspend fun removeVote(imageId: String, userId: String): Result<Unit> {
         return try {
-            // Get the current vote
-            val currentVoteResult = getUserVote(imageId, userId)
-            val currentVote = currentVoteResult.getOrNull()
+            val currentVote = getUserVote(imageId, userId).getOrNull() ?: return Result.success(Unit)
 
-            if (currentVote != null) {
-                val batch = firestore.batch()
+            val imageRef = firestore.collection(IMAGES_COLLECTION).document(imageId)
+            val voteRef = firestore.collection(VOTES_COLLECTION)
+                .document(imageId)
+                .collection(VOTES_SUBCOLLECTION)
+                .document(userId)
 
-                val imageRef = firestore.collection(IMAGES_COLLECTION).document(imageId)
-                val voteRef = firestore.collection(VOTES_COLLECTION)
-                    .document(imageId)
-                    .collection(VOTES_SUBCOLLECTION)
-                    .document(userId)
-
-                // Decrement the appropriate counter
-                if (currentVote.vote == VOTE_LIKE) {
-                    batch.update(imageRef, FIELD_LIKE_COUNT, FieldValue.increment(-1))
-                } else {
-                    batch.update(imageRef, FIELD_UNLIKE_COUNT, FieldValue.increment(-1))
-                }
-
-                // Delete the vote document
-                batch.delete(voteRef)
-
-                batch.commit().await()
+            val batch = firestore.batch()
+            if (currentVote.vote == VOTE_LIKE) {
+                batch.update(imageRef, FIELD_LIKE_COUNT, FieldValue.increment(-1))
             }
-
+            batch.delete(voteRef)
+            batch.commit().await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

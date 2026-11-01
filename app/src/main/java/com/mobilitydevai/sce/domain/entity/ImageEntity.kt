@@ -8,6 +8,5 @@ data class ImageEntity(
     val url: String = "",
     val description: String = "",
     val likeCount: Long = 0,
-    val unlikeCount: Long = 0,
     val timestamp: String = ""
 )

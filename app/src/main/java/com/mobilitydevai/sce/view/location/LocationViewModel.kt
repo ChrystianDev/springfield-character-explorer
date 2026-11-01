@@ -67,7 +67,7 @@ class LocationsViewModel @Inject constructor(
 
     private fun generateLikesList() {
         _likesList.value = _uiState.value.entity.results.mapIndexed { index, location ->
-            LikeUiState(likeCount = 0, unlikeCount = 0, index = index)
+            LikeUiState(likeCount = 0, index = index)
         }
         // Load existing counts from Firestore
         loadVoteCounts()
@@ -83,10 +83,7 @@ class LocationsViewModel @Inject constructor(
                         _likesList.update { state ->
                             state.mapIndexed { listIndex, likeUiState ->
                                 if (listIndex == index) {
-                                    likeUiState.copy(
-                                        likeCount = image.likeCount.toInt(),
-                                        unlikeCount = image.unlikeCount.toInt()
-                                    )
+                                    likeUiState.copy(likeCount = image.likeCount.toInt())
                                 } else {
                                     likeUiState
                                 }
@@ -121,7 +118,7 @@ class LocationsViewModel @Inject constructor(
         return "img${id.toString().padStart(3, '0')}"
     }
 
-    fun updateLikes(index: Int, like: Int) {
+    fun like(index: Int) {
         viewModelScope.launch(dispatcher) {
             // Anonymous Firebase uid: one vote per installation
             val uid = userRepository.getOrCreateAnonymousUid().getOrElse { exception ->
@@ -135,11 +132,7 @@ class LocationsViewModel @Inject constructor(
             _likesList.update { state ->
                 state.mapIndexed { indexList, likeUiState ->
                     if (indexList == index) {
-                        if (like > 0) {
-                            likeUiState.copy(likeCount = likeUiState.likeCount + 1)
-                        } else {
-                            likeUiState.copy(unlikeCount = likeUiState.unlikeCount + 1)
-                        }
+                        likeUiState.copy(likeCount = likeUiState.likeCount + 1)
                     } else {
                         likeUiState
                     }
@@ -161,15 +154,14 @@ class LocationsViewModel @Inject constructor(
                         url = url,
                         description = location.name,
                         likeCount = 0,
-                        unlikeCount = 0,
                         timestamp = System.currentTimeMillis().toString()
                     )
                     imageRepository.createOrUpdateImage(newImage)
                 }
 
-                // Add or update vote
-                val voteType = if (like > 0) "like" else "unlike"
-                val result = imageRepository.addOrUpdateVote(imageId, uid, voteType)
+                // Add like (no-op if this user already liked the image)
+                val voteType = "like"
+                val result = imageRepository.addLike(imageId, uid)
 
                 result.onSuccess {
                     // Log successful vote
@@ -182,10 +174,7 @@ class LocationsViewModel @Inject constructor(
                         _likesList.update { state ->
                             state.mapIndexed { listIndex, likeUiState ->
                                 if (listIndex == index) {
-                                    likeUiState.copy(
-                                        likeCount = updatedImage.likeCount.toInt(),
-                                        unlikeCount = updatedImage.unlikeCount.toInt()
-                                    )
+                                    likeUiState.copy(likeCount = updatedImage.likeCount.toInt())
                                 } else {
                                     likeUiState
                                 }
@@ -211,10 +200,7 @@ class LocationsViewModel @Inject constructor(
                         _likesList.update { state ->
                             state.mapIndexed { listIndex, likeUiState ->
                                 if (listIndex == index) {
-                                    likeUiState.copy(
-                                        likeCount = reloadedImage.likeCount.toInt(),
-                                        unlikeCount = reloadedImage.unlikeCount.toInt()
-                                    )
+                                    likeUiState.copy(likeCount = reloadedImage.likeCount.toInt())
                                 } else {
                                     likeUiState
                                 }
@@ -251,6 +237,5 @@ data class LocationsUiState(
 
 data class LikeUiState(
     val likeCount: Int = 0,
-    val unlikeCount: Int = 0,
     val index: Int = 0
 )

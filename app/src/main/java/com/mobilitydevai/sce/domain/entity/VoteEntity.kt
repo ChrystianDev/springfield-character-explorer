@@ -5,6 +5,6 @@ package com.mobilitydevai.sce.domain.entity
 
 data class VoteEntity(
     val userId: String = "",
-    val vote: String = "", // "like" or "unlike"
+    val vote: String = "", // "like"
     val timestamp: String = ""
 )

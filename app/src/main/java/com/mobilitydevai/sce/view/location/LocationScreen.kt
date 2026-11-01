@@ -114,41 +114,19 @@ fun LocationScreen(
                                 .weight(1f),
                         ) {
                             CustomBodyText(
-                                modifier = Modifier.weight(1f),
                                 text = "${likesList[index].likeCount}",
+                                padding = 0.dp,
                                 color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             IconButton(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .width(20.dp),
                                 onClick = {
-                                    locationsViewModel.updateLikes(index, +1)
+                                    locationsViewModel.like(index)
                                 }) {
                                 Icon(
                                     painter = painterResource(R.drawable.icon_thumb_up_unselected),
                                     contentDescription = "like button",
                                     tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                            CustomBodyText(
-                                modifier = Modifier.weight(1f),
-                                text = "${likesList[index].unlikeCount}",
-                                color = MaterialTheme.colorScheme.tertiary,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            IconButton(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .width(20.dp),
-                                onClick = {
-                                    locationsViewModel.updateLikes(index, -1)
-                                }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.icon_thumb_down),
-                                    contentDescription = "unlike button",
-                                    tint = MaterialTheme.colorScheme.tertiary
                                 )
                             }
                         }

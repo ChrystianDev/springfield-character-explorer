@@ -10,6 +10,6 @@ interface ImageRepository {
     suspend fun getImage(imageId: String): Result<ImageEntity?>
     suspend fun createOrUpdateImage(image: ImageEntity): Result<Unit>
     suspend fun getUserVote(imageId: String, userId: String): Result<VoteEntity?>
-    suspend fun addOrUpdateVote(imageId: String, userId: String, vote: String): Result<Unit>
+    suspend fun addLike(imageId: String, userId: String): Result<Unit>
     suspend fun removeVote(imageId: String, userId: String): Result<Unit>
 }
