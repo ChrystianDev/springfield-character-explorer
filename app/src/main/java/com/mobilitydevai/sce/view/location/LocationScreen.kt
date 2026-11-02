@@ -31,7 +31,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.mobilitydevai.sce.R
-import com.mobilitydevai.sce.config.Constants.BASE_URL_IMAGE_SHORT
+import com.mobilitydevai.sce.config.Constants.BASE_URL_IMAGE_LARGE
 import com.mobilitydevai.sce.view.core.components.CustomBodyText
 import com.mobilitydevai.sce.view.core.components.CustomHomerLoading
 import com.mobilitydevai.sce.view.core.components.CustomLoadingStyleIOS
@@ -40,7 +40,7 @@ import com.mobilitydevai.sce.view.core.components.SpaceV20
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LocationScreen(
-    locationsViewModel: LocationsViewModel = hiltViewModel()
+    locationsViewModel: LocationsViewModel = hiltViewModel(),
 ) {
     val uiState by locationsViewModel.uiState.collectAsStateWithLifecycle()
     val isLoading by locationsViewModel.isLoading.collectAsStateWithLifecycle()
@@ -85,7 +85,7 @@ fun LocationScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.background),
-                        model = "$BASE_URL_IMAGE_SHORT${uiState.entity.results[index].imagePath}",
+                        model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[index].imagePath}",
                         contentDescription = "image webp",
                         contentScale = ContentScale.FillWidth,
 
@@ -114,35 +114,22 @@ fun LocationScreen(
                                 .weight(1f),
                         ) {
                             CustomBodyText(
-                                modifier = Modifier.weight(1f),
-                                text = if (likesList[index].like > 0) "+${likesList[index].like}" else "${likesList[index].like}",
-                                color = if (likesList[index].like >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
+                                text = "${likesList.getOrNull(index)?.likeCount ?: 0}",
+                                padding = 0.dp,
+                                color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             IconButton(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .width(20.dp),
                                 onClick = {
-                                    locationsViewModel.updateLikes(index, +1)
+                                    locationsViewModel.toggleLike(index)
                                 }) {
                                 Icon(
-                                    painter = painterResource(if (likesList[index].like > 0) R.drawable.icon_thumb_up_selected else R.drawable.icon_thumb_up_unselected),
-                                    contentDescription = "enable/disable sound",
-                                    tint = if (likesList[index].like > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                                )
-                            }
-                            IconButton(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .width(20.dp),
-                                onClick = {
-                                    locationsViewModel.updateLikes(index, -1)
-                                }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.icon_thumb_down),
-                                    contentDescription = "enable/disable sound",
-                                    tint = MaterialTheme.colorScheme.onBackground
+                                    painter = painterResource(
+                                        if (likesList.getOrNull(index)?.isLiked == true) R.drawable.icon_thumb_up_selected
+                                        else R.drawable.icon_thumb_up_unselected
+                                    ),
+                                    contentDescription = "like button",
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }

@@ -9,4 +9,7 @@ object Constants {
     const val BASE_URL_IMAGE_LARGE = "https://cdn.thesimpsonsapi.com/500"
     const val BASE_URL_IMAGE_SHORT = "https://cdn.thesimpsonsapi.com/200"
 
+    // Endpoints
+    const val ENDPOINT_EPISODES = "episodes"
+
 }

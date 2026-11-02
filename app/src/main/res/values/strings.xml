@@ -18,4 +18,9 @@
     <string name="main_loading_text">Loading …</string>
     <string name="character_details_text">Details</string>
 
+    <!--    Force update: English -->
+    <string name="force_update_title">Update required</string>
+    <string name="force_update_message">A new version of the app is available. Please update to keep using Springfield CE.</string>
+    <string name="force_update_button">Update</string>
+
 </resources>

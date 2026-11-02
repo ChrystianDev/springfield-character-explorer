@@ -5,12 +5,27 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
-
 android {
-    val psVersionCode = 3
-    val psVersionName = "1.0.2"
+    /**
+     * IMPORTANTE: versionCode ligado a Firebase Remote Config (actualización forzada).
+     *
+     * Al arrancar, la app compara este valor con el parámetro `min_version_code` de
+     * Remote Config (pestaña "Cliente", NO "Servidor"). Si versionCode < min_version_code,
+     * se muestra una pantalla de bloqueo que obliga a actualizar desde Google Play.
+     * Ver: update/ForceUpdateRepository.kt y update/ForceUpdateViewModel.kt
+     *
+     * Al cambiar este valor (nueva versión, mantenimiento o cualquier otra razón):
+     * - Nunca bajarlo: si queda por debajo de `min_version_code`, la app se bloqueará.
+     * - Subir `min_version_code` en la consola SOLO después de que Play haya distribuido
+     *   la nueva versión; si no, se bloquea a usuarios que aún no pueden actualizar.
+     * - Comprobarlo en Logcat (tag "ForceUpdate"): min_version_code = X, source = REMOTE.
+     */
+    val psVersionCode = 5
+    val psVersionName = "1.1.0"
     val psVersionNameSuffix = "-demo"
 
     namespace = "com.mobilitydevai.sce"
@@ -33,13 +48,13 @@ android {
     productFlavors {
         create("prod") {
             dimension = "version"
-            applicationIdSuffix = ".prod"
+            applicationIdSuffix = ""
             versionNameSuffix = "$psVersionNameSuffix.prod"
             versionName = psVersionName
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
-                value = "\"https://pro.thesimpsonsapi.com/api/\""
+                value = "\"https://thesimpsonsapi.com/api/\""
             )
         }
         create("qa") {
@@ -79,6 +94,11 @@ android {
     buildTypes {
         release {
 //        getByName("release") {
+            extensions.configure(
+                com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension::class.java
+            ) {
+                mappingFileUploadEnabled = false
+            }
             applicationIdSuffix = ".release"
             versionNameSuffix = ""
             isMinifyEnabled = true
@@ -90,8 +110,8 @@ android {
 
         debug {
 //        getByName("debug") {
-            applicationIdSuffix = ".deb"
-            versionNameSuffix = "-debug"
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = ""
             isDebuggable = true
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
@@ -123,13 +143,10 @@ android {
 
 
     kotlin {
-        jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
-//    kotlinOptions {
-//        jvmTarget = "11"
-//    }
 
     buildFeatures {
         compose = true
@@ -153,6 +170,18 @@ dependencies {
     implementation(libs.androidx.core.common)
     implementation(libs.androidx.core.runtime)
 
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.config)
+
+    // Forced updates (Google Play In-App Updates)
+    implementation(libs.play.app.update)
+
     // Navigation
     implementation(libs.androidx.navigation.compose)
 
@@ -164,6 +193,7 @@ dependencies {
     // API-Rest
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.converter.gson)
+    implementation(libs.squareup.okhttp)
 
     // Media
     implementation(libs.coil.compose)
@@ -173,6 +203,7 @@ dependencies {
     // Local DB
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.datastore.preferences)
 
     // Theme
     implementation(libs.accompanist.systemuicontroller)
