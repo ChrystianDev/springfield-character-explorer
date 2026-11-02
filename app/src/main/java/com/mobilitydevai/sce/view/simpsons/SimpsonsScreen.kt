@@ -74,6 +74,9 @@ import kotlin.math.abs
 /** Fixed carousel item width, needed to center items (snap + side padding). */
 private val CAROUSEL_ITEM_WIDTH = 90.dp
 
+/** Load the next page when the last visible item is this close to the end of the list. */
+private const val LOAD_MORE_THRESHOLD = 3
+
 @Composable
 fun SimpsonsScreen(
     simpsonsViewModel: SimpsonsViewModel = hiltViewModel(),
@@ -86,6 +89,7 @@ fun SimpsonsScreen(
     val indexSelected by simpsonsViewModel.indexSelected.collectAsStateWithLifecycle()
     val isMuted by simpsonsViewModel.isMuted.collectAsStateWithLifecycle()
     val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
+    val isLoadingMore by simpsonsViewModel.isLoadingMore.collectAsStateWithLifecycle()
 
     var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
 
@@ -107,6 +111,18 @@ fun SimpsonsScreen(
                 .minByOrNull { abs(it.offset + it.size / 2 - viewportCenter) }
                 ?.index ?: -1
         }
+    }
+
+    // Auto-load the next page before reaching the end, so no empty space appears on the right
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            val itemCount = simpsonsViewModel.uiState.value.entity.results.size
+            itemCount > 0 && lastVisible >= itemCount - 1 - LOAD_MORE_THRESHOLD
+        }
+            .distinctUntilChanged()
+            .filter { it }
+            .collect { simpsonsViewModel.loadNextPage() }
     }
 
     // The selected character is the centered one, updated once the scroll stops
@@ -230,42 +246,51 @@ fun SimpsonsScreen(
                                     contentDescription = "image webp"
                                 )
                             }
+                            // Placeholder at the end while the next page loads
+                            if (isLoadingMore) {
+                                item {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.width(CAROUSEL_ITEM_WIDTH)
+                                    ) {
+                                        CustomItemHomerLoading()
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+                // ‹ › move one character; the next page is auto-loaded at the end
+                val canGoPrevious = indexSelected > 0
+                val canGoNext = indexSelected < uiState.entity.results.size - 1
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     IconButton(
-                        enabled = uiState.entity.prev.isNotEmpty(),
+                        enabled = canGoPrevious,
                         onClick = {
-                            simpsonsViewModel.decrementPage()
-                            simpsonsViewModel.onGetCharacters()
+                            scope.launch { listState.animateScrollToItem(indexSelected - 1) }
                         }
                     ) {
                         Icon(
                             painterResource(R.drawable.icon_arrow_backward),
-                            contentDescription = "forward",
-                            tint = if (uiState.entity.prev.isNotEmpty())
-                                MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
-                                0.2f
-                            )
+                            contentDescription = "previous character",
+                            tint = if (canGoPrevious) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.primary.copy(0.2f)
                         )
                     }
                     IconButton(
-                        enabled = uiState.entity.next.isNotEmpty(),
+                        enabled = canGoNext,
                         onClick = {
-                            simpsonsViewModel.incrementPage()
-                            simpsonsViewModel.onGetCharacters()
-                        }) {
+                            scope.launch { listState.animateScrollToItem(indexSelected + 1) }
+                        }
+                    ) {
                         Icon(
                             painterResource(R.drawable.icon_arrow_forward),
-                            contentDescription = "forward",
-                            tint = if (uiState.entity.next.isNotEmpty())
-                                MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
-                                0.5f
-                            )
+                            contentDescription = "next character",
+                            tint = if (canGoNext) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.primary.copy(0.2f)
                         )
                     }
                 }
