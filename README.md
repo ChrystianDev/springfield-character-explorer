@@ -1,6 +1,161 @@
 # Springfield Character Explorer
 
-<!-- TODO: descripción de la app, qué contiene y cómo se usa -->
+App Android (Jetpack Compose) para explorar personajes, ubicaciones y episodios de Los Simpson,
+con datos de [The Simpsons API](https://thesimpsonsapi.com).
+
+| | |
+|---|---|
+| Versión | `1.1.0-demo` (`psVersionCode = 5`, `psVersionName = "1.1.0"` en `app/build.gradle.kts`) |
+| SDK | minSdk 24 · targetSdk 36 |
+| Package | `com.mobilitydevai.sce` |
+
+---
+
+## Funcionalidades
+
+### Navegación
+
+- `MainPager`: `HorizontalPager` con 4 pestañas (Personajes, Ubicaciones, Episodios, Favoritos)
+  y una barra de botones inferior (`IOSStyleSegmentedControl`).
+- Pantalla edge-to-edge.
+- El botón atrás (botón o gesto) **nunca cierra la app**: en otra pestaña vuelve a Personajes;
+  en Personajes no hace nada.
+
+### Personajes (`view/simpsons`)
+
+- Carrusel de personajes con **carga automática** de la siguiente página al llegar al final.
+- El ítem seleccionado queda **centrado**.
+- Los huecos de los extremos del carrusel muestran una dona (`Modifier.carouselEdgeDonuts`,
+  `drawable/simpsons_donut.png`).
+- Cambio de tema claro/oscuro.
+- Detalle del personaje (`view/detail/CharacterScreen.kt`): lectura en voz alta (Text-to-Speech)
+  y añadir/quitar de favoritos.
+
+### Ubicaciones (`view/location`)
+
+- Lista paginada de ubicaciones con **likes** anónimos guardados en Firestore
+  (ver [Firestore: modelo de datos](#firestore-modelo-de-datos)).
+
+### Episodios (`view/episode`)
+
+- Carrusel con los episodios de la **temporada seleccionada**. Cada card muestra imagen, sinopsis,
+  `Chapter n / Season n` y fecha de emisión; el título del episodio centrado aparece arriba.
+- Debajo, dos filas (`LazyRow`) con chips `OutlinedLabel`:
+  - **Temporadas**: `Season 01` … `Season 35`.
+  - **Capítulos** de la temporada seleccionada: `Chapter 01` … `Chapter n`.
+  - El chip seleccionado es sólido (fondo `YellowDarkDev`, texto `DarkBackground`); el resto, solo borde.
+- Pulsar una **temporada**: se muestra el loading de la app (`CustomHomerLoading`) sobre el carrusel
+  y se carga desde su primer capítulo. El loading es un retardo de `SEASON_LOADING_MILLIS` (600 ms):
+  los episodios ya están en memoria.
+- Pulsar un **capítulo**: el carrusel se desliza desde el ítem actual hasta ese capítulo
+  (`animateScrollBy` con `tween`, 300 ms + 120 ms por ítem, máximo 1,5 s).
+- Mover el carrusel a mano cambia el capítulo seleccionado, y la fila de capítulos se desplaza
+  lo justo para que el chip seleccionado **siempre quede a la vista**.
+
+### Favoritos (`view/favorite`)
+
+- Personajes guardados en local con **Room** (`FavouriteCharacter.db`).
+
+### Actualización forzada
+
+- Pantalla de bloqueo si la versión instalada es menor que la mínima configurada en Remote Config
+  (ver [Remote Config: actualización forzada](#remote-config-actualización-forzada)).
+
+---
+
+## The Simpsons API
+
+`BASE_URL` = `https://thesimpsonsapi.com/api/` (prod y dev).
+Imágenes: `https://cdn.thesimpsonsapi.com/500` y `/200` (`config/Constants.kt`).
+
+| Endpoint | Cliente | Paginación |
+|---|---|---|
+| `characters` | Retrofit (`SimpsonsClient`) | 20 por página, 60 páginas |
+| `locations` | Retrofit (`SimpsonsClient`) | Paginado |
+| `episodes` | OkHttp + Gson (`EpisodesOkHttpClient`) | 20 por página, 39 páginas (768 episodios) |
+
+### Episodios y temporadas
+
+- La API **no tiene endpoint de temporadas ni filtro por temporada** (`?season=` se ignora).
+- `EpisodesRepositoryImpl.fetchSeasons()` pide la página 1, lee `pages` y descarga el resto
+  **en paralelo**; después agrupa los episodios por `season` (`SeasonEntity(number, episodes)`).
+- Si falla **cualquier** página devuelve `null` y no se muestran temporadas (unos conteos
+  incompletos serían incorrectos).
+- `episode_number` es **global** (no se reinicia en cada temporada): el número de capítulo que
+  muestra la app es la posición del episodio dentro de su temporada (`index + 1`).
+
+---
+
+## Arquitectura
+
+```
+com.mobilitydevai.sce
+├── view/        Pantallas Compose + ViewModels (MVVM, StateFlow)
+├── domain/      entity/, repository/ (interfaces), usecase/
+├── data/        network/, response/ (DTO + toDomain), repository/ (local Room, remote Firebase), di/
+├── update/      Actualización forzada (Remote Config + In-App Updates)
+├── notification/, analytics/, config/, ui/theme/
+```
+
+- Inyección de dependencias con **Hilt** (`data/di/DataModule.kt`).
+- Flujo: `Screen` → `ViewModel` → `UseCase` → `Repository` (interfaz en `domain`, implementación en `data`).
+
+### Stack
+
+| Área | Librerías |
+|---|---|
+| UI | Jetpack Compose (BOM), Navigation Compose, Coil 3, Lottie, Accompanist SystemUiController |
+| DI | Hilt |
+| Red | Retrofit + Gson, OkHttp |
+| Persistencia | Room, DataStore Preferences |
+| Firebase | Auth (anónima), Firestore, Remote Config, Crashlytics, Analytics, Cloud Messaging |
+| Google Play | In-App Updates |
+| Tests | JUnit, MockK, kotlinx-coroutines-test, Espresso |
+
+---
+
+## Compilar y ejecutar
+
+**Requisito: JDK 17.** Gradle 8.13 falla con JDK 25 (error que solo muestra `25.0.1`).
+Usar el JBR de Android Studio:
+
+```bash
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+```
+
+### Flavors y build types
+
+| Flavor | `applicationIdSuffix` | `BASE_URL` |
+|---|---|---|
+| `prod` | — | `https://thesimpsonsapi.com/api/` |
+| `dev` | `.dev` | `https://thesimpsonsapi.com/api/` |
+
+Build types: `debug` (sufijo `.debug`) y `release` (sufijo `.release`, minify activado).
+Ejemplo: `devDebug` → `com.mobilitydevai.sce.dev.debug`.
+
+```bash
+./gradlew :app:installDevDebug          # instalar en el dispositivo/emulador
+./gradlew :app:compileDevDebugKotlin    # solo compilar
+./gradlew :app:testDevDebugUnitTest     # tests unitarios
+```
+
+Notificaciones push: ver [`FCM_DEBUG_GUIDE.md`](FCM_DEBUG_GUIDE.md).
+
+---
+
+## Pendientes y problemas conocidos
+
+- [ ] **Desplegar las reglas de Firestore** (`firebase deploy --only firestore:rules`). Las reglas de
+      producción caducaron el 2025-12-20: hasta desplegar, Firestore deniega todas las peticiones de la app.
+- [ ] **Habilitar el proveedor Anónimo** en Firebase Authentication (necesario para los likes).
+- [ ] Subir `psVersionCode` a **6** para la próxima publicación en Play.
+- [ ] El build type `release` usa `applicationIdSuffix = ".release"`, que no está registrado en
+      `google-services.json`: `assembleProdRelease` falla, y Play lo trataría como otra app.
+- [ ] `LocationsViewModelTest` no compila (constructor y campos antiguos); revisar también
+      `SimpsonsViewModelTest` tras `loadNextPage`.
+- [ ] Borrar las colecciones antiguas de Firestore (`images-sce`, `images-vote`).
+- [ ] `EpisodesEntity` y `EpisodesResponse.toDomain()` ya no se usan.
+- [ ] Verificar en el emulador las donas del final del carrusel de personajes (después de la última página).
 
 ---
 
