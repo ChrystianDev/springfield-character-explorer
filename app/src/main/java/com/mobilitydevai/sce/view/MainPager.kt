@@ -43,8 +43,8 @@ fun MainPager(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxSize()
-            .safeDrawingPadding()
             .background(MaterialTheme.colorScheme.background)
+            .safeDrawingPadding()
     ) {
         HorizontalPager(
             modifier = Modifier.weight(1f),
