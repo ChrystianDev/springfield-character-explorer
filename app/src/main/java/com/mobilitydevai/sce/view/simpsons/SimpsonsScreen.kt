@@ -4,7 +4,13 @@
 package com.mobilitydevai.sce.view.simpsons
 
 import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,9 +37,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -59,6 +66,13 @@ import com.mobilitydevai.sce.view.core.components.CustomItemHomerLoading
 import com.mobilitydevai.sce.view.core.components.SpaceV10
 import com.mobilitydevai.sce.view.core.components.TitleMainImage
 import com.mobilitydevai.sce.view.core.components.rememberTextToSpeech
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
+import kotlin.math.abs
+
+/** Fixed carousel item width, needed to center items (snap + side padding). */
+private val CAROUSEL_ITEM_WIDTH = 90.dp
 
 @Composable
 fun SimpsonsScreen(
@@ -74,7 +88,6 @@ fun SimpsonsScreen(
     val isLoading by simpsonsViewModel.isLoading.collectAsStateWithLifecycle()
 
     var isDarkThemeMode by remember { mutableStateOf(darkThemeParam) }
-    var lastVisibleItem by remember { mutableIntStateOf(0) }
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val analyticsManager = remember {
@@ -83,17 +96,30 @@ fun SimpsonsScreen(
 
     val listState = rememberLazyListState()
     val tts = rememberTextToSpeech()
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size
-        }.collect { visibleItems ->
-            if (visibleItems > 3) {
-                lastVisibleItem = visibleItems - 3
-                simpsonsViewModel.setIndexSelected(index = lastVisibleItem)
-                simpsonsViewModel.stopSpeak(tts = tts)
-            }
+    // Carousel item closest to the center of the carousel (-1 if there are no items)
+    val centeredIndex by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val viewportCenter = (layoutInfo.viewportStartOffset + layoutInfo.viewportEndOffset) / 2
+            layoutInfo.visibleItemsInfo
+                .minByOrNull { abs(it.offset + it.size / 2 - viewportCenter) }
+                ?.index ?: -1
         }
+    }
+
+    // The selected character is the centered one, updated once the scroll stops
+    LaunchedEffect(listState) {
+        snapshotFlow { if (listState.isScrollInProgress) -1 else centeredIndex }
+            .filter { it >= 0 }
+            .distinctUntilChanged()
+            .collect { index ->
+                if (index != simpsonsViewModel.indexSelected.value) {
+                    simpsonsViewModel.setIndexSelected(index)
+                    simpsonsViewModel.stopSpeak(tts = tts)
+                }
+            }
     }
 
     Column(
@@ -144,36 +170,59 @@ fun SimpsonsScreen(
                     )
                 }
                 SpaceV10()
-                Box(
+                BoxWithConstraints(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.primary.copy(0.1f))
                         .padding(vertical = 5.dp)
                 ) {
+                    // Side padding so the first and last items can also be centered
+                    val sidePadding = ((maxWidth - CAROUSEL_ITEM_WIDTH) / 2).coerceAtLeast(0.dp)
                     LazyRow(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier,
                         state = listState,
+                        contentPadding = PaddingValues(horizontal = sidePadding),
+                        // When the scroll stops, an item always ends up centered
+                        flingBehavior = rememberSnapFlingBehavior(
+                            lazyListState = listState,
+                            snapPosition = SnapPosition.Center
+                        ),
                     ) {
                         if (isLoading) {
                             items(10) { index ->
-                                CustomItemHomerLoading(indexSelected = index == indexSelected)
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.width(CAROUSEL_ITEM_WIDTH)
+                                ) {
+                                    CustomItemHomerLoading(indexSelected = index == centeredIndex)
+                                }
                             }
                         } else {
                             items(uiState.entity.results.size) { index ->
+                                // Only the centered item grows
+                                val isCentered = index == centeredIndex
+                                val itemHeight by animateDpAsState(
+                                    targetValue = if (isCentered) 100.dp else 90.dp,
+                                    label = "carouselItemHeight"
+                                )
+                                val itemScale by animateFloatAsState(
+                                    targetValue = if (isCentered) 1.5f else 1f,
+                                    label = "carouselItemScale"
+                                )
                                 AsyncImage(
                                     modifier = Modifier
+                                        .width(CAROUSEL_ITEM_WIDTH)
                                         .clip(shape = shapes.large)
                                         .padding(horizontal = 5.dp)
                                         .background(MaterialTheme.colorScheme.background)
-                                        .height(if (index == indexSelected) 100.dp else 90.dp)
+                                        .height(itemHeight)
                                         .padding(vertical = 10.dp, horizontal = 5.dp)
-                                        .scale(
-                                            scaleX = if (index == indexSelected) 1.5f else 1f,
-                                            scaleY = if (index == indexSelected) 1.5f else 1f
-                                        )
+                                        .scale(itemScale)
                                         .clickable(onClick = {
+                                            // Bring the tapped item to the center
+                                            scope.launch { listState.animateScrollToItem(index) }
                                             simpsonsViewModel.setIndexSelected(index)
                                             simpsonsViewModel.speakItemCharacters(index, tts)
                                         }),
