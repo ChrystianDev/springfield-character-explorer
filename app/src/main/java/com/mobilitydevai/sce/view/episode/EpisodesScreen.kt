@@ -111,7 +111,39 @@ fun EpisodesScreen(
         chaptersListState.scrollToItem(0)
     }
 
-    val itemStridePx = with(LocalDensity.current) { (cardWidth + cardSpacing).toPx() }
+    // Keep the selected chapter visible when the carousel changes it (e.g. manual swipe):
+    // scroll the chapters row only as much as needed to show the whole chip
+    LaunchedEffect(selectedEpisodeIndex) {
+        val info = chaptersListState.layoutInfo
+        val visibleItems = info.visibleItemsInfo
+        if (visibleItems.isEmpty()) return@LaunchedEffect
+        // Item offsets are relative to the content start (after the start padding)
+        val contentStart = 0
+        val contentEnd = info.viewportEndOffset - info.afterContentPadding
+        val item = visibleItems.firstOrNull { it.index == selectedEpisodeIndex }
+        when {
+            item == null && selectedEpisodeIndex < visibleItems.first().index ->
+                chaptersListState.animateScrollToItem(selectedEpisodeIndex)
+
+            item == null -> {
+                // Off-screen to the right: bring it in as the last visible chip
+                val fullyVisibleCount = visibleItems.count {
+                    it.offset >= contentStart && it.offset + it.size <= contentEnd
+                }.coerceAtLeast(1)
+                chaptersListState.animateScrollToItem(
+                    (selectedEpisodeIndex - fullyVisibleCount + 1).coerceAtLeast(0)
+                )
+            }
+
+            item.offset < contentStart ->
+                chaptersListState.animateScrollBy((item.offset - contentStart).toFloat())
+
+            item.offset + item.size > contentEnd ->
+                chaptersListState.animateScrollBy((item.offset + item.size - contentEnd).toFloat())
+        }
+    }
+
+    val itemStridePx =with(LocalDensity.current) { (cardWidth + cardSpacing).toPx() }
 
     // Visible slide through every card between the current one and [index]
     // (animateScrollToItem is too fast to notice). All cards share the same width.
@@ -176,6 +208,7 @@ fun EpisodesScreen(
                         EpisodeCard(
                             imageUrl = "${Constants.BASE_URL_IMAGE_LARGE}${episodes[index].image_path}",
                             synopsis = episodes[index].synopsis,
+                            chapter = index + 1,
                             season = episodes[index].season,
                             airdate = episodes[index].airdate,
                             isSelected = index == selectedEpisodeIndex,
@@ -261,6 +294,7 @@ fun OutlinedLabel(
 fun EpisodeCard(
     imageUrl: String,
     synopsis: String,
+    chapter: Int,
     season: Int,
     airdate: String,
     isSelected: Boolean,
@@ -316,7 +350,7 @@ fun EpisodeCard(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
-                    text = "Season $season",
+                    text = "Chapter $chapter / Season $season",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
