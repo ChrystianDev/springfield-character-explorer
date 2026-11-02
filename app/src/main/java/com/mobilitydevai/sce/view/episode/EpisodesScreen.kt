@@ -3,7 +3,10 @@
  */
 package com.mobilitydevai.sce.view.episode
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -29,14 +32,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,7 +55,6 @@ import com.mobilitydevai.sce.ui.theme.DarkBackground
 import com.mobilitydevai.sce.ui.theme.YellowDarkDev
 import com.mobilitydevai.sce.ui.theme.shapes
 import com.mobilitydevai.sce.view.core.components.CustomHomerLoading
-import com.mobilitydevai.sce.view.core.components.CustomLoadingStyleIOS
 import com.mobilitydevai.sce.view.core.components.SpaceV10
 import com.mobilitydevai.sce.view.core.components.SpaceV20
 import com.mobilitydevai.sce.view.core.components.SpaceVAny
@@ -65,7 +69,13 @@ fun EpisodesScreen(
     val isLoading by episodesViewModel.isLoading.collectAsStateWithLifecycle()
     val selectedEpisodeIndex by episodesViewModel.selectedEpisodeIndex.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val chaptersListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val episodes = uiState.episodes
+
+    // True while the carousel is animated from code (chapter tap), so the
+    // centered-item sync doesn't overwrite the selected chapter mid-animation
+    var isProgrammaticScroll by remember { mutableStateOf(false) }
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -90,17 +100,34 @@ fun EpisodesScreen(
     }
 
     LaunchedEffect(centeredItemIndex) {
-        if (centeredItemIndex < uiState.entity.results.size) {
+        if (!isProgrammaticScroll && centeredItemIndex < episodes.size) {
             episodesViewModel.setSelectedEpisodeIndex(centeredItemIndex)
         }
     }
 
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            listState.canScrollForward
-        }.collect { canScrollForward ->
-            if (!canScrollForward && uiState.entity.results.isNotEmpty() && !isLoading) {
-                episodesViewModel.loadNextPage()
+    // New season: carousel and chapters start again at the first item
+    LaunchedEffect(uiState.selectedSeason) {
+        listState.scrollToItem(0)
+        chaptersListState.scrollToItem(0)
+    }
+
+    val itemStridePx = with(LocalDensity.current) { (cardWidth + cardSpacing).toPx() }
+
+    // Visible slide through every card between the current one and [index]
+    // (animateScrollToItem is too fast to notice). All cards share the same width.
+    fun scrollCarouselTo(index: Int) {
+        episodesViewModel.setSelectedEpisodeIndex(index)
+        scope.launch {
+            isProgrammaticScroll = true
+            try {
+                val currentPx = listState.firstVisibleItemIndex * itemStridePx +
+                        listState.firstVisibleItemScrollOffset
+                val distancePx = index * itemStridePx - currentPx
+                val items = kotlin.math.abs(distancePx / itemStridePx)
+                val duration = (300 + items * 120).toInt().coerceAtMost(1500)
+                listState.animateScrollBy(distancePx, tween(duration, easing = FastOutSlowInEasing))
+            } finally {
+                isProgrammaticScroll = false
             }
         }
     }
@@ -113,13 +140,13 @@ fun EpisodesScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
-        if (uiState.entity.results.isEmpty() && isLoading) {
+        if (episodes.isEmpty() && isLoading) {
             CustomHomerLoading()
         } else {
             // Episode Name at the top (dynamic content)
             Text(
-                text = if (uiState.entity.results.isNotEmpty() && selectedEpisodeIndex < uiState.entity.results.size) {
-                    uiState.entity.results[selectedEpisodeIndex].name
+                text = if (!uiState.isSeasonLoading && selectedEpisodeIndex < episodes.size) {
+                    episodes[selectedEpisodeIndex].name
                 } else {
                     "Episodes"
                 },
@@ -135,34 +162,33 @@ fun EpisodesScreen(
             )
             SpaceVAny(50.dp)
 
-            // LazyRow for episodes
-            LazyRow(
-                verticalAlignment = Alignment.CenterVertically,
-                state = listState,
-                horizontalArrangement = Arrangement.spacedBy(cardSpacing),
-                contentPadding = PaddingValues(horizontal = sidePadding),
-                flingBehavior = snapFlingBehavior,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(uiState.entity.results.size) { index ->
-                    EpisodeCard(
-                        imageUrl = "${Constants.BASE_URL_IMAGE_LARGE}${uiState.entity.results[index].image_path}",
-                        synopsis = uiState.entity.results[index].synopsis,
-                        season = uiState.entity.results[index].season,
-                        airdate = uiState.entity.results[index].airdate,
-                        isSelected = index == selectedEpisodeIndex,
-                        onClick = {
-                            episodesViewModel.setSelectedEpisodeIndex(index)
-                            scope.launch {
-                                listState.animateScrollToItem(index)
-                            }
-                        }
-                    )
-                }
-                if (isLoading)
-                    item {
-                        CustomLoadingStyleIOS(padding = 30.dp)
+            Box {
+                // LazyRow for the episodes of the selected season
+                LazyRow(
+                    verticalAlignment = Alignment.CenterVertically,
+                    state = listState,
+                    horizontalArrangement = Arrangement.spacedBy(cardSpacing),
+                    contentPadding = PaddingValues(horizontal = sidePadding),
+                    flingBehavior = snapFlingBehavior,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(episodes.size, key = { episodes[it].id }) { index ->
+                        EpisodeCard(
+                            imageUrl = "${Constants.BASE_URL_IMAGE_LARGE}${episodes[index].image_path}",
+                            synopsis = episodes[index].synopsis,
+                            season = episodes[index].season,
+                            airdate = episodes[index].airdate,
+                            isSelected = index == selectedEpisodeIndex,
+                            onClick = { scrollCarouselTo(index) }
+                        )
                     }
+                }
+                // Season switch in progress: the app's loading covers the carousel
+                if (uiState.isSeasonLoading) {
+                    Box(modifier = Modifier.matchParentSize()) {
+                        CustomHomerLoading()
+                    }
+                }
             }
 
             if (uiState.seasons.isNotEmpty()) {
@@ -184,16 +210,18 @@ fun EpisodesScreen(
                 SpaceV10()
                 // Chapters of the selected season
                 LazyRow(
+                    state = chaptersListState,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(horizontal = 8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(uiState.selectedSeasonEpisodeCount) { index ->
-                        val chapter = index + 1
+                    items(episodes.size) { index ->
                         OutlinedLabel(
-                            text = "Chapter %02d".format(chapter),
-                            isSelected = chapter == uiState.selectedChapter,
-                            onClick = { episodesViewModel.setSelectedChapter(chapter) }
+                            text = "Chapter %02d".format(index + 1),
+                            isSelected = !uiState.isSeasonLoading && index == selectedEpisodeIndex,
+                            onClick = {
+                                if (!uiState.isSeasonLoading) scrollCarouselTo(index)
+                            }
                         )
                     }
                 }

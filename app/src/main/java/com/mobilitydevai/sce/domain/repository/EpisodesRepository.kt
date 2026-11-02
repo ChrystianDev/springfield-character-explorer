@@ -11,7 +11,7 @@ interface EpisodesRepository {
 
     /**
      * The API has no seasons endpoint, so all episode pages are fetched
-     * and grouped by season. Returns null if any page fails.
+     * and grouped by season (with their episodes). Returns null if any page fails.
      */
     suspend fun fetchSeasons(): List<SeasonEntity>?
 }

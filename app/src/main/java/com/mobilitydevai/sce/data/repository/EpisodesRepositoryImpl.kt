@@ -41,9 +41,11 @@ class EpisodesRepositoryImpl @Inject constructor(
 
             (listOf(firstPage) + otherPages.filterNotNull())
                 .flatMap { it.results }
-                .groupingBy { it.season }
-                .eachCount()
-                .map { (season, count) -> SeasonEntity(number = season, episodeCount = count) }
+                .map { it.toDomain() }
+                .groupBy { it.season }
+                .map { (season, episodes) ->
+                    SeasonEntity(number = season, episodes = episodes.sortedBy { it.episode_number })
+                }
                 .sortedBy { it.number }
         } catch (e: Exception) {
             Log.e("fetchSeasons", e.message.toString())
