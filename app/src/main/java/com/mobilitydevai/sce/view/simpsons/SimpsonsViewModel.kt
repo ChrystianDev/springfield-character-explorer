@@ -51,6 +51,10 @@ class SimpsonsViewModel @Inject constructor(
 
     var isLoading = MutableStateFlow(false)
 
+    /** Loading the next page at the end of the carousel (the list stays visible). */
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore
+
     private val _page = MutableStateFlow("1")
 
     val page: StateFlow<String> = _page
@@ -71,6 +75,32 @@ class SimpsonsViewModel @Inject constructor(
                 } ?: state
             }
             toggleLoading()
+        }
+    }
+
+    /**
+     * Appends the next page to the current list (continuous carousel).
+     * Does nothing if a page is already loading or there are no more pages.
+     */
+    fun loadNextPage() {
+        if (_isLoadingMore.value || isLoading.value) return
+        if (_uiState.value.entity.next.isEmpty()) return
+        val nextPage = (_page.value.toIntOrNull() ?: return) + 1
+
+        _isLoadingMore.value = true
+        viewModelScope.launch(dispatcher) {
+            try {
+                val response = simpsonsUsecase(page = nextPage.toString())
+                if (response != null) {
+                    _page.value = nextPage.toString()
+                    _uiState.update { state ->
+                        state.copy(entity = response.copy(results = state.entity.results + response.results))
+                    }
+                    analyticsManager.logPageView(nextPage, "characters")
+                }
+            } finally {
+                _isLoadingMore.value = false
+            }
         }
     }
 

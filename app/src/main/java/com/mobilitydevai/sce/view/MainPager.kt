@@ -3,6 +3,7 @@
  */
 package com.mobilitydevai.sce.view
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,13 +39,22 @@ fun MainPager(
     val pageState = rememberPagerState { 4 }
     val options = remember {listOf(0, 1, 2, 3)}
     val scope = rememberCoroutineScope()
+
+    // Root screen: back (button or gesture) never closes the app.
+    // On another tab it returns to the first one; on the first tab it does nothing.
+    BackHandler(enabled = true) {
+        if (pageState.currentPage != 0) {
+            scope.launch { pageState.animateScrollToPage(0) }
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxSize()
-            .safeDrawingPadding()
             .background(MaterialTheme.colorScheme.background)
+            .safeDrawingPadding()
     ) {
         HorizontalPager(
             modifier = Modifier.weight(1f),

@@ -5,10 +5,12 @@ package com.mobilitydevai.sce.view.episode
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mobilitydevai.sce.domain.entity.EpisodesEntity
-import com.mobilitydevai.sce.domain.usecase.EpisodesUsecase
+import com.mobilitydevai.sce.domain.entity.EpisodeEntity
+import com.mobilitydevai.sce.domain.entity.SeasonEntity
+import com.mobilitydevai.sce.domain.usecase.SeasonsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,13 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EpisodesViewModel @Inject constructor(
-    private val episodesUsecase: EpisodesUsecase,
+    private val seasonsUsecase: SeasonsUsecase,
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
-
-    init {
-        fetchEpisodes()
-    }
 
     private val _uiState = MutableStateFlow(EpisodesUiState())
     val uiState: StateFlow<EpisodesUiState> = _uiState
@@ -32,31 +30,47 @@ class EpisodesViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _currentPage = MutableStateFlow(1)
-    val currentPage: StateFlow<Int> = _currentPage
-
+    /** Index in the carousel of the selected season; chapter number = index + 1 */
     private val _selectedEpisodeIndex = MutableStateFlow(0)
     val selectedEpisodeIndex: StateFlow<Int> = _selectedEpisodeIndex
 
-    fun fetchEpisodes() {
+    private var seasonJob: Job? = null
+
+    init {
+        fetchSeasons()
+    }
+
+    fun fetchSeasons() {
         viewModelScope.launch(dispatcher) {
-            delay(100)
-            toggleLoading()
-            delay(1000)
-            val response = episodesUsecase(page = _currentPage.value)
-            _uiState.update { state ->
-                response?.let { entity ->
-                    state.copy(entity = entity)
-                } ?: state
+            _isLoading.value = true
+            val seasons = seasonsUsecase()
+            if (seasons != null) {
+                _uiState.update { state ->
+                    state.copy(
+                        seasons = seasons,
+                        selectedSeason = seasons.firstOrNull()?.number ?: 0
+                    )
+                }
+                _selectedEpisodeIndex.value = 0
             }
-            toggleLoading()
+            _isLoading.value = false
         }
     }
 
-    fun loadNextPage() {
-        if (_uiState.value.entity.next.isNotEmpty() && !_isLoading.value) {
-            _currentPage.value += 1
-            fetchEpisodes()
+    /**
+     * Shows the loading while the carousel is switched to the episodes of [season],
+     * starting at its first chapter.
+     */
+    fun setSelectedSeason(season: Int) {
+        if (season == _uiState.value.selectedSeason) return
+        seasonJob?.cancel()
+        seasonJob = viewModelScope.launch(dispatcher) {
+            _uiState.update { it.copy(isSeasonLoading = true) }
+            _uiState.update { it.copy(selectedSeason = season) }
+            _selectedEpisodeIndex.value = 0
+            // Episodes are already in memory; keep the loading visible long enough to be noticed
+            delay(SEASON_LOADING_MILLIS)
+            _uiState.update { it.copy(isSeasonLoading = false) }
         }
     }
 
@@ -64,11 +78,17 @@ class EpisodesViewModel @Inject constructor(
         _selectedEpisodeIndex.value = index
     }
 
-    private fun toggleLoading() {
-        _isLoading.value = !_isLoading.value
+    private companion object {
+        const val SEASON_LOADING_MILLIS = 600L
     }
 }
 
 data class EpisodesUiState(
-    val entity: EpisodesEntity = EpisodesEntity()
-)
+    val seasons: List<SeasonEntity> = emptyList(),
+    val selectedSeason: Int = 0,
+    val isSeasonLoading: Boolean = false
+) {
+    /** Episodes shown in the carousel: the ones of [selectedSeason] */
+    val episodes: List<EpisodeEntity>
+        get() = seasons.firstOrNull { it.number == selectedSeason }?.episodes.orEmpty()
+}
