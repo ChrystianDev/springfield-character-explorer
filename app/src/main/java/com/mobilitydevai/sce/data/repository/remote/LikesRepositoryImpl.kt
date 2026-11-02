@@ -20,7 +20,8 @@ import javax.inject.Inject
 
 /**
  * Firestore model: a single document `likes/locations` with one counter per image,
- * e.g. { "img001": 12, "img017": 3 }.
+ * e.g. { "img001": 12, "img017": 3, "lastImageId": "img017" }.
+ * `lastImageId` tells the Firestore rules which counter a write changes (see firestore.rules).
  * - Read all counters: 1 read.
  * - Like / unlike: 1 write (atomic FieldValue.increment, no previous read).
  *
@@ -34,6 +35,7 @@ class LikesRepositoryImpl @Inject constructor(
     companion object {
         private const val LIKES_COLLECTION = "likes"
         private const val LOCATIONS_DOCUMENT = "locations"
+        private const val FIELD_LAST_IMAGE_ID = "lastImageId"
         private val LIKED_IDS_KEY = stringSetPreferencesKey("liked_location_ids")
     }
 
@@ -47,6 +49,7 @@ class LikesRepositoryImpl @Inject constructor(
         return try {
             val snapshot = likesDocument.get().await()
             val counts = snapshot.data.orEmpty()
+                .filterKeys { it != FIELD_LAST_IMAGE_ID }
                 .mapValues { (_, value) -> (value as? Number)?.toLong() ?: 0L }
             Result.success(counts)
         } catch (e: CancellationException) {
@@ -66,7 +69,10 @@ class LikesRepositoryImpl @Inject constructor(
         return try {
             likesDocument
                 .set(
-                    mapOf(imageId to FieldValue.increment(if (nowLiked) 1L else -1L)),
+                    mapOf(
+                        imageId to FieldValue.increment(if (nowLiked) 1L else -1L),
+                        FIELD_LAST_IMAGE_ID to imageId
+                    ),
                     SetOptions.merge()
                 )
                 .await()
