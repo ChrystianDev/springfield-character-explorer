@@ -25,7 +25,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -76,6 +81,57 @@ private val CAROUSEL_ITEM_WIDTH = 90.dp
 
 /** Load the next page when the last visible item is this close to the end of the list. */
 private const val LOAD_MORE_THRESHOLD = 3
+
+private val CAROUSEL_DONUT_SIZE = 60.dp
+private const val CAROUSEL_DONUT_ALPHA = 0.5f
+
+/**
+ * Draws donuts (not clickable, not list items) in the empty side space of the carousel:
+ * before the first item and, if [showTrailing], after the last one.
+ * Positions are read from [listState] at draw time, so they scroll with the carousel.
+ */
+private fun Modifier.carouselEdgeDonuts(
+    listState: LazyListState,
+    painter: Painter,
+    showTrailing: Boolean,
+): Modifier = drawBehind {
+    val layoutInfo = listState.layoutInfo
+    val visibleItems = layoutInfo.visibleItemsInfo
+    if (visibleItems.isEmpty()) return@drawBehind
+
+    val cellWidth = CAROUSEL_ITEM_WIDTH.toPx()
+    val donutWidth = CAROUSEL_DONUT_SIZE.toPx()
+    val intrinsic = painter.intrinsicSize
+    val donutHeight = if (intrinsic.width > 0f) donutWidth * intrinsic.height / intrinsic.width else donutWidth
+    val top = (size.height - donutHeight) / 2
+
+    // Item offsets are relative to the content start; convert to container coordinates
+    fun containerX(offset: Int) = (offset - layoutInfo.viewportStartOffset).toFloat()
+
+    fun drawDonut(cellStart: Float) {
+        translate(left = cellStart + (cellWidth - donutWidth) / 2, top = top) {
+            with(painter) { draw(Size(donutWidth, donutHeight), alpha = CAROUSEL_DONUT_ALPHA) }
+        }
+    }
+
+    val first = visibleItems.first()
+    if (first.index == 0) {
+        var cellStart = containerX(first.offset) - cellWidth
+        while (cellStart + cellWidth > 0f) {
+            drawDonut(cellStart)
+            cellStart -= cellWidth
+        }
+    }
+
+    val last = visibleItems.last()
+    if (showTrailing && last.index == layoutInfo.totalItemsCount - 1) {
+        var cellStart = containerX(last.offset + last.size)
+        while (cellStart < size.width) {
+            drawDonut(cellStart)
+            cellStart += cellWidth
+        }
+    }
+}
 
 @Composable
 fun SimpsonsScreen(
@@ -194,10 +250,18 @@ fun SimpsonsScreen(
                         .padding(vertical = 5.dp)
                 ) {
                     // Side padding so the first and last items can also be centered
+                    val donutPainter = painterResource(R.drawable.simpsons_donut)
                     val sidePadding = ((maxWidth - CAROUSEL_ITEM_WIDTH) / 2).coerceAtLeast(0.dp)
                     LazyRow(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier,
+                        // Decorative donuts in the empty space before the first character
+                        // and after the last one (only when there are no more pages)
+                        modifier = Modifier.carouselEdgeDonuts(
+                            listState = listState,
+                            painter = donutPainter,
+                            showTrailing = !isLoading && !isLoadingMore &&
+                                uiState.entity.next.isEmpty(),
+                        ),
                         state = listState,
                         contentPadding = PaddingValues(horizontal = sidePadding),
                         // When the scroll stops, an item always ends up centered
