@@ -4,9 +4,11 @@
 package com.mobilitydevai.sce.view.episode
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,6 +34,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
@@ -42,9 +46,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.mobilitydevai.sce.config.Constants
+import com.mobilitydevai.sce.ui.theme.DarkBackground
+import com.mobilitydevai.sce.ui.theme.YellowDarkDev
 import com.mobilitydevai.sce.ui.theme.shapes
 import com.mobilitydevai.sce.view.core.components.CustomHomerLoading
 import com.mobilitydevai.sce.view.core.components.CustomLoadingStyleIOS
+import com.mobilitydevai.sce.view.core.components.SpaceV10
 import com.mobilitydevai.sce.view.core.components.SpaceV20
 import com.mobilitydevai.sce.view.core.components.SpaceVAny
 import kotlinx.coroutines.launch
@@ -157,7 +164,68 @@ fun EpisodesScreen(
                         CustomLoadingStyleIOS(padding = 30.dp)
                     }
             }
+
+            if (uiState.seasons.isNotEmpty()) {
+                SpaceV20()
+                // Seasons
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(uiState.seasons, key = { it.number }) { season ->
+                        OutlinedLabel(
+                            text = "Season %02d".format(season.number),
+                            isSelected = season.number == uiState.selectedSeason,
+                            onClick = { episodesViewModel.setSelectedSeason(season.number) }
+                        )
+                    }
+                }
+                SpaceV10()
+                // Chapters of the selected season
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(uiState.selectedSeasonEpisodeCount) { index ->
+                        val chapter = index + 1
+                        OutlinedLabel(
+                            text = "Chapter %02d".format(chapter),
+                            isSelected = chapter == uiState.selectedChapter,
+                            onClick = { episodesViewModel.setSelectedChapter(chapter) }
+                        )
+                    }
+                }
+            }
         }
+    }
+}
+
+@Composable
+fun OutlinedLabel(
+    text: String,
+    isSelected: Boolean = false,
+    onClick: (() -> Unit)? = null
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .clip(shapes.small)
+            .background(if (isSelected) YellowDarkDev else Color.Transparent)
+            .border(
+                width = 1.dp,
+                color = if (isSelected) YellowDarkDev else MaterialTheme.colorScheme.primary,
+                shape = shapes.small
+            )
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (isSelected) DarkBackground else MaterialTheme.colorScheme.primary
+        )
     }
 }
 

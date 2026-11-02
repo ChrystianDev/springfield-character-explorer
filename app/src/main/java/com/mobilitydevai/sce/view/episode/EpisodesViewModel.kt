@@ -6,7 +6,9 @@ package com.mobilitydevai.sce.view.episode
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mobilitydevai.sce.domain.entity.EpisodesEntity
+import com.mobilitydevai.sce.domain.entity.SeasonEntity
 import com.mobilitydevai.sce.domain.usecase.EpisodesUsecase
+import com.mobilitydevai.sce.domain.usecase.SeasonsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -19,12 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class EpisodesViewModel @Inject constructor(
     private val episodesUsecase: EpisodesUsecase,
+    private val seasonsUsecase: SeasonsUsecase,
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
-
-    init {
-        fetchEpisodes()
-    }
 
     private val _uiState = MutableStateFlow(EpisodesUiState())
     val uiState: StateFlow<EpisodesUiState> = _uiState
@@ -37,6 +36,11 @@ class EpisodesViewModel @Inject constructor(
 
     private val _selectedEpisodeIndex = MutableStateFlow(0)
     val selectedEpisodeIndex: StateFlow<Int> = _selectedEpisodeIndex
+
+    init {
+        fetchEpisodes()
+        fetchSeasons()
+    }
 
     fun fetchEpisodes() {
         viewModelScope.launch(dispatcher) {
@@ -51,6 +55,27 @@ class EpisodesViewModel @Inject constructor(
             }
             toggleLoading()
         }
+    }
+
+    private fun fetchSeasons() {
+        viewModelScope.launch(dispatcher) {
+            val seasons = seasonsUsecase() ?: return@launch
+            _uiState.update { state ->
+                state.copy(
+                    seasons = seasons,
+                    selectedSeason = seasons.firstOrNull()?.number ?: 0,
+                    selectedChapter = 1
+                )
+            }
+        }
+    }
+
+    fun setSelectedSeason(season: Int) {
+        _uiState.update { it.copy(selectedSeason = season, selectedChapter = 1) }
+    }
+
+    fun setSelectedChapter(chapter: Int) {
+        _uiState.update { it.copy(selectedChapter = chapter) }
     }
 
     fun loadNextPage() {
@@ -70,5 +95,12 @@ class EpisodesViewModel @Inject constructor(
 }
 
 data class EpisodesUiState(
-    val entity: EpisodesEntity = EpisodesEntity()
-)
+    val entity: EpisodesEntity = EpisodesEntity(),
+    val seasons: List<SeasonEntity> = emptyList(),
+    val selectedSeason: Int = 0,
+    /** 1-based chapter number within [selectedSeason] */
+    val selectedChapter: Int = 0
+) {
+    val selectedSeasonEpisodeCount: Int
+        get() = seasons.firstOrNull { it.number == selectedSeason }?.episodeCount ?: 0
+}
