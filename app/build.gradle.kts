@@ -2,48 +2,163 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
-    namespace = "com.example.simpsonsinfo"
+    /**
+     * IMPORTANTE: versionCode ligado a Firebase Remote Config (actualización forzada).
+     *
+     * Al arrancar, la app compara este valor con el parámetro `min_version_code` de
+     * Remote Config (pestaña "Cliente", NO "Servidor"). Si versionCode < min_version_code,
+     * se muestra una pantalla de bloqueo que obliga a actualizar desde Google Play.
+     * Ver: update/ForceUpdateRepository.kt y update/ForceUpdateViewModel.kt
+     *
+     * Al cambiar este valor (nueva versión, mantenimiento o cualquier otra razón):
+     * - Nunca bajarlo: si queda por debajo de `min_version_code`, la app se bloqueará.
+     * - Subir `min_version_code` en la consola SOLO después de que Play haya distribuido
+     *   la nueva versión; si no, se bloquea a usuarios que aún no pueden actualizar.
+     * - Comprobarlo en Logcat (tag "ForceUpdate"): min_version_code = X, source = REMOTE.
+     */
+    val psVersionCode = 5
+    val psVersionName = "1.1.0"
+    val psVersionNameSuffix = "-demo"
+
+    namespace = "com.mobilitydevai.sce"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.simpsonsinfo"
+        applicationId = "com.mobilitydevai.sce"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = psVersionCode
+        versionName = psVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Specifies one flavor dimension.
+    flavorDimensions += "version"
+    productFlavors {
+        create("prod") {
+            dimension = "version"
+            applicationIdSuffix = ""
+            versionNameSuffix = "$psVersionNameSuffix.prod"
+            versionName = psVersionName
+            buildConfigField(
+                type = "String",
+                name = "BASE_URL",
+                value = "\"https://thesimpsonsapi.com/api/\""
+            )
+        }
+        create("qa") {
+            dimension = "version"
+            applicationIdSuffix = ".qa"
+            versionNameSuffix = "$psVersionNameSuffix.qa"
+            versionName = psVersionName
+            buildConfigField(
+                type = "String",
+                name = "BASE_URL",
+                value = "\"https://qa.thesimpsonsapi.com/api/\""
+            )
+
+        }
+        create("dev") {
+            // Assigns this product flavor to the "version" flavor dimension.
+            // If you are using only one dimension, this property is optional,
+            // and the plugin automatically assigns all the module's flavors to
+            // that dimension.
+            dimension = "version"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = psVersionNameSuffix
+            versionName = psVersionName
+            buildConfigField(
+                type = "String",
+                name = "BASE_URL",
+                value = "\"https://thesimpsonsapi.com/api/\""
+            )
+        }
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+//        getByName("release") {
+            extensions.configure(
+                com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension::class.java
+            ) {
+                mappingFileUploadEnabled = false
+            }
+            applicationIdSuffix = ".release"
+            versionNameSuffix = ""
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+
+        debug {
+//        getByName("debug") {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = ""
+            isDebuggable = true
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
+            manifestPlaceholders["hostName"] = "com.mobilitydevai.sce"
+        }
+
+        /**
+         * The `initWith` property lets you copy configurations from other build types,
+         * then configure only the settings you want to change. This one copies the debug build
+         * type, and then changes the manifest placeholder and application ID.
+         */
+        create("staging") {
+            initWith(getByName("debug"))
+            manifestPlaceholders["hostName"] = "com.mobilitydevai.sce"
+            applicationIdSuffix = ".debugStaging"
+        }
     }
+
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
+
     buildFeatures {
         compose = true
     }
+
 }
 
 dependencies {
+    // Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -51,11 +166,61 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.core.common)
+    implementation(libs.androidx.core.runtime)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.config)
+
+    // Forced updates (Google Play In-App Updates)
+    implementation(libs.play.app.update)
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // DI: Dependencies
+    implementation(libs.google.dagger.hilt.android)
+    implementation(libs.hilt.navigation)
+    ksp(libs.google.dagger.hilt.compiler)
+
+    // API-Rest
+    implementation(libs.squareup.retrofit)
+    implementation(libs.squareup.retrofit.converter.gson)
+    implementation(libs.squareup.okhttp)
+
+    // Media
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.lottie.compose)
+
+    // Local DB
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.datastore.preferences)
+
+    // Theme
+    implementation(libs.accompanist.systemuicontroller)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    // Others
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
+
+apply(from = "jacoco.gradle.kts")

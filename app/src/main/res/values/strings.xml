@@ -1,3 +1,26 @@
 <resources>
-    <string name="app_name">SimpsonsInfo</string>
+    <string name="app_name">Springfield CE</string>
+
+    <!--    Main: English -->
+    <string name="main_more">more</string>
+    <string name="main_get_characters">Get characters</string>
+
+
+    <!--    Character: English -->
+    <string name="character_years">years old</string>
+    <string name="locations_text">"Location: "</string>
+    <string name="favourite_character_added">The character was added to favourites</string>
+    <string name="favourite_character_deleted">The character was deleted from favourites</string>
+    <string name="favourite_subtitle_empty_message">To save favourite characters, click on the favourites icon on the character screen.</string>
+    <string name="favourite_title_empty_message">There are no favourites…</string>
+    <string name="empty_screen_no_results">No results were found. Please try again.</string>
+    <string name="error_exclamation_no_results">opssss</string>
+    <string name="main_loading_text">Loading …</string>
+    <string name="character_details_text">Details</string>
+
+    <!--    Force update: English -->
+    <string name="force_update_title">Update required</string>
+    <string name="force_update_message">A new version of the app is available. Please update to keep using Springfield CE.</string>
+    <string name="force_update_button">Update</string>
+
 </resources>

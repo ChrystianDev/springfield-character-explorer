@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ------------------------------------------------------------------
+    // Likes: single document `likes/locations` with one counter per image
+    //   { "img001": 12, "img017": 3, ..., "lastImageId": "img017" }
+    // Each write changes ONE counter with FieldValue.increment(+1 / -1) and sets
+    // `lastImageId` to that counter's key so the rules can validate it
+    // (see LikesRepositoryImpl). Requires a Firebase session (anonymous auth).
+    // ------------------------------------------------------------------
+    match /likes/locations {
+      allow read: if true;
+
+      // First like ever: document created with a single counter = 1
+      allow create: if request.auth != null
+        && isImageId(request.resource.data.get('lastImageId', ''))
+        && request.resource.data.keys().hasOnly([request.resource.data.lastImageId, 'lastImageId'])
+        && request.resource.data[request.resource.data.lastImageId] == 1;
+
+      // Like / unlike: exactly one counter changes, by +1 or -1
+      allow update: if request.auth != null && isSingleCounterStep();
+
+      allow delete: if false;
+    }
+
+    function isImageId(key) {
+      return key is string && key.matches('img[0-9]+');
+    }
+
+    function isSingleCounterStep() {
+      let key = request.resource.data.get('lastImageId', '');
+      let diff = request.resource.data.diff(resource.data);
+      return isImageId(key)
+        && diff.affectedKeys().hasOnly([key, 'lastImageId'])
+        && diff.removedKeys().size() == 0
+        && request.resource.data[key] is int
+        && request.resource.data[key] - resource.data.get(key, 0) in [-1, 1];
+    }
+
+    // Everything else is closed, including the legacy collections
+    // `images-sce`, `images-vote` (old like/unlike model, app <= v5)
+    // and `users` (old Google sign-in, no longer used by the app).
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SimpsonsInfo"
+rootProject.name = "Springfield-CE"
 include(":app")
  

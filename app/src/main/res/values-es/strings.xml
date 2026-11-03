@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Springfield CE</string>
+
+    <!--    Principal: Español -->
+    <string name="main_more">mas</string>
+    <string name="main_get_characters">Recupera personajes</string>
+
+    <!--    Personaje: Español -->
+    <string name="character_years">años</string>
+    <string name="locations_text">"Lugar: "</string>
+    <string name="favourite_character_added">El personaje se añadio a favoritos</string>
+    <string name="favourite_character_deleted">El personaje fue eliminado de favoritos</string>
+    <string name="favourite_subtitle_empty_message">Para guardar personajes favoritos, haz click en el icono favoritos desde la pantalla del personaje</string>
+    <string name="favourite_title_empty_message">No hay favoritos…</string>
+    <string name="empty_screen_no_results">No se obtuvieron resultados. Por favor inténtelo de nuevo</string>
+    <string name="error_exclamation_no_results">opssss</string>
+    <string name="main_loading_text">Cargando …</string>
+    <string name="character_details_text">Detalles</string>
+
+    <!--    Actualización obligatoria: Español -->
+    <string name="force_update_title">Actualización necesaria</string>
+    <string name="force_update_message">Hay una nueva versión de la app disponible. Actualízala para seguir usando Springfield CE.</string>
+    <string name="force_update_button">Actualizar</string>
+
+</resources>
