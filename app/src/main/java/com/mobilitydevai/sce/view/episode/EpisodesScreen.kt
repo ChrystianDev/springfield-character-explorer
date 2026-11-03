@@ -23,7 +23,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,6 +46,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.mobilitydevai.sce.R
 import com.mobilitydevai.sce.config.Constants
 import com.mobilitydevai.sce.ui.theme.DarkBackground
 import com.mobilitydevai.sce.ui.theme.YellowDarkDev
@@ -76,6 +83,9 @@ fun EpisodesScreen(
     // True while the carousel is animated from code (chapter tap), so the
     // centered-item sync doesn't overwrite the selected chapter mid-animation
     var isProgrammaticScroll by remember { mutableStateOf(false) }
+
+    // Index of the episode whose full synopsis is shown in the bottom sheet (null = hidden)
+    var readMoreIndex by remember { mutableStateOf<Int?>(null) }
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -212,7 +222,11 @@ fun EpisodesScreen(
                             season = episodes[index].season,
                             airdate = episodes[index].airdate,
                             isSelected = index == selectedEpisodeIndex,
-                            onClick = { scrollCarouselTo(index) }
+                            onClick = { scrollCarouselTo(index) },
+                            onReadMore = {
+                                scrollCarouselTo(index)
+                                readMoreIndex = index
+                            }
                         )
                     }
                 }
@@ -261,6 +275,61 @@ fun EpisodesScreen(
             }
         }
     }
+
+    // Full synopsis of the episode tapped in "Read more"
+    readMoreIndex?.let { episodes.getOrNull(it) }?.let { episode ->
+        EpisodeSynopsisSheet(
+            title = episode.name,
+            synopsis = episode.synopsis,
+            chapter = readMoreIndex!! + 1,
+            season = episode.season,
+            airdate = episode.airdate,
+            onDismiss = { readMoreIndex = null }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EpisodeSynopsisSheet(
+    title: String,
+    synopsis: String,
+    chapter: Int,
+    season: Int,
+    airdate: String,
+    onDismiss: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            SpaceV10()
+            Text(
+                text = "Chapter $chapter / Season $season  ·  ${airdate.ifEmpty { "N/A" }}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            SpaceV20()
+            Text(
+                text = synopsis,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
 }
 
 @Composable
@@ -298,11 +367,15 @@ fun EpisodeCard(
     season: Int,
     airdate: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onReadMore: () -> Unit
 ) {
+    // True when the synopsis doesn't fit in its 4 lines -> "Read more" is shown
+    var isSynopsisTruncated by remember(synopsis) { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
-            .width(350.dp)
+            .width(370.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(
             defaultElevation = if (isSelected) 8.dp else 4.dp
@@ -338,9 +411,31 @@ fun EpisodeCard(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
                     .padding(top = 8.dp),
-                maxLines = 4,
-                overflow = TextOverflow.Ellipsis
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                onTextLayout = { isSynopsisTruncated = it.hasVisualOverflow }
             )
+            SpaceV10()
+            // Same 20dp as the former spacer, so the card height doesn't change
+            Box(
+                contentAlignment = Alignment.CenterEnd,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(20.dp)
+            ) {
+                if (isSynopsisTruncated) {
+                    Text(
+                        text = stringResource(R.string.episode_read_more),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.W300,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .clip(shapes.small)
+                            .clickable { onReadMore() }
+                            .padding(horizontal = 8.dp)
+                    )
+                }
+            }
             SpaceV20()
             // Season and Airdate
             Row(

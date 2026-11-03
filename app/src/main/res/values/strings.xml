@@ -22,5 +22,6 @@
     <string name="force_update_title">Update required</string>
     <string name="force_update_message">A new version of the app is available. Please update to keep using Springfield CE.</string>
     <string name="force_update_button">Update</string>
+    <string name="episode_read_more">Read more</string>
 
 </resources>
