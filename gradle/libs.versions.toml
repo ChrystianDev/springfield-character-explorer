@@ -77,6 +77,7 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 squareup-retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 squareup-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+squareup-okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 
 # Firebase

@@ -79,6 +79,9 @@ import kotlin.math.abs
 /** Fixed carousel item width, needed to center items (snap + side padding). */
 private val CAROUSEL_ITEM_WIDTH = 90.dp
 
+/** Height of the centered (tallest) carousel item; also the fixed height of the carousel. */
+private val CAROUSEL_ITEM_MAX_HEIGHT = 100.dp
+
 /** Load the next page when the last visible item is this close to the end of the list. */
 private const val LOAD_MORE_THRESHOLD = 3
 
@@ -183,7 +186,12 @@ fun SimpsonsScreen(
 
     // The selected character is the centered one, updated once the scroll stops
     LaunchedEffect(listState) {
-        snapshotFlow { if (listState.isScrollInProgress) -1 else centeredIndex }
+        snapshotFlow {
+            val index = if (listState.isScrollInProgress) -1 else centeredIndex
+            // Ignore the "loading more" placeholder (index == results.size). Reading the
+            // results size here re-emits that index once the page arrives and it's a real item
+            if (index < uiState.entity.results.size) index else -1
+        }
             .filter { it >= 0 }
             .distinctUntilChanged()
             .collect { index ->
@@ -256,12 +264,14 @@ fun SimpsonsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         // Decorative donuts in the empty space before the first character
                         // and after the last one (only when there are no more pages)
-                        modifier = Modifier.carouselEdgeDonuts(
-                            listState = listState,
-                            painter = donutPainter,
-                            showTrailing = !isLoading && !isLoadingMore &&
-                                uiState.entity.next.isEmpty(),
-                        ),
+                        modifier = Modifier
+                            .height(CAROUSEL_ITEM_MAX_HEIGHT)
+                            .carouselEdgeDonuts(
+                                listState = listState,
+                                painter = donutPainter,
+                                showTrailing = !isLoading && !isLoadingMore &&
+                                    uiState.entity.next.isEmpty(),
+                            ),
                         state = listState,
                         contentPadding = PaddingValues(horizontal = sidePadding),
                         // When the scroll stops, an item always ends up centered
@@ -284,7 +294,7 @@ fun SimpsonsScreen(
                                 // Only the centered item grows
                                 val isCentered = index == centeredIndex
                                 val itemHeight by animateDpAsState(
-                                    targetValue = if (isCentered) 100.dp else 90.dp,
+                                    targetValue = if (isCentered) CAROUSEL_ITEM_MAX_HEIGHT else CAROUSEL_ITEM_MAX_HEIGHT - 10.dp,
                                     label = "carouselItemHeight"
                                 )
                                 val itemScale by animateFloatAsState(
@@ -367,7 +377,9 @@ fun SimpsonsScreen(
                     TitleMainImage(stringResource(R.string.main_loading_text))
                 }
             } else {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // Defensive: indexSelected may briefly be out of range (e.g. list reloaded)
+                val selectedCharacter = uiState.entity.results.getOrNull(indexSelected)
+                if (selectedCharacter != null) Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     AsyncImage(
                         modifier = Modifier
                             .size(200.dp)
@@ -380,13 +392,13 @@ fun SimpsonsScreen(
                             .padding(10.dp)
                             .clickable(onClick = {
                                 onNavigationDetail()
-                                simpsonsViewModel.setCharacterSelected(uiState.entity.results[indexSelected])
+                                simpsonsViewModel.setCharacterSelected(selectedCharacter)
                             }),
-                        model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[indexSelected].portrait_path}",
+                        model = "$BASE_URL_IMAGE_LARGE${selectedCharacter.portrait_path}",
                         contentDescription = "image webp"
                     )
                     SpaceV10()
-                    TitleMainImage(uiState.entity.results[indexSelected].name)
+                    TitleMainImage(selectedCharacter.name)
                 }
             }
 
