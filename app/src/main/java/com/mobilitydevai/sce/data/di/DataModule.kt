@@ -4,6 +4,7 @@
 package com.mobilitydevai.sce.data.di
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -27,9 +28,13 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+
+private const val HTTP_LOG_TAG = "okhttp.OkHttpClient"
+private const val HTTP_LOG_CHUNK_SIZE = 3000
 
 private val Context.likesDataStore: DataStore<Preferences> by preferencesDataStore(name = "likes")
 
@@ -46,10 +51,12 @@ object DataModule {
     // ****** PLUGINS or DEPENDENCIES ******
     @Singleton
     @Provides
-    fun provideRetrofit(): Retrofit {
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         val buildConfig = BuildConfig.BASE_URL
         return Retrofit.Builder()
             .baseUrl(buildConfig)
+            // Shared client, so Retrofit calls also go through the logging interceptor
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -63,7 +70,18 @@ object DataModule {
     @Singleton
     @Provides
     fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
+        // HTTP logs (method, URL, status, headers and bodies) only in debug builds.
+        // Logcat filter: tag:okhttp.OkHttpClient
+        val loggingInterceptor = HttpLoggingInterceptor { message ->
+            // Logcat truncates entries at ~4 KB, so long bodies are split into chunks
+            message.chunked(HTTP_LOG_CHUNK_SIZE).forEach { Log.d(HTTP_LOG_TAG, it) }
+        }.apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+            else HttpLoggingInterceptor.Level.NONE
+        }
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
     }
 
     @Singleton
