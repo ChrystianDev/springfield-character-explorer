@@ -143,22 +143,6 @@ Notificaciones push: ver [`FCM_DEBUG_GUIDE.md`](FCM_DEBUG_GUIDE.md).
 
 ---
 
-## Pendientes y problemas conocidos
-
-- [ ] **Desplegar las reglas de Firestore** (`firebase deploy --only firestore:rules`). Las reglas de
-      producción caducaron el 2025-12-20: hasta desplegar, Firestore deniega todas las peticiones de la app.
-- [ ] **Habilitar el proveedor Anónimo** en Firebase Authentication (necesario para los likes).
-- [ ] Subir `psVersionCode` a **6** para la próxima publicación en Play.
-- [ ] El build type `release` usa `applicationIdSuffix = ".release"`, que no está registrado en
-      `google-services.json`: `assembleProdRelease` falla, y Play lo trataría como otra app.
-- [ ] `LocationsViewModelTest` no compila (constructor y campos antiguos); revisar también
-      `SimpsonsViewModelTest` tras `loadNextPage`.
-- [ ] Borrar las colecciones antiguas de Firestore (`images-sce`, `images-vote`).
-- [ ] `EpisodesEntity` y `EpisodesResponse.toDomain()` ya no se usan.
-- [ ] Verificar en el emulador las donas del final del carrusel de personajes (después de la última página).
-
----
-
 ## Firebase
 
 | | |
