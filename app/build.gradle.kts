@@ -194,6 +194,7 @@ dependencies {
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.converter.gson)
     implementation(libs.squareup.okhttp)
+    implementation(libs.squareup.okhttp.logging.interceptor)
 
     // Media
     implementation(libs.coil.compose)
