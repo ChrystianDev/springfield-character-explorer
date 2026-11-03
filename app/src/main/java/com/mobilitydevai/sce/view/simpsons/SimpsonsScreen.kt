@@ -79,6 +79,9 @@ import kotlin.math.abs
 /** Fixed carousel item width, needed to center items (snap + side padding). */
 private val CAROUSEL_ITEM_WIDTH = 90.dp
 
+/** Height of the centered (tallest) carousel item; also the fixed height of the carousel. */
+private val CAROUSEL_ITEM_MAX_HEIGHT = 100.dp
+
 /** Load the next page when the last visible item is this close to the end of the list. */
 private const val LOAD_MORE_THRESHOLD = 3
 
@@ -256,12 +259,16 @@ fun SimpsonsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         // Decorative donuts in the empty space before the first character
                         // and after the last one (only when there are no more pages)
-                        modifier = Modifier.carouselEdgeDonuts(
-                            listState = listState,
-                            painter = donutPainter,
-                            showTrailing = !isLoading && !isLoadingMore &&
-                                uiState.entity.next.isEmpty(),
-                        ),
+                        modifier = Modifier
+                            // Fixed height: otherwise the row follows its tallest visible
+                            // item, which changes while items animate during the scroll
+                            .height(CAROUSEL_ITEM_MAX_HEIGHT)
+                            .carouselEdgeDonuts(
+                                listState = listState,
+                                painter = donutPainter,
+                                showTrailing = !isLoading && !isLoadingMore &&
+                                    uiState.entity.next.isEmpty(),
+                            ),
                         state = listState,
                         contentPadding = PaddingValues(horizontal = sidePadding),
                         // When the scroll stops, an item always ends up centered
@@ -284,7 +291,7 @@ fun SimpsonsScreen(
                                 // Only the centered item grows
                                 val isCentered = index == centeredIndex
                                 val itemHeight by animateDpAsState(
-                                    targetValue = if (isCentered) 100.dp else 90.dp,
+                                    targetValue = if (isCentered) CAROUSEL_ITEM_MAX_HEIGHT else CAROUSEL_ITEM_MAX_HEIGHT - 10.dp,
                                     label = "carouselItemHeight"
                                 )
                                 val itemScale by animateFloatAsState(
