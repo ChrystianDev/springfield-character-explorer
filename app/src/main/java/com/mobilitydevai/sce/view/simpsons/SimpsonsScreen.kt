@@ -186,7 +186,12 @@ fun SimpsonsScreen(
 
     // The selected character is the centered one, updated once the scroll stops
     LaunchedEffect(listState) {
-        snapshotFlow { if (listState.isScrollInProgress) -1 else centeredIndex }
+        snapshotFlow {
+            val index = if (listState.isScrollInProgress) -1 else centeredIndex
+            // Ignore the "loading more" placeholder (index == results.size). Reading the
+            // results size here re-emits that index once the page arrives and it's a real item
+            if (index < uiState.entity.results.size) index else -1
+        }
             .filter { it >= 0 }
             .distinctUntilChanged()
             .collect { index ->
@@ -260,8 +265,6 @@ fun SimpsonsScreen(
                         // Decorative donuts in the empty space before the first character
                         // and after the last one (only when there are no more pages)
                         modifier = Modifier
-                            // Fixed height: otherwise the row follows its tallest visible
-                            // item, which changes while items animate during the scroll
                             .height(CAROUSEL_ITEM_MAX_HEIGHT)
                             .carouselEdgeDonuts(
                                 listState = listState,
@@ -374,7 +377,9 @@ fun SimpsonsScreen(
                     TitleMainImage(stringResource(R.string.main_loading_text))
                 }
             } else {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // Defensive: indexSelected may briefly be out of range (e.g. list reloaded)
+                val selectedCharacter = uiState.entity.results.getOrNull(indexSelected)
+                if (selectedCharacter != null) Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     AsyncImage(
                         modifier = Modifier
                             .size(200.dp)
@@ -387,13 +392,13 @@ fun SimpsonsScreen(
                             .padding(10.dp)
                             .clickable(onClick = {
                                 onNavigationDetail()
-                                simpsonsViewModel.setCharacterSelected(uiState.entity.results[indexSelected])
+                                simpsonsViewModel.setCharacterSelected(selectedCharacter)
                             }),
-                        model = "$BASE_URL_IMAGE_LARGE${uiState.entity.results[indexSelected].portrait_path}",
+                        model = "$BASE_URL_IMAGE_LARGE${selectedCharacter.portrait_path}",
                         contentDescription = "image webp"
                     )
                     SpaceV10()
-                    TitleMainImage(uiState.entity.results[indexSelected].name)
+                    TitleMainImage(selectedCharacter.name)
                 }
             }
 
