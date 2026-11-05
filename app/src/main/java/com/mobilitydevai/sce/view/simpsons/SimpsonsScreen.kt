@@ -3,7 +3,6 @@
  */
 package com.mobilitydevai.sce.view.simpsons
 
-import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -424,9 +423,6 @@ fun SimpsonsScreen(
                         val crashlyticsManager = remember {
                             (context.applicationContext as? com.mobilitydevai.sce.SimpsonsInfoApp)?.crashlyticsManager
                         }
-                        val notificationHelper = remember {
-                            (context.applicationContext as? com.mobilitydevai.sce.SimpsonsInfoApp)?.notificationHelper
-                        }
                         CustomBiographyText("BuildType: ${BuildConfig.BUILD_TYPE}, Flavor: ${BuildConfig.FLAVOR}")
 
                         // Crashlytics Testing
@@ -495,46 +491,6 @@ fun SimpsonsScreen(
                                     text = "Breadcrumbs",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onPrimary
-                                )
-                            }
-                        }
-
-                        // Notifications Testing
-                        SpaceV10()
-                        Text(
-                            text = "Notifications Testing",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                        )
-
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            TextButton(
-                                onClick = {
-                                    notificationHelper?.showTestNotification()
-                                },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = "Test Notification",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-
-                            TextButton(
-                                onClick = {
-                                    val token = notificationHelper?.getToken()
-                                    Log.d("SimpsonsScreen", "FCM Token: $token")
-                                },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = "Show Token",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.secondary
                                 )
                             }
                         }

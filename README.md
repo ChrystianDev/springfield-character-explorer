@@ -94,7 +94,7 @@ com.mobilitydevai.sce
 ├── domain/      entity/, repository/ (interfaces), usecase/
 ├── data/        network/, response/ (DTO + toDomain), repository/ (local Room, remote Firebase), di/
 ├── update/      Actualización forzada (Remote Config + In-App Updates)
-├── notification/, analytics/, config/, ui/theme/
+├── analytics/, config/, ui/theme/
 ```
 
 - Inyección de dependencias con **Hilt** (`data/di/DataModule.kt`).
@@ -108,7 +108,7 @@ com.mobilitydevai.sce
 | DI | Hilt |
 | Red | Retrofit + Gson, OkHttp |
 | Persistencia | Room, DataStore Preferences |
-| Firebase | Auth (anónima), Firestore, Remote Config, Crashlytics, Analytics, Cloud Messaging |
+| Firebase | Auth (anónima), Firestore, Remote Config, Crashlytics, Analytics |
 | Google Play | In-App Updates |
 | Tests | JUnit, MockK, kotlinx-coroutines-test, Espresso |
 
@@ -138,8 +138,6 @@ Ejemplo: `devDebug` → `com.mobilitydevai.sce.dev.debug`.
 ./gradlew :app:compileDevDebugKotlin    # solo compilar
 ./gradlew :app:testDevDebugUnitTest     # tests unitarios
 ```
-
-Notificaciones push: ver [`FCM_DEBUG_GUIDE.md`](FCM_DEBUG_GUIDE.md).
 
 ---
 
