@@ -7,11 +7,13 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -44,13 +47,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -66,6 +68,27 @@ import com.mobilitydevai.sce.view.core.components.SpaceV10
 import com.mobilitydevai.sce.view.core.components.SpaceV20
 import com.mobilitydevai.sce.view.core.components.SpaceVAny
 import kotlinx.coroutines.launch
+
+private val EPISODE_CARD_WIDTH = 370.dp
+
+/** Distance (px) to scroll so the item at [index] ends up centered in the viewport, or null if there's no layout yet. */
+private fun LazyListState.distanceToCenter(index: Int): Float? {
+    val info = layoutInfo
+    val reference = info.visibleItemsInfo.firstOrNull { it.index == index }
+        ?: info.visibleItemsInfo.firstOrNull()
+        ?: return null
+    // Offsets are relative to the content start, same space as viewportStart/EndOffset
+    val viewportCenter = (info.viewportStartOffset + info.viewportEndOffset) / 2f
+    val referenceCenter = reference.offset + reference.size / 2f
+    return referenceCenter - viewportCenter + (index - reference.index) * itemStridePx()
+}
+
+/** Width of one card plus the spacing between cards, measured from the layout. */
+private fun LazyListState.itemStridePx(): Float {
+    val info = layoutInfo
+    val size = info.visibleItemsInfo.firstOrNull()?.size ?: return 0f
+    return (size + info.mainAxisItemSpacing).toFloat()
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -87,11 +110,8 @@ fun EpisodesScreen(
     // Index of the episode whose full synopsis is shown in the bottom sheet (null = hidden)
     var readMoreIndex by remember { mutableStateOf<Int?>(null) }
 
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val cardWidth = 350.dp
+    val cardWidth = EPISODE_CARD_WIDTH
     val cardSpacing = 16.dp
-    val sidePadding = (screenWidth - cardWidth) / 2
 
     val snapFlingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
 
@@ -153,21 +173,24 @@ fun EpisodesScreen(
         }
     }
 
-    val itemStridePx =with(LocalDensity.current) { (cardWidth + cardSpacing).toPx() }
-
-    // Visible slide through every card between the current one and [index]
-    // (animateScrollToItem is too fast to notice). All cards share the same width.
+    // Visible slide through every card between the current one and [index], ending with
+    // the target card centered (animateScrollToItem is too fast to notice and aligns the
+    // item to the start). Distances come from the real layout, so they stay exact whatever
+    // the card width or screen size. All cards share the same width.
     fun scrollCarouselTo(index: Int) {
         episodesViewModel.setSelectedEpisodeIndex(index)
         scope.launch {
             isProgrammaticScroll = true
             try {
-                val currentPx = listState.firstVisibleItemIndex * itemStridePx +
-                        listState.firstVisibleItemScrollOffset
-                val distancePx = index * itemStridePx - currentPx
-                val items = kotlin.math.abs(distancePx / itemStridePx)
+                val distancePx = listState.distanceToCenter(index) ?: return@launch
+                val stridePx = listState.itemStridePx()
+                val items = if (stridePx > 0) kotlin.math.abs(distancePx / stridePx) else 1f
                 val duration = (300 + items * 120).toInt().coerceAtMost(1500)
                 listState.animateScrollBy(distancePx, tween(duration, easing = FastOutSlowInEasing))
+                // Fix any sub-pixel/rounding leftover so the card ends up exactly centered
+                listState.distanceToCenter(index)
+                    ?.takeIf { kotlin.math.abs(it) >= 1f }
+                    ?.let { listState.scrollBy(it) }
             } finally {
                 isProgrammaticScroll = false
             }
@@ -204,7 +227,9 @@ fun EpisodesScreen(
             )
             SpaceVAny(50.dp)
 
-            Box {
+            BoxWithConstraints {
+                // Side padding from the real carousel width, so the first/last card can be centered
+                val sidePadding = ((maxWidth - cardWidth) / 2).coerceAtLeast(0.dp)
                 // LazyRow for the episodes of the selected season
                 LazyRow(
                     verticalAlignment = Alignment.CenterVertically,
@@ -216,6 +241,7 @@ fun EpisodesScreen(
                 ) {
                     items(episodes.size, key = { episodes[it].id }) { index ->
                         EpisodeCard(
+                            width = cardWidth,
                             imageUrl = "${Constants.BASE_URL_IMAGE_LARGE}${episodes[index].image_path}",
                             synopsis = episodes[index].synopsis,
                             chapter = index + 1,
@@ -361,6 +387,7 @@ fun OutlinedLabel(
 
 @Composable
 fun EpisodeCard(
+    width: Dp,
     imageUrl: String,
     synopsis: String,
     chapter: Int,
@@ -375,7 +402,7 @@ fun EpisodeCard(
 
     Card(
         modifier = Modifier
-            .width(370.dp)
+            .width(width)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(
             defaultElevation = if (isSelected) 8.dp else 4.dp
